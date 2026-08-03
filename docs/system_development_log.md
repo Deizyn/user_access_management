@@ -145,6 +145,8 @@
   1. **ปรับโทนสีปุ่มเพิ่มเติม**: เปลี่ยนกรอบและพื้นหลังของปุ่ม `+เพิ่มเติม (จำนวน)` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) จากโทนสีม่วงเข้มให้เป็น **โทนสีเทาสว่าง/สีจางนุ่มตา (`bg-slate-100/80 text-slate-600 border-slate-200/90`)** เพื่อไม่ให้ตารางดูลายตา
   2. **เปลี่ยนไอคอน Device Code**: ปรับไอคอนหน้าข้อมูล Device Code ในส่วน Primary Contact Details ของ [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) จากรูปสมาร์ตโฟน (`Smartphone`) ให้เป็น **รูปหน้าจอคอมพิวเตอร์ (`Monitor`)**
   3. **ย้ายตำแหน่ง M365 License**: ย้ายข้อมูลสิทธิ์ Microsoft 365 License จากส่วน System Privileges Summary ขึ้นมาจัดเรียงในส่วน **Primary Contact Details** เพื่อความสะดวกและต่อเนื่องในการดูโปรไฟล์ผู้ใช้
+### 2.25 ปรับโทนสีป้ายสิทธิ์การพิมพ์ (Printer Badge) ให้เป็นสีเทาเบสเรียบเดียวกันทั้งหมด
+- **การปรับปรุง**: ปรับเปลี่ยน Class สีของกลุ่มสิทธิ์การพิมพ์ (Printer Color และ Printer Mono) ใน [specialGroups.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/constants/specialGroups.ts) จากเดิมที่เป็นสีฟ้า/น้ำเงินตัดกัน ให้เป็น **โทนสีเทาสว่างเบสเดียวกันทั้งหมด (`bg-slate-100 text-slate-800 border-slate-200`)** ช่วยให้ตารางข้อมูลพนักงานดูสะอาด สบายตา และไม่ก่อให้เกิดความสับสนหรือตาลายจากการฉูดฉาดของสี
 
 ---
 

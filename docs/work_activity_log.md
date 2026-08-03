@@ -88,6 +88,9 @@
   - ปรับสไตล์ปุ่ม `+เพิ่มเติม` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) เป็นโทนสีเทาสว่าง/จางนุ่มตา (`bg-slate-100/80 text-slate-600 border-slate-200/90`) สบายตา
   - ปรับเปลี่ยนไอคอนของ Device Code ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) เป็นรูปหน้าจอคอมพิวเตอร์ (`Monitor`)
   - ย้ายข้อมูล M365 License ขึ้นมาไว้ในส่วน **Primary Contact Details** ของหน้า User Profile Modal
+- **[LOG-031] Base Gray Tone Uniformity for Printer Badges**:
+  - ปรับเปลี่ยนโทนสีป้าย Printer Color และ Printer Mono ใน [specialGroups.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/constants/specialGroups.ts) ให้เป็นสีเทาเบสเนียนนุ่มเดียวกัน (`bg-slate-100 text-slate-800 border-slate-200`) ไม่ฉูดฉาด ป้องกันอาการตาลาย
+
 
 
 

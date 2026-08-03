@@ -1,24 +1,24 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  X, 
-  Building, 
-  Shield, 
-  Mail, 
-  Globe, 
-  ShieldCheck, 
-  Printer, 
-  Copy, 
-  Check, 
-  IdCard, 
-  AtSign, 
-  Monitor, 
-  Calendar, 
-  Users, 
-  AlertTriangle, 
-  CheckSquare, 
-  Briefcase, 
-  Cloud, 
-  User as UserIcon, 
+import {
+  X,
+  Building,
+  Shield,
+  Mail,
+  Globe,
+  ShieldCheck,
+  Printer,
+  Copy,
+  Check,
+  IdCard,
+  AtSign,
+  Monitor,
+  Calendar,
+  Users,
+  AlertTriangle,
+  CheckSquare,
+  Briefcase,
+  Cloud,
+  User as UserIcon,
   Clock,
   Key
 } from 'lucide-react';
@@ -42,11 +42,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose 
   const derivedProfile = useMemo(() => {
     if (!user) return { printQuota: '', specialPermissions: [], isVpnActive: false };
     const groups = user.groups || [];
-    
+
     // 1. Printer Permissions
     const hasPrinterColor = groups.some(g => g.group_id === 108 || g.group_name.toLowerCase().includes('color') || g.group_name.includes('ปริ้นสี'));
     const hasPrinterMono = groups.some(g => g.group_id === 109 || g.group_name.toLowerCase().includes('mono') || g.group_name.includes('ขาวดำ'));
-    
+
     let printQuota = user.print_quota_group || 'Standard Quota';
     if (hasPrinterColor && hasPrinterMono) {
       printQuota = 'Color & Mono';
@@ -121,17 +121,17 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
   };
 
   return (
-    <div 
+    <div
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
       className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-3 sm:p-6 overflow-y-auto cursor-pointer"
     >
-      <div 
+      <div
         onClick={(e) => e.stopPropagation()}
         className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-6 cursor-default flex flex-col max-h-[92vh] border border-slate-200"
       >
-        
+
         {/* MICROSOFT PROFILE CARD HEADER STYLE */}
         <div className="p-6 pb-2 bg-white relative shrink-0 border-b border-slate-100">
           {/* Close Button */}
@@ -181,22 +181,20 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
           <div className="flex items-center gap-6 mt-6 border-b border-slate-200">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${
-                activeTab === 'overview' 
-                  ? 'text-indigo-600 border-b-2 border-indigo-600 font-bold' 
+              className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${activeTab === 'overview'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 font-bold'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Overview
             </button>
 
             <button
               onClick={() => setActiveTab('groups')}
-              className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${
-                activeTab === 'groups' 
-                  ? 'text-indigo-600 border-b-2 border-indigo-600 font-bold' 
+              className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${activeTab === 'groups'
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 font-bold'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Assigned Groups ({user.groups.length})
             </button>
@@ -205,10 +203,10 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
 
         {/* MODAL BODY CONTENT */}
         <div className="p-6 overflow-y-auto space-y-6 bg-slate-50/50 flex-1">
-          
+
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              
+
               {/* Presence & Work Status Banner */}
               <div className="p-4 rounded-xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
                 <div className="flex items-center justify-between flex-wrap gap-2">
@@ -337,7 +335,7 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                       <Cloud className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 font-medium">M365 License SKU</div>
+                      <div className="text-xs text-slate-500 font-medium">M365 License</div>
                       <div className="text-sm font-semibold text-sky-700 truncate">{o365License}</div>
                     </div>
                   </div>

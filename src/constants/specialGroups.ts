@@ -45,12 +45,12 @@ export const DEFAULT_SPECIAL_GROUPS_CONFIG: Record<number, SpecialGroupConfig> =
   108: {
     id: 108,
     name: 'Printer Color (ปริ้นสี)',
-    badgeClass: 'bg-blue-100 text-blue-900 border-blue-200',
+    badgeClass: 'bg-slate-100 text-slate-800 border-slate-200',
   },
   109: {
     id: 109,
     name: 'Printer Mono (ปริ้นขาวดำ)',
-    badgeClass: 'bg-sky-100 text-sky-900 border-sky-200',
+    badgeClass: 'bg-slate-100 text-slate-800 border-slate-200',
   },
 };
 
@@ -125,10 +125,10 @@ export function getGroupBadgeInfo(group: Group) {
     return { label: 'VPN Access', variant: 'bg-emerald-100 text-emerald-900 border-emerald-200' };
   }
   if (name.includes('printer color') || name.includes('ปริ้นสี')) {
-    return { label: 'Printer Color (ปริ้นสี)', variant: 'bg-blue-100 text-blue-900 border-blue-200' };
+    return { label: 'Printer Color (ปริ้นสี)', variant: 'bg-slate-100 text-slate-800 border-slate-200' };
   }
   if (name.includes('printer mono') || name.includes('ปริ้นขาวดำ')) {
-    return { label: 'Printer Mono (ปริ้นขาวดำ)', variant: 'bg-sky-100 text-sky-900 border-sky-200' };
+    return { label: 'Printer Mono (ปริ้นขาวดำ)', variant: 'bg-slate-100 text-slate-800 border-slate-200' };
   }
 
   if (group.internet_level || name.includes('internet level')) {
