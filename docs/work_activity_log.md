@@ -79,6 +79,9 @@
 - **[LOG-027] Git Repository Initialization & Push to GitHub Remote**:
   - สร้าง Git Repository (`git init`), ตั้งค่าชื่อ branch หลักเป็น `main`, ผูก remote ไปยัง `https://github.com/Deizyn/user_access_management.git`
   - ทำการ commit และ push ซอร์สโค้ดและเอกสารระบบขึ้นคลัง GitHub เรียบร้อยแล้ว
+- **[LOG-028] Create Enterprise-Grade README.md for GitHub Repository**:
+  - จัดทำไฟล์ [README.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/README.md) หน้าแรกใหม่ระดับองค์กร สรุปฟีเจอร์ สถาปัตยกรรม วิธีการรัน สคริปต์ SQL และดรรชนีเชื่อมโยงเอกสาร
+
 
 
 

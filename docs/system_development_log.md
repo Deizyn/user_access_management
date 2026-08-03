@@ -130,6 +130,9 @@
 ### 2.21 ตั้งค่า Git Repository และซิงค์โค้ดไปยัง GitHub Remote
 - **การปรับปรุง**: ริเริ่มสร้างคลังโค้ด `git init`, กำหนดชื่อ Branch หลักเป็น `main`, ผูก Remote Repository เข้ากับ `https://github.com/Deizyn/user_access_management.git`
 - **ผลลัพธ์**: คอมมิตและดัน (Push) ซอร์สโค้ดระบบทั้งหมด เอกสารประกอบสถาปัตยกรรม และคู่มือระบบไปยัง GitHub Repository เรียบร้อยแล้ว
+### 2.22 จัดทำเอกสาร README.md ใหม่สำหรับ GitHub Repository
+- **การปรับปรุง**: ยกร่างเอกสารหน้าแรก [README.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/README.md) ใหม่ระดับ Enterprise รองรับการแสดงผลบน GitHub
+- **เนื้อหา**: ครอบคลุมภาพรวมระบบ, ฟีเจอร์หลัก (Unified Master Table, Internet Level & Special Groups, MySQL 8 Real-Time Syncing, CSV Import/Export, Analytics View), สถาปัตยกรรม Technology Stack, ขั้นตอนการติดตั้งและรันโปรเจกต์ (`npm run dev`), สคริปต์ SQL ล้างข้อมูลและสอบถามใน MySQL Workbench และดรรชนีเชื่อมโยงไปยังโฟลเดอร์ `docs/`
 
 ---
 
