@@ -191,17 +191,6 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
             </button>
 
             <button
-              onClick={() => setActiveTab('contact')}
-              className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${
-                activeTab === 'contact' 
-                  ? 'text-indigo-600 border-b-2 border-indigo-600 font-bold' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Contact & System Profile
-            </button>
-
-            <button
               onClick={() => setActiveTab('groups')}
               className={`pb-3 text-sm font-semibold transition-colors relative cursor-pointer ${
                 activeTab === 'groups' 
@@ -406,48 +395,6 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                 )}
               </div>
 
-            </div>
-          )}
-
-          {activeTab === 'contact' && (
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
-                <h3 className="text-sm font-bold text-slate-900">Technical Attributes & Device Details</h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Corporate Email Address</div>
-                    <div className="text-sm font-semibold text-slate-900">{user.email}</div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Microsoft 365 License SKU</div>
-                    <div className="text-sm font-semibold text-slate-900">{o365License}</div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Authority Group</div>
-                    <div className="text-sm font-semibold text-slate-900">{user.authority_group || 'Domain Users'}</div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Device Code</div>
-                    <div className="text-sm font-semibold text-slate-900 font-mono">{user.device_code || 'N/A'}</div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Phone PIN / Passcode</div>
-                    <div className="text-sm font-semibold text-slate-900 font-mono">{user.telephone_pass_code || '****'}</div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs text-slate-500 font-medium mb-1">Creation & Expiry Date</div>
-                    <div className="text-sm font-semibold text-slate-900">
-                      {formatDate(user.creation_date)} → {user.expiry_date ? formatDate(user.expiry_date) : 'No Expiry'}
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 

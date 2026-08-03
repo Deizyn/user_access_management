@@ -66,6 +66,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   });
 
   const [showColumnDropdown, setShowColumnDropdown] = useState(false);
+  const [openPopoverUserId, setOpenPopoverUserId] = useState<string | null>(null);
 
   // Expanded Level Groups state per user employee_id
   const [expandedUserIds, setExpandedUserIds] = useState<Record<string, boolean>>({});
@@ -338,7 +339,23 @@ export const UserTable: React.FC<UserTableProps> = ({
               paginatedUsers.map((user) => {
                 const derivedInternetLevel = user.internet_level || getUserPrimaryInternetLevel(user.groups, 'B');
                 const internetBadgeClass = getInternetLevelBadgeClasses(derivedInternetLevel);
-                const specialGroups = getSpecialGroupsForUser(user);
+                const allSpecial = getSpecialGroupsForUser(user);
+
+                // 1. Printer Group
+                const printerGroup = allSpecial.find(
+                  (sg) =>
+                    sg.name.toLowerCase().includes('printer') ||
+                    sg.name.includes('ปริ้น') ||
+                    sg.id === 'special_108' ||
+                    sg.id === 'special_109'
+                );
+
+                // 2. Remaining Special Groups (excluding Internet Level & Printer Group)
+                const remainingSpecial = allSpecial.filter((sg) => {
+                  if (sg.name.toLowerCase().includes('internet level')) return false;
+                  if (printerGroup && sg.id === printerGroup.id) return false;
+                  return true;
+                });
 
                 return (
                   <tr
@@ -400,25 +417,80 @@ export const UserTable: React.FC<UserTableProps> = ({
                       </td>
                     )}
 
-                    {/* 6. GROUP MEMBER (LEVEL GROUP) */}
+                    {/* 6. GROUP MEMBER (LEVEL GROUP) - 3 Structured Lines */}
                     {visibleColumns.level_group && (
-                      <td className="p-3">
-                        <div className="grid grid-cols-2 gap-1.5 max-w-[280px] py-0.5">
-                          {specialGroups.length > 0 ? (
-                            specialGroups.map((sg) => (
-                              <span
-                                key={sg.id}
-                                className={`inline-flex items-center justify-center text-center px-2 py-0.5 rounded-md text-[10px] font-bold border truncate ${sg.variant}`}
-                                title={sg.name}
-                              >
-                                {sg.name}
-                              </span>
-                            ))
-                          ) : (
-                            <span className={`inline-flex items-center justify-center text-center px-2 py-0.5 rounded-md text-[10px] font-bold border col-span-2 ${getInternetLevelBadgeClasses(derivedInternetLevel)}`}>
+                      <td className="p-3 relative">
+                        <div className="flex flex-col gap-1 min-w-[170px] max-w-[220px] py-0.5 text-xs">
+                          {/* Line 1: Internet Level */}
+                          <div>
+                            <span className={`inline-flex items-center justify-center text-center px-2 py-0.5 rounded-md text-[10px] font-bold border truncate w-full ${internetBadgeClass}`}>
                               Internet Level {derivedInternetLevel}
                             </span>
-                          )}
+                          </div>
+
+                          {/* Line 2: Printer */}
+                          <div>
+                            {printerGroup ? (
+                              <span className={`inline-flex items-center justify-center text-center px-2 py-0.5 rounded-md text-[10px] font-bold border truncate w-full ${printerGroup.variant}`}>
+                                {printerGroup.name}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-medium px-2 py-0.5 block text-center italic border border-dashed border-slate-200 rounded-md bg-slate-50/50">
+                                -
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Line 3: เพิ่มเติม (Clickable Popover) */}
+                          <div className="relative">
+                            {remainingSpecial.length > 0 ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenPopoverUserId(openPopoverUserId === user.employee_id ? null : user.employee_id);
+                                  }}
+                                  className="w-full inline-flex items-center justify-between px-2.5 py-0.5 rounded-md text-[10px] font-bold border bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100 transition-colors cursor-pointer"
+                                  title="คลิกเพื่อดู Special Groups ที่เหลือทั้งหมด"
+                                >
+                                  <span>+เพิ่มเติม ({remainingSpecial.length})</span>
+                                  <ChevronDown className="w-3 h-3 text-purple-600" />
+                                </button>
+
+                                {/* Popover Dropdown for Remaining Special Groups */}
+                                {openPopoverUserId === user.employee_id && (
+                                  <div 
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="absolute left-0 top-full mt-1 z-[80] bg-white rounded-xl shadow-xl border border-slate-200 p-2.5 min-w-[210px] flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-100"
+                                  >
+                                    <div className="text-[10px] font-bold text-slate-600 pb-1 border-b border-slate-100 flex items-center justify-between">
+                                      <span>Special Groups ที่เหลือ ({remainingSpecial.length})</span>
+                                      <button 
+                                        type="button"
+                                        onClick={() => setOpenPopoverUserId(null)}
+                                        className="text-slate-400 hover:text-slate-600 cursor-pointer p-0.5 rounded hover:bg-slate-100"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                    {remainingSpecial.map((sg) => (
+                                      <span
+                                        key={sg.id}
+                                        className={`inline-flex items-center justify-center text-center px-2 py-1 rounded-md text-[10px] font-bold border ${sg.variant}`}
+                                      >
+                                        {sg.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-medium px-2 py-0.5 block text-center italic border border-dashed border-slate-200 rounded-md bg-slate-50/50">
+                                -
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                     )}

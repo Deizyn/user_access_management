@@ -81,6 +81,10 @@
   - ทำการ commit และ push ซอร์สโค้ดและเอกสารระบบขึ้นคลัง GitHub เรียบร้อยแล้ว
 - **[LOG-028] Create Enterprise-Grade README.md for GitHub Repository**:
   - จัดทำไฟล์ [README.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/README.md) หน้าแรกใหม่ระดับองค์กร สรุปฟีเจอร์ สถาปัตยกรรม วิธีการรัน สคริปต์ SQL และดรรชนีเชื่อมโยงเอกสาร
+- **[LOG-029] User Profile Cleanup & 3-Line Group Member Column Layout with Popover**:
+  - ลบแท็บและส่วนแสดงผล `Contact & System Profile` ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) ออกตามความต้องการของผู้ใช้
+  - ปรับโครงสร้างคอลัมน์ `GROUP MEMBER (LEVEL GROUP)` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) ให้แสดง 3 บรรทัดแนวตั้ง (1. Internet Level, 2. Printer, 3. +เพิ่มเติม) โดยปุ่มเพิ่มเติมรองรับการเปิด Popover การ์ดลอยแสดง Special Groups ที่เหลือทั้งหมด
+
 
 
 

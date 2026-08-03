@@ -133,6 +133,13 @@
 ### 2.22 จัดทำเอกสาร README.md ใหม่สำหรับ GitHub Repository
 - **การปรับปรุง**: ยกร่างเอกสารหน้าแรก [README.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/README.md) ใหม่ระดับ Enterprise รองรับการแสดงผลบน GitHub
 - **เนื้อหา**: ครอบคลุมภาพรวมระบบ, ฟีเจอร์หลัก (Unified Master Table, Internet Level & Special Groups, MySQL 8 Real-Time Syncing, CSV Import/Export, Analytics View), สถาปัตยกรรม Technology Stack, ขั้นตอนการติดตั้งและรันโปรเจกต์ (`npm run dev`), สคริปต์ SQL ล้างข้อมูลและสอบถามใน MySQL Workbench และดรรชนีเชื่อมโยงไปยังโฟลเดอร์ `docs/`
+### 2.23 ปรับปรุง User Profile Modal และเปลี่ยนโครงสร้าง Group Member เป็น 3 บรรทัดพร้อม Popover
+- **การปรับปรุง**: 
+  1. ลบแท็บและส่วนแสดงผล `Contact & System Profile` ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) ตามความต้องการของผู้ใช้
+  2. อัปเดตการแสดงผลในคอลัมน์ `GROUP MEMBER (LEVEL GROUP)` ของ [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) ให้จัดเรียงเป็น 3 บรรทัดแนวตั้ง:
+     - **บรรทัดที่ 1**: ป้ายสิทธิ์ Internet Level (Level A / B / C)
+     - **บรรทัดที่ 2**: ป้ายสิทธิ์การพิมพ์ Printer (เช่น Printer Color / Printer Mono)
+     - **บรรทัดที่ 3**: ปุ่มป้ายสิทธิ์เพิ่มเติม `+เพิ่มเติม (จำนวน)` ซึ่งเมื่อคลิกจะเปิด Popover Card แสดงสิทธิ์ Special Groups ที่เหลือทั้งหมด (*Video Access, Communications, Free E-mail, VPN Access ฯลฯ*)
 
 ---
 
