@@ -11,7 +11,7 @@ import {
   Check, 
   IdCard, 
   AtSign, 
-  Smartphone, 
+  Monitor, 
   Calendar, 
   Users, 
   AlertTriangle, 
@@ -132,7 +132,7 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
         className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-6 cursor-default flex flex-col max-h-[92vh] border border-slate-200"
       >
         
-        {/* MICROSOFT 365 CARD HEADER STYLE */}
+        {/* MICROSOFT PROFILE CARD HEADER STYLE */}
         <div className="p-6 pb-2 bg-white relative shrink-0 border-b border-slate-100">
           {/* Close Button */}
           <button
@@ -309,10 +309,10 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                     </div>
                   </div>
 
-                  {/* Device Code */}
+                  {/* Device Code (Computer Monitor Icon) */}
                   <div className="flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-slate-100 text-slate-600 shrink-0">
-                      <Smartphone className="w-4 h-4" />
+                      <Monitor className="w-4 h-4 text-slate-700" />
                     </div>
                     <div>
                       <div className="text-xs text-slate-500 font-medium">Device Code</div>
@@ -330,6 +330,17 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                       <div className="text-sm font-semibold text-slate-900 font-mono">{user.telephone_pass_code || 'N/A'}</div>
                     </div>
                   </div>
+
+                  {/* Microsoft 365 License (Moved from Privileges Summary) */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-slate-100 text-slate-600 shrink-0">
+                      <Cloud className="w-4 h-4 text-sky-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 font-medium">M365 License SKU</div>
+                      <div className="text-sm font-semibold text-sky-700 truncate">{o365License}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -340,7 +351,7 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                   System Privileges Summary
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Internet Level */}
                   <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
                     <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5 mb-1">
@@ -368,15 +379,6 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                       Print Quota Policy
                     </div>
                     <div className="text-sm font-bold text-slate-900">{derivedProfile.printQuota}</div>
-                  </div>
-
-                  {/* Microsoft 365 License */}
-                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
-                    <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5 mb-1">
-                      <Cloud className="w-3.5 h-3.5 text-sky-600" />
-                      M365 License
-                    </div>
-                    <div className="text-sm font-bold text-sky-900 truncate">{o365License}</div>
                   </div>
                 </div>
 

@@ -140,6 +140,11 @@
      - **บรรทัดที่ 1**: ป้ายสิทธิ์ Internet Level (Level A / B / C)
      - **บรรทัดที่ 2**: ป้ายสิทธิ์การพิมพ์ Printer (เช่น Printer Color / Printer Mono)
      - **บรรทัดที่ 3**: ปุ่มป้ายสิทธิ์เพิ่มเติม `+เพิ่มเติม (จำนวน)` ซึ่งเมื่อคลิกจะเปิด Popover Card แสดงสิทธิ์ Special Groups ที่เหลือทั้งหมด (*Video Access, Communications, Free E-mail, VPN Access ฯลฯ*)
+### 2.24 ปรับโทนสีปุ่มเพิ่มเติม และย้าย M365 License พร้อมปรับไอคอน Device Code ใน User Profile Modal
+- **การปรับปรุง**: 
+  1. **ปรับโทนสีปุ่มเพิ่มเติม**: เปลี่ยนกรอบและพื้นหลังของปุ่ม `+เพิ่มเติม (จำนวน)` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) จากโทนสีม่วงเข้มให้เป็น **โทนสีเทาสว่าง/สีจางนุ่มตา (`bg-slate-100/80 text-slate-600 border-slate-200/90`)** เพื่อไม่ให้ตารางดูลายตา
+  2. **เปลี่ยนไอคอน Device Code**: ปรับไอคอนหน้าข้อมูล Device Code ในส่วน Primary Contact Details ของ [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) จากรูปสมาร์ตโฟน (`Smartphone`) ให้เป็น **รูปหน้าจอคอมพิวเตอร์ (`Monitor`)**
+  3. **ย้ายตำแหน่ง M365 License**: ย้ายข้อมูลสิทธิ์ Microsoft 365 License จากส่วน System Privileges Summary ขึ้นมาจัดเรียงในส่วน **Primary Contact Details** เพื่อความสะดวกและต่อเนื่องในการดูโปรไฟล์ผู้ใช้
 
 ---
 

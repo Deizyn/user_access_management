@@ -84,6 +84,11 @@
 - **[LOG-029] User Profile Cleanup & 3-Line Group Member Column Layout with Popover**:
   - ลบแท็บและส่วนแสดงผล `Contact & System Profile` ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) ออกตามความต้องการของผู้ใช้
   - ปรับโครงสร้างคอลัมน์ `GROUP MEMBER (LEVEL GROUP)` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) ให้แสดง 3 บรรทัดแนวตั้ง (1. Internet Level, 2. Printer, 3. +เพิ่มเติม) โดยปุ่มเพิ่มเติมรองรับการเปิด Popover การ์ดลอยแสดง Special Groups ที่เหลือทั้งหมด
+- **[LOG-030] Soft Gray Styling for +More Button & User Profile UI Enhancements**:
+  - ปรับสไตล์ปุ่ม `+เพิ่มเติม` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/UserTable.tsx) เป็นโทนสีเทาสว่าง/จางนุ่มตา (`bg-slate-100/80 text-slate-600 border-slate-200/90`) สบายตา
+  - ปรับเปลี่ยนไอคอนของ Device Code ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/components/modals/UserDetailModal.tsx) เป็นรูปหน้าจอคอมพิวเตอร์ (`Monitor`)
+  - ย้ายข้อมูล M365 License ขึ้นมาไว้ในส่วน **Primary Contact Details** ของหน้า User Profile Modal
+
 
 
 

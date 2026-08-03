@@ -451,11 +451,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                                     e.stopPropagation();
                                     setOpenPopoverUserId(openPopoverUserId === user.employee_id ? null : user.employee_id);
                                   }}
-                                  className="w-full inline-flex items-center justify-between px-2.5 py-0.5 rounded-md text-[10px] font-bold border bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100 transition-colors cursor-pointer"
+                                  className="w-full inline-flex items-center justify-between px-2.5 py-0.5 rounded-md text-[10px] font-semibold border bg-slate-100/80 text-slate-600 border-slate-200/90 hover:bg-slate-200/80 hover:text-slate-800 transition-colors cursor-pointer"
                                   title="คลิกเพื่อดู Special Groups ที่เหลือทั้งหมด"
                                 >
                                   <span>+เพิ่มเติม ({remainingSpecial.length})</span>
-                                  <ChevronDown className="w-3 h-3 text-purple-600" />
+                                  <ChevronDown className="w-3 h-3 text-slate-400" />
                                 </button>
 
                                 {/* Popover Dropdown for Remaining Special Groups */}
