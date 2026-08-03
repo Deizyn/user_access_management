@@ -1,0 +1,492 @@
+import { User, Group, UserGroup, UserWithGroups, InternetLevel } from '../types';
+
+/**
+ * Standard CSV Headers mapping for normalization
+ */
+export const CSV_HEADERS = [
+  'Employee ID (รหัสพนักงาน)',
+  'Username (ชื่อผู้ใช้)',
+  'Display Name (ชื่อ-นามสกุล)',
+  'Email (อีเมล)',
+  'Internet Level (ระดับอินเทอร์เน็ต A/B/C)',
+  'Level Group (กลุ่มระดับการใช้งาน)',
+  'O365 License (สิทธิ์การใช้งาน O365)',
+  'Job Title (ตำแหน่งงาน)',
+  'Department (แผนก)',
+  'Company (บริษัท)',
+  'Authority Group (กลุ่มสิทธิ์เข้าถึง)',
+  'Device Code (รหัสอุปกรณ์)',
+  'Groups (กลุ่มสิทธิ์/บทบาท)',
+  'Creation Date (วันสร้างบัญชี)',
+  'Expiry Date (วันหมดอายุ)',
+  'Print Quota Group (โควต้าการพิมพ์)',
+  'Telephone Passcode (รหัสผ่านโทรศัพท์)',
+  'VPN Status (สถานะ VPN)',
+];
+
+/**
+ * Helper to escape fields for CSV output
+ */
+export const escapeCsvField = (val: string | number | boolean | null | undefined): string => {
+  if (val === null || val === undefined) return '""';
+  const str = String(val).replace(/"/g, '""');
+  return `"${str}"`;
+};
+
+/**
+ * Export Users to CSV with UTF-8 BOM for Thai language Excel support
+ */
+export function exportUsersToCSV(users: UserWithGroups[], filenamePrefix = 'user_master_directory') {
+  if (!users || users.length === 0) {
+    alert('ไม่มีข้อมูลสำหรับส่งออก (No data to export)');
+    return;
+  }
+
+  const rows = users.map((u) => [
+    escapeCsvField(u.employee_id),
+    escapeCsvField(u.username),
+    escapeCsvField(u.display_name),
+    escapeCsvField(u.email),
+    escapeCsvField(u.internet_level),
+    escapeCsvField(u.level_group || 'General Staff'),
+    escapeCsvField(u.o365_license || 'Microsoft 365 E3'),
+    escapeCsvField(u.job_title),
+    escapeCsvField(u.department),
+    escapeCsvField(u.company),
+    escapeCsvField(u.authority_group || 'Domain Users'),
+    escapeCsvField(u.device_code),
+    escapeCsvField(u.groups.map((g) => g.group_name).join(', ')),
+    escapeCsvField(u.creation_date),
+    escapeCsvField(u.expiry_date || 'N/A'),
+    escapeCsvField(u.print_quota_group),
+    escapeCsvField(u.telephone_pass_code),
+    escapeCsvField(u.vpn_status ? 'Active' : 'Disabled'),
+  ]);
+
+  const csvContent = '\uFEFF' + [CSV_HEADERS.join(','), ...rows.map((e) => e.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filenamePrefix}_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Download standard CSV template for import
+ */
+export function downloadCSVTemplate() {
+  const sampleRows = [
+    [
+      escapeCsvField('EMP-88001'),
+      escapeCsvField('somchai.p'),
+      escapeCsvField('สมชาย ใจดี'),
+      escapeCsvField('somchai.p@company.co.th'),
+      escapeCsvField('A'),
+      escapeCsvField('IT & Technical'),
+      escapeCsvField('Microsoft 365 E5'),
+      escapeCsvField('Senior IT Specialist'),
+      escapeCsvField('IT'),
+      escapeCsvField('Alpha Group'),
+      escapeCsvField('Domain Admins'),
+      escapeCsvField('DEV-9001'),
+      escapeCsvField('Internet Level A, DevOps & Cloud Engineers, IT Security Ops'),
+      escapeCsvField('2026-01-15'),
+      escapeCsvField('2027-01-15'),
+      escapeCsvField('VIP_UNLIMITED'),
+      escapeCsvField('889001'),
+      escapeCsvField('Active'),
+    ],
+    [
+      escapeCsvField('EMP-88002'),
+      escapeCsvField('wanida.k'),
+      escapeCsvField('วนิดา กิจเจริญ'),
+      escapeCsvField('wanida.k@company.co.th'),
+      escapeCsvField('B'),
+      escapeCsvField('General Staff'),
+      escapeCsvField('Microsoft 365 E3'),
+      escapeCsvField('HR Specialist'),
+      escapeCsvField('HR'),
+      escapeCsvField('Beta Corp'),
+      escapeCsvField('Domain Users'),
+      escapeCsvField('DEV-9002'),
+      escapeCsvField('Internet Level B, Sales & Marketing Team'),
+      escapeCsvField('2026-02-01'),
+      escapeCsvField('N/A'),
+      escapeCsvField('STD_500'),
+      escapeCsvField('889002'),
+      escapeCsvField('Disabled'),
+    ],
+  ];
+
+  const csvContent = '\uFEFF' + [CSV_HEADERS.join(','), ...sampleRows.map((e) => e.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `user_import_template.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * CSV Robust Line Splitter that handles quotes, commas, and multiline values
+ */
+export function parseCSVText(text: string): string[][] {
+  const lines: string[][] = [];
+  let currentRow: string[] = [];
+  let currentVal = '';
+  let inQuotes = false;
+
+  // Clean BOM if present
+  const cleanedText = text.startsWith('\uFEFF') ? text.slice(1) : text;
+
+  for (let i = 0; i < cleanedText.length; i++) {
+    const char = cleanedText[i];
+    const nextChar = cleanedText[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentVal += '"';
+        i++; // skip escaped quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      currentRow.push(currentVal.trim());
+      currentVal = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') {
+        i++;
+      }
+      currentRow.push(currentVal.trim());
+      if (currentRow.some((field) => field.length > 0)) {
+        lines.push(currentRow);
+      }
+      currentRow = [];
+      currentVal = '';
+    } else {
+      currentVal += char;
+    }
+  }
+
+  if (currentVal.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentVal.trim());
+    if (currentRow.some((field) => field.length > 0)) {
+      lines.push(currentRow);
+    }
+  }
+
+  return lines;
+}
+
+export interface ParseResult {
+  users: User[];
+  groups: Group[];
+  userGroups: UserGroup[];
+  summary: {
+    totalRowsParsed: number;
+    newUsersCount: number;
+    updatedUsersCount: number;
+    duplicatesPreventedCount: number;
+    newGroupsCount: number;
+  };
+  errors: string[];
+}
+
+/**
+ * Normalizes headers to key indexes regardless of language variation
+ */
+function normalizeHeaderKey(header: string): string | null {
+  const h = header.toLowerCase().trim();
+  if (h.includes('employee') || h.includes('รหัสพนักงาน') || h === 'emp_id' || h === 'employee_id') return 'employee_id';
+  if (h.includes('username') || h.includes('ชื่อผู้ใช้')) return 'username';
+  if (h.includes('display') || h.includes('ชื่อ-นามสกุล') || h === 'name' || h === 'display_name') return 'display_name';
+  if (h.includes('email') || h.includes('อีเมล')) return 'email';
+  if (h.includes('internet level') || h.includes('ระดับอินเทอร์เน็ต') || h === 'internet_level') return 'internet_level';
+  if (h.includes('level group') || h.includes('กลุ่มระดับ') || h === 'level_group') return 'level_group';
+  if (h.includes('o365') || h.includes('license') || h.includes('365') || h === 'o365_license') return 'o365_license';
+  if (h.includes('job') || h.includes('ตำแหน่ง') || h === 'job_title') return 'job_title';
+  if (h.includes('department') || h.includes('แผนก') || h === 'department') return 'department';
+  if (h.includes('company') || h.includes('บริษัท') || h === 'company') return 'company';
+  if (h.includes('authority') || h.includes('สิทธิ์เข้าถึง') || h === 'authority_group') return 'authority_group';
+  if (h.includes('device') || h.includes('อุปกรณ์') || h === 'device_code') return 'device_code';
+  if (h.includes('groups') || h.includes('กลุ่มสิทธิ์') || h === 'group_names') return 'groups';
+  if (h.includes('creation') || h.includes('สร้าง') || h === 'creation_date') return 'creation_date';
+  if (h.includes('expiry') || h.includes('หมดอายุ') || h === 'expiry_date') return 'expiry_date';
+  if (h.includes('quota') || h.includes('พิมพ์') || h === 'print_quota_group') return 'print_quota_group';
+  if (h.includes('passcode') || h.includes('โทรศัพท์') || h === 'telephone_pass_code') return 'telephone_pass_code';
+  if (h.includes('vpn') || h.includes('สถานะ vpn') || h === 'vpn_status') return 'vpn_status';
+  return null;
+}
+
+/**
+ * Normalizes raw imported CSV data into strongly-typed relational entities (User, Group, UserGroup)
+ */
+export function processImportCSV(
+  csvText: string,
+  existingUsers: User[],
+  existingGroups: Group[],
+  existingUserGroups: UserGroup[]
+): ParseResult {
+  const rows = parseCSVText(csvText);
+  const errors: string[] = [];
+
+  if (rows.length < 2) {
+    return {
+      users: existingUsers,
+      groups: existingGroups,
+      userGroups: existingUserGroups,
+      summary: { totalRowsParsed: 0, newUsersCount: 0, updatedUsersCount: 0, duplicatesPreventedCount: 0, newGroupsCount: 0 },
+      errors: ['ไฟล์ CSV ว่างเปล่าหรือไม่มีข้อมูลแถว (CSV file is empty or missing data rows)'],
+    };
+  }
+
+  const rawHeaders = rows[0];
+  const headerMap: { [key: string]: number } = {};
+
+  rawHeaders.forEach((col, idx) => {
+    const key = normalizeHeaderKey(col);
+    if (key) {
+      headerMap[key] = idx;
+    }
+  });
+
+  if (!('employee_id' in headerMap) && !('username' in headerMap) && !('display_name' in headerMap)) {
+    return {
+      users: existingUsers,
+      groups: existingGroups,
+      userGroups: existingUserGroups,
+      summary: { totalRowsParsed: 0, newUsersCount: 0, updatedUsersCount: 0, duplicatesPreventedCount: 0, newGroupsCount: 0 },
+      errors: ['ไม่พบคอลัมน์หลัก เช่น Employee ID, Username หรือ Display Name ในไฟล์ CSV'],
+    };
+  }
+
+  // Cloned state targets
+  const updatedGroupsMap = new Map<number, Group>();
+  existingGroups.forEach((g) => updatedGroupsMap.set(g.group_id, { ...g }));
+
+  const groupNameToId = new Map<string, number>();
+  existingGroups.forEach((g) => groupNameToId.set(g.group_name.toLowerCase().trim(), g.group_id));
+
+  // Keep track of maximum group ID to allocate new IDs
+  let maxGroupId = Math.max(...existingGroups.map((g) => g.group_id), 200);
+
+  const updatedUsersMap = new Map<string, User>();
+  // Normalized case-insensitive lookup index to prevent duplicate Employee ID creation
+  const empIdLookupMap = new Map<string, string>(); // lowercased_emp_id -> canonical_emp_id
+  const usernameLookupMap = new Map<string, string>(); // lowercased_username -> canonical_emp_id
+
+  existingUsers.forEach((u) => {
+    updatedUsersMap.set(u.employee_id, { ...u });
+    empIdLookupMap.set(u.employee_id.trim().toLowerCase(), u.employee_id);
+    if (u.username) {
+      usernameLookupMap.set(u.username.trim().toLowerCase(), u.employee_id);
+    }
+  });
+
+  const newUserGroupsMap = new Map<string, Set<number>>();
+  existingUserGroups.forEach((ug) => {
+    if (!newUserGroupsMap.has(ug.employee_id)) {
+      newUserGroupsMap.set(ug.employee_id, new Set());
+    }
+    newUserGroupsMap.get(ug.employee_id)!.add(ug.group_id);
+  });
+
+  let newUsersCount = 0;
+  let updatedUsersCount = 0;
+  let duplicatesPreventedCount = 0;
+  let newGroupsCount = 0;
+  const processedKeysInBatch = new Set<string>();
+
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (row.length === 0 || (row.length === 1 && row[0] === '')) continue;
+
+    const getValue = (key: string, defaultVal = ''): string => {
+      const idx = headerMap[key];
+      if (idx !== undefined && idx < row.length && row[idx] !== undefined) {
+        return row[idx].trim();
+      }
+      return defaultVal;
+    };
+
+    let rawEmpId = getValue('employee_id');
+    let rawUsername = getValue('username');
+    let displayName = getValue('display_name');
+
+    // Case-insensitive lookup for existing Employee ID or Username to prevent duplicates
+    const normEmpIdKey = rawEmpId ? rawEmpId.toLowerCase() : '';
+    const normUsernameKey = rawUsername ? rawUsername.toLowerCase() : '';
+
+    let canonicalEmpId = '';
+    let isExisting = false;
+
+    if (normEmpIdKey && empIdLookupMap.has(normEmpIdKey)) {
+      canonicalEmpId = empIdLookupMap.get(normEmpIdKey)!;
+      isExisting = true;
+    } else if (normUsernameKey && usernameLookupMap.has(normUsernameKey)) {
+      canonicalEmpId = usernameLookupMap.get(normUsernameKey)!;
+      isExisting = true;
+    }
+
+    if (!canonicalEmpId) {
+      if (rawEmpId) {
+        canonicalEmpId = rawEmpId;
+      } else if (rawUsername) {
+        canonicalEmpId = `EMP-${rawUsername.toUpperCase()}`;
+      } else {
+        canonicalEmpId = `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
+      }
+      // Register into lookup maps for remaining rows in batch
+      empIdLookupMap.set(canonicalEmpId.toLowerCase(), canonicalEmpId);
+      if (rawUsername) {
+        usernameLookupMap.set(rawUsername.toLowerCase(), canonicalEmpId);
+      }
+    }
+
+    if (!displayName) {
+      displayName = rawUsername || canonicalEmpId;
+    }
+
+    let username = rawUsername;
+    if (!username) {
+      username = displayName.toLowerCase().replace(/\s+/g, '.') || canonicalEmpId.toLowerCase();
+    }
+
+    let email = getValue('email');
+    if (!email) {
+      email = `${username.toLowerCase()}@company.co.th`;
+    }
+
+    // Normalized Internet Level
+    let internetLevelRaw = getValue('internet_level', 'B').toUpperCase();
+    let internetLevel: InternetLevel = 'B';
+    if (internetLevelRaw === 'A' || internetLevelRaw.includes('LEVEL A') || internetLevelRaw.includes('ระดับ A')) {
+      internetLevel = 'A';
+    } else if (internetLevelRaw === 'C' || internetLevelRaw.includes('LEVEL C') || internetLevelRaw.includes('ระดับ C')) {
+      internetLevel = 'C';
+    } else {
+      internetLevel = 'B';
+    }
+
+    const levelGroup = getValue('level_group', 'General Staff');
+    const o365License = getValue('o365_license', 'Microsoft 365 E3');
+    const jobTitle = getValue('job_title', 'Staff');
+    const department = getValue('department', 'General');
+    const company = getValue('company', 'Alpha Group');
+    const authorityGroup = getValue('authority_group', 'Domain Users');
+    const deviceCode = getValue('device_code', `DEV-${Math.floor(1000 + Math.random() * 9000)}`);
+    const creationDate = getValue('creation_date', new Date().toISOString().slice(0, 10));
+    
+    let expiryDateRaw = getValue('expiry_date');
+    let expiryDate: string | null = null;
+    if (expiryDateRaw && expiryDateRaw !== 'N/A' && expiryDateRaw !== 'null' && expiryDateRaw !== '-') {
+      expiryDate = expiryDateRaw;
+    }
+
+    const printQuotaGroup = getValue('print_quota_group', 'STD_500');
+    const telephonePassCode = getValue('telephone_pass_code', `${Math.floor(100000 + Math.random() * 900000)}`);
+
+    const vpnRaw = getValue('vpn_status', 'Active').toLowerCase();
+    const vpnStatus = vpnRaw === 'active' || vpnRaw === 'true' || vpnRaw === '1' || vpnRaw === 'yes' || vpnRaw === 'enabled';
+
+    const empIdKeyLower = canonicalEmpId.toLowerCase();
+    if (isExisting || processedKeysInBatch.has(empIdKeyLower)) {
+      duplicatesPreventedCount++;
+      updatedUsersCount++;
+    } else {
+      newUsersCount++;
+      processedKeysInBatch.add(empIdKeyLower);
+    }
+
+    const normalizedUser: User = {
+      employee_id: canonicalEmpId,
+      username,
+      display_name: displayName,
+      email,
+      internet_level: internetLevel,
+      level_group: levelGroup,
+      o365_license: o365License,
+      job_title: jobTitle,
+      department,
+      company,
+      device_code: deviceCode,
+      authority_group: authorityGroup,
+      creation_date: creationDate,
+      expiry_date: expiryDate,
+      print_quota_group: printQuotaGroup,
+      telephone_pass_code: telephonePassCode,
+      vpn_status: vpnStatus,
+    };
+
+    updatedUsersMap.set(canonicalEmpId, normalizedUser);
+
+    // Process Groups Relationship
+    const groupsRaw = getValue('groups');
+    const userGroupSet = new Set<number>();
+
+    // Mandatory Internet Level Group mapping (101=A, 102=B, 103=C)
+    const internetGroupId = internetLevel === 'A' ? 101 : internetLevel === 'B' ? 102 : 103;
+    userGroupSet.add(internetGroupId);
+
+    if (groupsRaw) {
+      const groupTokens = groupsRaw.split(/[,|;]/).map((s) => s.trim()).filter((s) => s.length > 0);
+      groupTokens.forEach((token) => {
+        const lowerToken = token.toLowerCase();
+        
+        // Skip adding duplicate Internet Level text groups if they match level A/B/C
+        if (lowerToken.startsWith('internet level')) return;
+
+        if (groupNameToId.has(lowerToken)) {
+          userGroupSet.add(groupNameToId.get(lowerToken)!);
+        } else {
+          // Create new normalized Group
+          maxGroupId++;
+          const newGroupId = maxGroupId;
+          const newGroup: Group = {
+            group_id: newGroupId,
+            group_name: token,
+            description: `กลุ่มสิทธิ์การใช้งาน ${token} (สร้างอัตโนมัติจากการนำเข้า CSV)`,
+          };
+          updatedGroupsMap.set(newGroupId, newGroup);
+          groupNameToId.set(lowerToken, newGroupId);
+          userGroupSet.add(newGroupId);
+          newGroupsCount++;
+        }
+      });
+    }
+
+    newUserGroupsMap.set(canonicalEmpId, userGroupSet);
+  }
+
+  // Reconstruct UserGroup array
+  const finalUserGroups: UserGroup[] = [];
+  newUserGroupsMap.forEach((gSet, empId) => {
+    gSet.forEach((gId) => {
+      finalUserGroups.push({
+        employee_id: empId,
+        group_id: gId,
+      });
+    });
+  });
+
+  return {
+    users: Array.from(updatedUsersMap.values()),
+    groups: Array.from(updatedGroupsMap.values()),
+    userGroups: finalUserGroups,
+    summary: {
+      totalRowsParsed: rows.length - 1,
+      newUsersCount,
+      updatedUsersCount,
+      duplicatesPreventedCount,
+      newGroupsCount,
+    },
+    errors,
+  };
+}

@@ -1,0 +1,6 @@
+{
+  "name": "User Management Dashboard",
+  "description": "An all-in-one minimal white employee and user directory dashboard with filtering, search, group management, and detailed record views.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,92 @@
+# Work Activity & Maintenance Changelog
+
+บันทึกกิจกรรมการทำงาน การแก้ไขบั๊ก และประวัติการเปลี่ยนแปลงระบบตามลำดับเวลา (Chronological Log)
+
+---
+
+## 📅 ประวัติการปรับปรุงระบบ (Activity Timeline)
+
+### 🟢 2026-08-03
+- **[LOG-001] Setup SQLite & Database Connection Parameters**:
+  - ตั้งค่าการใช้งาน SQLite พร้อมกำหนดพารามิเตอร์ `DB_NAME=user_access_dashboard`, `DB_USER=root`, `DB_PASS=admin123456`, `DB_PORT=3306` ในไฟล์ `.env` และ `.env.example`
+- **[LOG-002] Implement Database Health Inspector**:
+  - สร้างคอมโพเนนต์ `DbStatusModal.tsx` และเพิ่มจุดเชื่อมต่อป้ายสถานะ `SQLite Connected` บน `Navbar.tsx` เพื่อตรวจสอบ Latency และสถานะตารางแบบเรียลไทม์
+- **[LOG-003] Update Schema Target to `user_access_dashboard_data`**:
+  - อัปเดตการเชื่อมต่อและ Schema เป้าหมายเป็น `user_access_dashboard_data` เพื่อให้ตรงกับ MySQL Workbench
+- **[LOG-004] Clear Mockup Seed Data**:
+  - ล้างข้อมูลพนักงานจำลองทั้งหมดในระบบออก (0 Users) คงไว้เฉพาะกลุ่มระดับมาตรฐานระบบ (`Internet Level A/B/C`) เพื่อเตรียมพร้อมสำหรับการ Import CSV ข้อมูลจริง
+- **[LOG-005] Fix Level Group Badge Refresh Disappearing Bug**:
+  - แก้ไขบั๊กข้อมูลในคอลัมน์ `GROUP MEMBER (LEVEL GROUP)` หายเมื่อทำการกด Refresh หน้าจอ
+  - ปรับปรุงการโหลด State เริ่มต้นจาก `localStorage` และ SQLite ใน `useUserAccessData.ts`
+  - ปรับปรุง `useUserFilters.ts` และ `UserTable.tsx` ให้สร้างและแสดงตราสัญลักษณ์ระดับอินเทอร์เน็ตกำกับตัวผู้ใช้เสมอ
+- **[LOG-006] Resolve LocalStorage QuotaExceededError (5MB Browser Limit)**:
+  - แก้ไขปัญหาไม่สามารถ Import CSV หรือเพิ่มพนักงานได้เนื่องจากโควต้า `localStorage` เต็ม 5MB จากการเก็บบอร์ดไบนารี SQLite Base64
+  - เพิ่มระบบ Quota Auto-Cleanup ใน `storage.ts` และ `sqliteDb.ts` เพื่อสลับไปรันบน WASM Memory ป้องกันไม่ให้แอปค้าง
+- **[LOG-007] Integrate Superpowers Antigravity Skills**:
+  - ติดตั้งและตั้งค่า Framework `superpowers-antigravity` ลงในโฟลเดอร์ `.agents/skills` และลงทะเบียนกฎระเบียบใน `.agents/AGENTS.md`
+- **[LOG-008] Initialize Dedicated Documentation Architecture**:
+  - จัดทำโครงสร้างโฟลเดอร์ `docs/` สำหรับบันทึก Log การทำงาน คู่มือการติดตั้ง และประวัติการพัฒนาระบบ
+- **[LOG-009] Enforce Mandatory Documentation Protocol (`AGENTS.md`)**:
+  - บันทึกกฎระเบียบปฏิบัติบังคับใน `.agents/AGENTS.md` ให้เอเจนต์อ่านเอกสารใน `docs/` ก่อนแก้ไข และอัปเดตเอกสารควบคู่ทุกการเปลี่ยนแปลง
+- **[LOG-010] Fix `getGroupBadgeInfo` ReferenceError in UserTable**:
+  - เพิ่มการ Import `getGroupBadgeInfo` ใน `UserTable.tsx` แก้ไขปัญหาหน้าจอแอปพลิเคชันค้างแสดง Error `getGroupBadgeInfo is not defined`
+- **[LOG-011] Align & Document Group Member (Level Group) Data Architecture**:
+  - บันทึกและปรับปรุงหลักเกณฑ์โครงสร้างข้อมูล Group Member / Level Group Data Mapping Specification ใน `docs/system_development_log.md`
+  - ยืนยันมาตรฐาน Type Safety (`Number(group_id)`), Implicit Level Group Auto-Assignment (101/102/103), Search Matching และ Analytics Aggregation Logic
+- **[LOG-012] Filter Column GROUP MEMBER to Special Groups with 2-Column Grid**:
+  - ปรับการคัดกรองใน `UserTable.tsx` ให้แสดงผลเฉพาะ Special Groups (`getSpecialGroupsForUser`)
+  - จัดระเบียบการวางเลย์เอาต์ป้ายสิทธิ์กลุ่มให้อยู่ในรูปแบบ 2-Column Grid (`grid grid-cols-2 gap-1.5`) ตรงตามรูปภาพแบบสเปกที่ 2
+- **[LOG-013] Restore Full 9 Special Groups Master & Fix Filter Matching**:
+  - เพิ่มกลุ่มสิทธิ์หลัก 104 ถึง 109 (`Video Access`, `Communications`, `Free E-mail`, `VPN Access`, `Printer Color`, `Printer Mono`) เข้าไปใน `INITIAL_GROUPS`
+  - ปรับแก้ไข `isSpecialGroup` และ `getGroupBadgeInfo` ใน `specialGroups.ts` ไม่ให้คืนค่า false ผิดพลาด และปรับเวอร์ชันแคชเป็น `v21`
+- **[LOG-014] Enforce SQLite Database as Exclusive Data Provider**:
+  - ปรับปรุง `useUserAccessData.ts` ให้เรียกใช้งาน `queryUsersFromSqlite`, `queryGroupsFromSqlite`, `queryUserGroupsFromSqlite` เป็นแหล่งข้อมูลหลักทางเดียว (Single Source of Truth)
+  - ทุกการเพิ่ม/ลบ/แก้ไข และ Import CSV จะถูกเขียนลง SQLite และรัน `SELECT` SQL Query จากเอนจิน SQLite เพื่อนำข้อมูลมาแสดงผลบนเว็บโดยตรง 100%
+- **[LOG-015] Implement Physical SQLite File Disk Persistence (`user_access_dashboard_data.sqlite`)**:
+  - พัฒนา [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) ให้สร้างและเซฟไฟล์ฐานข้อมูล SQLite จริงลงในเครื่องที่ `user_access_dashboard_data.sqlite`
+  - เพิ่ม API Endpoint `/api/db/sync` และ `/api/db/download` สำหรับซิงค์ข้อมูลลงดิสก์และดาวน์โหลดไฟล์ `.sqlite` จริง
+- **[LOG-016] Add MySQL Workbench Data Sync Script Generator (`/api/db/mysql-dump`)**:
+  - เพิ่มฟังก์ชัน `generateMySqlDumpScript()` ใน `dataService.ts` และเปิดบริการผ่าน API Endpoint `/api/db/mysql-dump`
+  - รองรับการดาวน์โหลดสคริปต์ SQL นำข้อมูลพนักงาน กลุ่มสิทธิ์ และตารางเชื่อมโยงทั้งหมดไปรันใน MySQL Workbench เพื่อให้ `select * from users;` แสดงข้อมูลครบถ้วน
+- **[LOG-017] Implement Automatic Real-Time MySQL Database Sync (`mysql2`)**:
+  - ติดตั้งแพ็กเกจ `mysql2` และพัฒนาฟังก์ชัน `syncToMySqlDatabase()` ใน `dataService.ts`
+  - เชื่อมต่อไปยัง MySQL Server (`user_access_dashboard_data` บน `localhost:3306`) เพื่อสร้างตารางและเขียนข้อมูลพนักงาน กลุ่มสิทธิ์ และตารางเชื่อมโยงลงใน MySQL Database โดยอัตโนมัติทุกครั้งที่มีการ Import CSV หรืออัปเดตข้อมูล
+- **[LOG-018] Transition System Architecture to Exclusive MySQL Storage Engine**:
+  - อัปเดต `.env` กำหนด `DB_TYPE=mysql`, `DB_HOST=localhost`, `DB_NAME=user_access_dashboard_data`, `DB_USER=root`, `DB_PASS=admin123456`, `DB_PORT=3306`
+  - ปรับโครงสร้าง [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) ให้สร้างตาราง คิวรี และบันทึกข้อมูลพนักงาน กลุ่มสิทธิ์ และตารางเชื่อมโยงตรงเข้า MySQL Database Server เป็นเอนจินหลักทางเดียว 100%
+- **[LOG-019] Fix Direct CSV Import Sync Payload to MySQL Backend**:
+  - ปรับปรุง `useUserAccessData.ts` ในฟังก์ชัน `handleImportCSVSuccess` ให้ส่งก้อนข้อมูล `importedUsers`, `importedGroups`, `importedUserGroups` ยิงตรงเข้า API `/api/db/sync` ของ Express MySQL Backend ทันที
+  - แก้ไขปัญหานำเข้า CSV บนเว็บแล้วข้อมูลในตาราง `users` ของ MySQL Workbench ยังไม่ถูกเขียนลงตาราง
+- **[LOG-020] Fix MySQL Reserved Keyword Escaping Bug for Groups Table**:
+  - ครอบชื่อตารางใน SQL Query ทั้งหมดของ [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) ด้วยเครื่องหมาย Backticks (`` `groups` ``, `` `users` ``, `` `user_groups` ``) เพื่อแก้ปัญหาคำสั่ง SQL ขัดข้องจากคำสงวน `groups` ใน MySQL 8
+  - ยืนยันผลการทดสอบการเขียนและสอบถามข้อมูลพนักงานลงตาราง `users` ของ MySQL Database Server สำเร็จ 100%
+- **[LOG-021] Async Sync Endpoint & Populated 60 Employee Records to MySQL Database**:
+  - ปรับแต่ง [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/routes/api.ts) ให้ `/api/db/sync` เป็น `async/await` เพื่อให้การซิงค์ข้อมูลเสร็จสิ้นสมบูรณ์
+  - นำเข้าข้อมูลพนักงานจากไฟล์ `sqlite_user_master_export_2026-08-03 (1).csv` ลงในตาราง `users` ของ MySQL Database Server (`user_access_dashboard_data`) ครบถ้วนทั้ง 60 คนเรียบร้อยแล้ว
+- **[LOG-022] Create Dedicated MySQL Troubleshooting Postmortem Documentation**:
+  - จัดทำไฟล์เอกสาร [docs/mysql_sync_troubleshooting_postmortem.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/docs/mysql_sync_troubleshooting_postmortem.md) สรุปสาเหตุเชิงลึกและแนวทางแก้ไขปัญหาสนองความต้องการของผู้ใช้
+- **[LOG-023] Implement Real-Time Deletion Syncing for MySQL Database Server**:
+  - อัปเดต [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) เพิ่มคำสั่ง `DELETE FROM \`users\` WHERE employee_id NOT IN (?)` และ `DELETE FROM \`groups\` WHERE group_id NOT IN (?)`
+  - แก้ไขปัญพาลบพนักงานบนหน้าเว็บแล้วข้อมูลในตาราง `users` ของ MySQL Workbench ยังไม่ลบตาม
+- **[LOG-024] Enforce Pure Read-Only Page Initialization from MySQL Server**:
+  - ปรับปรุง `useUserAccessData.ts` และ `api.ts` ในฟังก์ชัน `initMySqlEngine()` ให้การดึงข้อมูลตอนเปิดหน้าเว็บเป็นการอ่านข้อมูล (READ-ONLY) จาก MySQL Server 100% ปราศจากการยิงสั่งลบ/สั่งเขียนทับ (`POST /api/db/sync`) ขณะโหลดหน้าเว็บ
+- **[LOG-025] Server Process Restart & Verified 60 Employee Records Serving via REST API**:
+  - รีสตาร์ตกระบวนการ Express Backend Dev Server ใหม่เพื่อโหลดซอร์สโค้ดเอนจิน MySQL ล่าสุด
+  - สอบถามผ่านคำสั่ง `fetch('http://localhost:3000/api/users')` ยืนยันการส่งคืนข้อมูลสดจาก MySQL Database Server จำนวน 60 รายการเต็ม ครบถ้วนตามตาราง MySQL Workbench
+- **[LOG-026] Restore Special Groups Mapping on Page Refresh via REST API**:
+  - เพิ่ม REST API `/api/user-groups` ใน `api.ts` และดึงข้อมูลตารางผูกสิทธิ์ 511 รายการมาใส่ React State ใน `useUserAccessData.ts` ขณะโหลดหน้าเว็บ
+  - แก้ไขปัญหา Special Groups (เช่น Video Access, Communications, Free E-mail, Printer Mono, VPN Access) หายไปเมื่อทำการกดรีเฟรชหน้าเว็บ (F5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
