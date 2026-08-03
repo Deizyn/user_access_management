@@ -127,6 +127,9 @@
 - **การแก้ไข**: 
   1. เพิ่ม Endpoint `GET /api/user-groups` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/routes/api.ts) คืนค่าตารางผูกสิทธิ์ 511 รายการจาก MySQL Database Server
   2. อัปเดต [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/frontend/hooks/useUserAccessData.ts) ในฟังก์ชัน `initMySqlEngine()` ให้เรียก `fetch('/api/user-groups')` ร่วมด้วย ทำให้การรีเฟรชหน้าเว็บแสดงผลป้าย Special Groups ครบถ้วน 100%
+### 2.21 ตั้งค่า Git Repository และซิงค์โค้ดไปยัง GitHub Remote
+- **การปรับปรุง**: ริเริ่มสร้างคลังโค้ด `git init`, กำหนดชื่อ Branch หลักเป็น `main`, ผูก Remote Repository เข้ากับ `https://github.com/Deizyn/user_access_management.git`
+- **ผลลัพธ์**: คอมมิตและดัน (Push) ซอร์สโค้ดระบบทั้งหมด เอกสารประกอบสถาปัตยกรรม และคู่มือระบบไปยัง GitHub Repository เรียบร้อยแล้ว
 
 ---
 

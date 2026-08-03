@@ -76,6 +76,10 @@
 - **[LOG-026] Restore Special Groups Mapping on Page Refresh via REST API**:
   - เพิ่ม REST API `/api/user-groups` ใน `api.ts` และดึงข้อมูลตารางผูกสิทธิ์ 511 รายการมาใส่ React State ใน `useUserAccessData.ts` ขณะโหลดหน้าเว็บ
   - แก้ไขปัญหา Special Groups (เช่น Video Access, Communications, Free E-mail, Printer Mono, VPN Access) หายไปเมื่อทำการกดรีเฟรชหน้าเว็บ (F5)
+- **[LOG-027] Git Repository Initialization & Push to GitHub Remote**:
+  - สร้าง Git Repository (`git init`), ตั้งค่าชื่อ branch หลักเป็น `main`, ผูก remote ไปยัง `https://github.com/Deizyn/user_access_management.git`
+  - ทำการ commit และ push ซอร์สโค้ดและเอกสารระบบขึ้นคลัง GitHub เรียบร้อยแล้ว
+
 
 
 
