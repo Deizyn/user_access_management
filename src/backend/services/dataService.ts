@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import { INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS } from '../../data/initialData';
 import { JSON_DATABASE_SCHEMA_DOC } from '../../data/databaseSchemaSpec';
-import { User, Group, UserGroup } from '../../types';
+import { User, Group, UserGroup, InternetLevel } from '../../types';
 
 export class DataService {
   // Cache synced with MySQL Server for sub-millisecond API response
@@ -60,10 +60,9 @@ export class DataService {
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`users\` (
           employee_id VARCHAR(50) PRIMARY KEY,
-          username VARCHAR(100) NOT NULL,
+          username VARCHAR(100) NOT NULL UNIQUE,
           display_name VARCHAR(150) NOT NULL,
           email VARCHAR(150) NOT NULL,
-          internet_level VARCHAR(10) NOT NULL,
           job_title VARCHAR(100) NOT NULL,
           department VARCHAR(100) NOT NULL,
           company VARCHAR(100) NOT NULL,
@@ -71,9 +70,7 @@ export class DataService {
           authority_group VARCHAR(100) NOT NULL,
           creation_date VARCHAR(50) NOT NULL,
           expiry_date VARCHAR(50) NULL,
-          print_quota_group VARCHAR(100) NOT NULL,
           telephone_pass_code VARCHAR(50) NOT NULL,
-          vpn_status TINYINT(1) NOT NULL DEFAULT 0,
           o365_license VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
@@ -164,21 +161,56 @@ export class DataService {
       const [groupRows]: any = await pool.query(`SELECT * FROM \`groups\`;`);
       const [ugRows]: any = await pool.query(`SELECT * FROM \`user_groups\`;`);
 
-      this.usersCache = userRows.map((u: any) => ({
-        ...u,
-        vpn_status: Boolean(u.vpn_status),
-        o365_license: u.o365_license || 'Microsoft 365 E3',
-      }));
-
+      const groupMap = new Map<number, Group>();
       if (groupRows.length > 0) {
-        this.groupsCache = groupRows.map((g: any) => ({
-          group_id: Number(g.group_id),
-          group_name: String(g.group_name),
-          description: g.description || undefined,
-          internet_level: g.internet_level || undefined,
-          is_special: Boolean(g.is_special),
-        }));
+        this.groupsCache = groupRows.map((g: any) => {
+          const groupObj: Group = {
+            group_id: Number(g.group_id),
+            group_name: String(g.group_name),
+            description: g.description || undefined,
+            internet_level: g.internet_level || undefined,
+            is_special: Boolean(g.is_special),
+          };
+          groupMap.set(groupObj.group_id, groupObj);
+          return groupObj;
+        });
       }
+
+      const userGroupsLookup = new Map<string, Group[]>();
+      ugRows.forEach((ug: any) => {
+        const empId = String(ug.employee_id);
+        const groupId = Number(ug.group_id);
+        const groupObj = groupMap.get(groupId);
+        if (groupObj) {
+          if (!userGroupsLookup.has(empId)) {
+            userGroupsLookup.set(empId, []);
+          }
+          userGroupsLookup.get(empId)!.push(groupObj);
+        }
+      });
+
+      this.usersCache = userRows.map((u: any) => {
+        const userGroups = userGroupsLookup.get(String(u.employee_id)) || [];
+        
+        // Dynamically compute derived properties from mapped groups
+        const hasA = userGroups.some((g) => g.group_id === 101 || g.internet_level === 'A' || g.group_name.toLowerCase().includes('level a'));
+        const hasC = userGroups.some((g) => g.group_id === 103 || g.internet_level === 'C' || g.group_name.toLowerCase().includes('level c'));
+        const internetLevel: InternetLevel = hasA ? 'A' : hasC ? 'C' : 'B';
+
+        const vpnStatus = userGroups.some((g) => g.group_id === 107 || g.group_name.toLowerCase().includes('vpn'));
+
+        const hasColor = userGroups.some((g) => g.group_id === 108 || g.group_name.toLowerCase().includes('printer color') || g.group_name.includes('ปริ้นสี'));
+        const hasMono = userGroups.some((g) => g.group_id === 109 || g.group_name.toLowerCase().includes('printer mono') || g.group_name.includes('ปริ้นขาวดำ'));
+        const printQuota = hasColor ? 'Printer Color (ปริ้นสี)' : hasMono ? 'Printer Mono (ปริ้นขาวดำ)' : 'Standard Print';
+
+        return {
+          ...u,
+          internet_level: u.internet_level || internetLevel,
+          vpn_status: u.vpn_status !== undefined ? Boolean(u.vpn_status) : vpnStatus,
+          print_quota_group: u.print_quota_group || printQuota,
+          o365_license: u.o365_license || 'Microsoft 365 E3',
+        };
+      });
 
       this.userGroupsCache = ugRows.map((ug: any) => ({
         employee_id: String(ug.employee_id),
@@ -249,15 +281,14 @@ export class DataService {
 
         for (const u of users) {
           await pool.query(
-            `INSERT INTO \`users\` (employee_id, username, display_name, email, internet_level, job_title, department, company, device_code, authority_group, creation_date, expiry_date, print_quota_group, telephone_pass_code, vpn_status, o365_license)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), internet_level=VALUES(internet_level), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), print_quota_group=VALUES(print_quota_group), telephone_pass_code=VALUES(telephone_pass_code), vpn_status=VALUES(vpn_status), o365_license=VALUES(o365_license);`,
+            `INSERT INTO \`users\` (employee_id, username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), telephone_pass_code=VALUES(telephone_pass_code), o365_license=VALUES(o365_license);`,
             [
               u.employee_id,
               u.username,
               u.display_name,
               u.email,
-              u.internet_level,
               u.job_title,
               u.department,
               u.company,
@@ -265,9 +296,7 @@ export class DataService {
               u.authority_group,
               u.creation_date,
               u.expiry_date || null,
-              u.print_quota_group,
               u.telephone_pass_code,
-              u.vpn_status ? 1 : 0,
               u.o365_license || 'Microsoft 365 E3',
             ]
           );

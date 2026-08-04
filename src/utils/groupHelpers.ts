@@ -57,16 +57,35 @@ export function getDarkInternetLevelBadgeClasses(level: string): string {
 }
 
 export function getUserPrimaryInternetLevel(groups: Group[], fallbackLevel: InternetLevel = 'B'): InternetLevel {
-  const hasA = groups.some((g) => g.group_id === 101 || g.internet_level === 'A');
+  if (!groups || groups.length === 0) return fallbackLevel;
+  const hasA = groups.some((g) => g.group_id === 101 || g.internet_level === 'A' || (g.group_name && g.group_name.toLowerCase().includes('level a')));
   if (hasA) return 'A';
-  const hasB = groups.some((g) => g.group_id === 102 || g.internet_level === 'B');
-  if (hasB) return 'B';
-  const hasC = groups.some((g) => g.group_id === 103 || g.internet_level === 'C');
+  const hasC = groups.some((g) => g.group_id === 103 || g.internet_level === 'C' || (g.group_name && g.group_name.toLowerCase().includes('level c')));
   if (hasC) return 'C';
+  const hasB = groups.some((g) => g.group_id === 102 || g.internet_level === 'B' || (g.group_name && g.group_name.toLowerCase().includes('level b')));
+  if (hasB) return 'B';
   return fallbackLevel;
 }
 
 export function getGroupHighestInternetLevel(groups: Group[]): InternetLevel {
   return getUserPrimaryInternetLevel(groups, 'B');
+}
+
+export function getUserVpnStatus(groups: Group[]): boolean {
+  if (!groups || groups.length === 0) return false;
+  return groups.some((g) => g.group_id === 107 || (g.group_name && g.group_name.toLowerCase().includes('vpn')));
+}
+
+export function getUserPrintQuotaGroup(groups: Group[]): string {
+  if (!groups || groups.length === 0) return 'Standard Print';
+  const hasColor = groups.some(
+    (g) => g.group_id === 108 || (g.group_name && (g.group_name.toLowerCase().includes('printer color') || g.group_name.includes('ปริ้นสี')))
+  );
+  if (hasColor) return 'Printer Color (ปริ้นสี)';
+  const hasMono = groups.some(
+    (g) => g.group_id === 109 || (g.group_name && (g.group_name.toLowerCase().includes('printer mono') || g.group_name.includes('ปริ้นขาวดำ')))
+  );
+  if (hasMono) return 'Printer Mono (ปริ้นขาวดำ)';
+  return 'Standard Print';
 }
 

@@ -14,7 +14,7 @@ export interface User {
   username: string;
   display_name: string;
   email: string;
-  internet_level: InternetLevel;
+  internet_level?: InternetLevel;
   level_group?: string;
   job_title: string;
   department: string;
@@ -23,9 +23,9 @@ export interface User {
   authority_group: string;
   creation_date: string;
   expiry_date: string | null;
-  print_quota_group: string;
+  print_quota_group?: string;
   telephone_pass_code: string;
-  vpn_status: boolean;
+  vpn_status?: boolean;
   o365_license?: O365License | string;
 }
 

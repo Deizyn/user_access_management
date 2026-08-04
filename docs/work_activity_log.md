@@ -114,9 +114,12 @@
   - ทดสอบรันคำสั่ง `POST /api/db/reset` และตรวจสอบผ่าน `GET /api/users` ยืนยันการลบข้อมูลพนักงานสำเร็จ 100% (`count: 0`)
 - **[LOG-039] Add Smart Fallback for Internet Level in CSV Import**:
   - ปรับปรุง [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) ให้ตรวจสอบคอลัมน์ `Groups` โดยอัตโนมัติหากคอลัมน์ `Internet Level` ถูกเว้นว่างไว้ เพื่อตรวจจับค่าระดับอินเทอร์เน็ต `A`, `B`, `C` จากชื่อกลุ่มสิทธิ์ ก่อนที่จะตกไปใช้ค่าเริ่มต้น `'B'`
-- **[LOG-040] Create `special_groups` Master Table in MySQL Database & Add Catalog API**:
-  - สร้างตาราง `special_groups` ใน MySQL Database ผ่าน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) เพื่อเป็น Master Catalog สำหรับเก็บสิทธิ์พิเศษทั้ง 7 หมวดหมู่หลัก (`Internet Level A/B/C`, `Video Access`, `Communications`, `Free E-mail`, `VPN Access`, `Printer Color`, `Printer Mono`)
-  - เพิ่ม REST API Route `GET /api/special-groups` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) สำหรับดึงรายการกลุ่มสิทธิ์พิเศษไปแมปกับกลุ่มของพนักงานแบบไดนามิก
+- **[LOG-040] Refactor Normalized AD Groups Engine & Streamline CSV to 14 Core Columns**:
+  - ลบคอลัมน์ซ้ำซ้อน (`Level Group`, `Internet Level`, `Print Quota Group`, `VPN Status`) ออกจากคอลัมน์ CSV ให้เหลือ 14 คอลัมน์หลักมาตรฐาน
+  - ปรับปรุง [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts), [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts), [groupHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/groupHelpers.ts) ให้ประมวลผลและสกัดค่าระดับอินเทอร์เน็ต (A/B/C), สถานะ VPN (Active/Disabled), โควต้าการพิมพ์ (Printer Color/Mono) และสิทธิ์พิเศษทรัพยากรอื่นๆ จากคอลัมน์ **`Groups` (Active Directory Groups)** โดยอัตโนมัติ
+  - เพิ่มตาราง Master Catalog `special_groups` ในฐานข้อมูล MySQL และ REST API Endpoint `GET /api/special-groups`
+  - สร้างไฟล์เอกสาร Mermaid Diagrams เชิงสถาปัตยกรรมใน [system_architecture_diagrams.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture_diagrams.md)
+
 
 
 

@@ -1,15 +1,13 @@
 import { User, Group, UserGroup, UserWithGroups, InternetLevel } from '../types';
 
 /**
- * Standard CSV Headers mapping for normalization
+ * Standard CSV Headers mapping for normalization (Streamlined 14 Columns)
  */
 export const CSV_HEADERS = [
   'Employee ID (รหัสพนักงาน)',
   'Username (ชื่อผู้ใช้)',
   'Display Name (ชื่อ-นามสกุล)',
   'Email (อีเมล)',
-  'Internet Level (ระดับอินเทอร์เน็ต A/B/C)',
-  'Level Group (กลุ่มระดับการใช้งาน)',
   'O365 License (สิทธิ์การใช้งาน O365)',
   'Job Title (ตำแหน่งงาน)',
   'Department (แผนก)',
@@ -19,9 +17,7 @@ export const CSV_HEADERS = [
   'Groups (กลุ่มสิทธิ์/บทบาท)',
   'Creation Date (วันสร้างบัญชี)',
   'Expiry Date (วันหมดอายุ)',
-  'Print Quota Group (โควต้าการพิมพ์)',
   'Telephone Passcode (รหัสผ่านโทรศัพท์)',
-  'VPN Status (สถานะ VPN)',
 ];
 
 /**
@@ -34,7 +30,7 @@ export const escapeCsvField = (val: string | number | boolean | null | undefined
 };
 
 /**
- * Export Users to CSV with UTF-8 BOM for Thai language Excel support
+ * Export Users to CSV with UTF-8 BOM for Thai language Excel support (14 Columns)
  */
 export function exportUsersToCSV(users: UserWithGroups[], filenamePrefix = 'user_master_directory') {
   if (!users || users.length === 0) {
@@ -47,8 +43,6 @@ export function exportUsersToCSV(users: UserWithGroups[], filenamePrefix = 'user
     escapeCsvField(u.username),
     escapeCsvField(u.display_name),
     escapeCsvField(u.email),
-    escapeCsvField(u.internet_level),
-    escapeCsvField(u.level_group || 'General Staff'),
     escapeCsvField(u.o365_license || 'Microsoft 365 E3'),
     escapeCsvField(u.job_title),
     escapeCsvField(u.department),
@@ -58,9 +52,7 @@ export function exportUsersToCSV(users: UserWithGroups[], filenamePrefix = 'user
     escapeCsvField(u.groups.map((g) => g.group_name).join(', ')),
     escapeCsvField(u.creation_date),
     escapeCsvField(u.expiry_date || 'N/A'),
-    escapeCsvField(u.print_quota_group),
     escapeCsvField(u.telephone_pass_code),
-    escapeCsvField(u.vpn_status ? 'Active' : 'Disabled'),
   ]);
 
   const csvContent = '\uFEFF' + [CSV_HEADERS.join(','), ...rows.map((e) => e.join(','))].join('\n');
@@ -76,7 +68,7 @@ export function exportUsersToCSV(users: UserWithGroups[], filenamePrefix = 'user
 }
 
 /**
- * Download standard CSV template for import
+ * Download standard CSV template for import (Streamlined 14 Columns)
  */
 export function downloadCSVTemplate() {
   const sampleRows = [
@@ -85,40 +77,32 @@ export function downloadCSVTemplate() {
       escapeCsvField('somchai.p'),
       escapeCsvField('สมชาย ใจดี'),
       escapeCsvField('somchai.p@company.co.th'),
-      escapeCsvField('A'),
-      escapeCsvField('IT & Technical'),
       escapeCsvField('Microsoft 365 E5'),
       escapeCsvField('Senior IT Specialist'),
       escapeCsvField('IT'),
       escapeCsvField('Alpha Group'),
       escapeCsvField('Domain Admins'),
       escapeCsvField('DEV-9001'),
-      escapeCsvField('Internet Level A, DevOps & Cloud Engineers, IT Security Ops'),
+      escapeCsvField('Internet Level A, VPN Access, Printer Color (ปริ้นสี), DevOps & Cloud Engineers'),
       escapeCsvField('2026-01-15'),
       escapeCsvField('2027-01-15'),
-      escapeCsvField('VIP_UNLIMITED'),
       escapeCsvField('889001'),
-      escapeCsvField('Active'),
     ],
     [
       escapeCsvField('EMP-88002'),
       escapeCsvField('wanida.k'),
       escapeCsvField('วนิดา กิจเจริญ'),
       escapeCsvField('wanida.k@company.co.th'),
-      escapeCsvField('B'),
-      escapeCsvField('General Staff'),
       escapeCsvField('Microsoft 365 E3'),
       escapeCsvField('HR Specialist'),
       escapeCsvField('HR'),
       escapeCsvField('Beta Corp'),
       escapeCsvField('Domain Users'),
       escapeCsvField('DEV-9002'),
-      escapeCsvField('Internet Level B, Sales & Marketing Team'),
+      escapeCsvField('Internet Level B, Printer Mono (ปริ้นขาวดำ), Free E-mail, Sales & Marketing Team'),
       escapeCsvField('2026-02-01'),
       escapeCsvField('N/A'),
-      escapeCsvField('STD_500'),
       escapeCsvField('889002'),
-      escapeCsvField('Disabled'),
     ],
   ];
 
@@ -135,25 +119,24 @@ export function downloadCSVTemplate() {
 }
 
 /**
- * CSV Robust Line Splitter that handles quotes, commas, and multiline values
+ * Parses raw CSV text string into a 2D array of string values
  */
-export function parseCSVText(text: string): string[][] {
+export function parseCSVText(csvText: string): string[][] {
   const lines: string[][] = [];
   let currentRow: string[] = [];
   let currentVal = '';
   let inQuotes = false;
 
-  // Clean BOM if present
-  const cleanedText = text.startsWith('\uFEFF') ? text.slice(1) : text;
+  const text = csvText.startsWith('\uFEFF') ? csvText.slice(1) : csvText;
 
-  for (let i = 0; i < cleanedText.length; i++) {
-    const char = cleanedText[i];
-    const nextChar = cleanedText[i + 1];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
 
     if (char === '"') {
       if (inQuotes && nextChar === '"') {
         currentVal += '"';
-        i++; // skip escaped quote
+        i++;
       } else {
         inQuotes = !inQuotes;
       }
@@ -165,11 +148,11 @@ export function parseCSVText(text: string): string[][] {
         i++;
       }
       currentRow.push(currentVal.trim());
+      currentVal = '';
       if (currentRow.some((field) => field.length > 0)) {
         lines.push(currentRow);
       }
       currentRow = [];
-      currentVal = '';
     } else {
       currentVal += char;
     }
@@ -208,8 +191,6 @@ function normalizeHeaderKey(header: string): string | null {
   if (h.includes('username') || h.includes('ชื่อผู้ใช้')) return 'username';
   if (h.includes('display') || h.includes('ชื่อ-นามสกุล') || h === 'name' || h === 'display_name') return 'display_name';
   if (h.includes('email') || h.includes('อีเมล')) return 'email';
-  if (h.includes('internet level') || h.includes('ระดับอินเทอร์เน็ต') || h === 'internet_level') return 'internet_level';
-  if (h.includes('level group') || h.includes('กลุ่มระดับ') || h === 'level_group') return 'level_group';
   if (h.includes('o365') || h.includes('license') || h.includes('365') || h === 'o365_license') return 'o365_license';
   if (h.includes('job') || h.includes('ตำแหน่ง') || h === 'job_title') return 'job_title';
   if (h.includes('department') || h.includes('แผนก') || h === 'department') return 'department';
@@ -219,9 +200,7 @@ function normalizeHeaderKey(header: string): string | null {
   if (h.includes('groups') || h.includes('กลุ่มสิทธิ์') || h === 'group_names') return 'groups';
   if (h.includes('creation') || h.includes('สร้าง') || h === 'creation_date') return 'creation_date';
   if (h.includes('expiry') || h.includes('หมดอายุ') || h === 'expiry_date') return 'expiry_date';
-  if (h.includes('quota') || h.includes('พิมพ์') || h === 'print_quota_group') return 'print_quota_group';
   if (h.includes('passcode') || h.includes('โทรศัพท์') || h === 'telephone_pass_code') return 'telephone_pass_code';
-  if (h.includes('vpn') || h.includes('สถานะ vpn') || h === 'vpn_status') return 'vpn_status';
   return null;
 }
 
@@ -235,7 +214,6 @@ export function processImportCSV(
   existingUserGroups: UserGroup[]
 ): ParseResult {
   const rows = parseCSVText(csvText);
-  const errors: string[] = [];
 
   if (rows.length < 2) {
     return {
@@ -278,9 +256,8 @@ export function processImportCSV(
   let maxGroupId = Math.max(...existingGroups.map((g) => g.group_id), 200);
 
   const updatedUsersMap = new Map<string, User>();
-  // Normalized case-insensitive lookup index to prevent duplicate Employee ID creation
-  const empIdLookupMap = new Map<string, string>(); // lowercased_emp_id -> canonical_emp_id
-  const usernameLookupMap = new Map<string, string>(); // lowercased_username -> canonical_emp_id
+  const empIdLookupMap = new Map<string, string>();
+  const usernameLookupMap = new Map<string, string>();
 
   existingUsers.forEach((u) => {
     updatedUsersMap.set(u.employee_id, { ...u });
@@ -320,7 +297,6 @@ export function processImportCSV(
     let rawUsername = getValue('username');
     let displayName = getValue('display_name');
 
-    // Case-insensitive lookup for existing Employee ID or Username to prevent duplicates
     const normEmpIdKey = rawEmpId ? rawEmpId.toLowerCase() : '';
     const normUsernameKey = rawUsername ? rawUsername.toLowerCase() : '';
 
@@ -343,7 +319,6 @@ export function processImportCSV(
       } else {
         canonicalEmpId = `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
       }
-      // Register into lookup maps for remaining rows in batch
       empIdLookupMap.set(canonicalEmpId.toLowerCase(), canonicalEmpId);
       if (rawUsername) {
         usernameLookupMap.set(rawUsername.toLowerCase(), canonicalEmpId);
@@ -364,28 +339,6 @@ export function processImportCSV(
       email = `${username.toLowerCase()}@company.co.th`;
     }
 
-    // Normalized Internet Level (with fallback to Groups column if internet_level column is blank)
-    let internetLevelRaw = getValue('internet_level').toUpperCase();
-    let groupsRaw = getValue('groups').toUpperCase();
-    let internetLevel: InternetLevel = 'B';
-
-    if (internetLevelRaw === 'A' || internetLevelRaw.includes('LEVEL A') || internetLevelRaw.includes('ระดับ A')) {
-      internetLevel = 'A';
-    } else if (internetLevelRaw === 'C' || internetLevelRaw.includes('LEVEL C') || internetLevelRaw.includes('ระดับ C')) {
-      internetLevel = 'C';
-    } else if (internetLevelRaw === 'B' || internetLevelRaw.includes('LEVEL B') || internetLevelRaw.includes('ระดับ B')) {
-      internetLevel = 'B';
-    } else if (groupsRaw.includes('INTERNET LEVEL A') || groupsRaw.includes('LEVEL A')) {
-      internetLevel = 'A';
-    } else if (groupsRaw.includes('INTERNET LEVEL C') || groupsRaw.includes('LEVEL C')) {
-      internetLevel = 'C';
-    } else if (groupsRaw.includes('INTERNET LEVEL B') || groupsRaw.includes('LEVEL B')) {
-      internetLevel = 'B';
-    } else {
-      internetLevel = 'B';
-    }
-
-    const levelGroup = getValue('level_group', 'General Staff');
     const o365License = getValue('o365_license', 'Microsoft 365 E3');
     const jobTitle = getValue('job_title', 'Staff');
     const department = getValue('department', 'General');
@@ -400,11 +353,7 @@ export function processImportCSV(
       expiryDate = expiryDateRaw;
     }
 
-    const printQuotaGroup = getValue('print_quota_group', 'STD_500');
     const telephonePassCode = getValue('telephone_pass_code', `${Math.floor(100000 + Math.random() * 900000)}`);
-
-    const vpnRaw = getValue('vpn_status', 'Active').toLowerCase();
-    const vpnStatus = vpnRaw === 'active' || vpnRaw === 'true' || vpnRaw === '1' || vpnRaw === 'yes' || vpnRaw === 'enabled';
 
     const empIdKeyLower = canonicalEmpId.toLowerCase();
     if (isExisting || processedKeysInBatch.has(empIdKeyLower)) {
@@ -415,33 +364,18 @@ export function processImportCSV(
       processedKeysInBatch.add(empIdKeyLower);
     }
 
-    const normalizedUser: User = {
-      employee_id: canonicalEmpId,
-      username,
-      display_name: displayName,
-      email,
-      internet_level: internetLevel,
-      level_group: levelGroup,
-      o365_license: o365License,
-      job_title: jobTitle,
-      department,
-      company,
-      device_code: deviceCode,
-      authority_group: authorityGroup,
-      creation_date: creationDate,
-      expiry_date: expiryDate,
-      print_quota_group: printQuotaGroup,
-      telephone_pass_code: telephonePassCode,
-      vpn_status: vpnStatus,
-    };
-
-    updatedUsersMap.set(canonicalEmpId, normalizedUser);
-
-    // Process Groups Relationship
+    // Process Groups Relationship from Active Directory Groups column
     const groupsText = getValue('groups');
     const userGroupSet = new Set<number>();
 
-    // Mandatory Internet Level Group mapping (101=A, 102=B, 103=C)
+    // Determine internet level group ID (101=A, 102=B, 103=C)
+    let internetLevel: InternetLevel = 'B';
+    const groupsTextUpper = groupsText.toUpperCase();
+    if (groupsTextUpper.includes('INTERNET LEVEL A') || groupsTextUpper.includes('LEVEL A')) {
+      internetLevel = 'A';
+    } else if (groupsTextUpper.includes('INTERNET LEVEL C') || groupsTextUpper.includes('LEVEL C')) {
+      internetLevel = 'C';
+    }
     const internetGroupId = internetLevel === 'A' ? 101 : internetLevel === 'B' ? 102 : 103;
     userGroupSet.add(internetGroupId);
 
@@ -449,20 +383,31 @@ export function processImportCSV(
       const groupTokens = groupsText.split(/[,|;]/).map((s) => s.trim()).filter((s) => s.length > 0);
       groupTokens.forEach((token) => {
         const lowerToken = token.toLowerCase();
-        
-        // Skip adding duplicate Internet Level text groups if they match level A/B/C
-        if (lowerToken.startsWith('internet level')) return;
 
         if (groupNameToId.has(lowerToken)) {
           userGroupSet.add(groupNameToId.get(lowerToken)!);
+        } else if (lowerToken.includes('video access')) {
+          userGroupSet.add(104);
+        } else if (lowerToken.includes('communication')) {
+          userGroupSet.add(105);
+        } else if (lowerToken.includes('free e-mail') || lowerToken.includes('free email')) {
+          userGroupSet.add(106);
+        } else if (lowerToken.includes('vpn')) {
+          userGroupSet.add(107);
+        } else if (lowerToken.includes('printer color') || lowerToken.includes('ปริ้นสี')) {
+          userGroupSet.add(108);
+        } else if (lowerToken.includes('printer mono') || lowerToken.includes('ปริ้นขาวดำ')) {
+          userGroupSet.add(109);
+        } else if (lowerToken.startsWith('internet level')) {
+          return;
         } else {
-          // Create new normalized Group
           maxGroupId++;
           const newGroupId = maxGroupId;
           const newGroup: Group = {
             group_id: newGroupId,
             group_name: token,
             description: `กลุ่มสิทธิ์การใช้งาน ${token} (สร้างอัตโนมัติจากการนำเข้า CSV)`,
+            is_special: true,
           };
           updatedGroupsMap.set(newGroupId, newGroup);
           groupNameToId.set(lowerToken, newGroupId);
@@ -472,6 +417,24 @@ export function processImportCSV(
       });
     }
 
+    const normalizedUser: User = {
+      employee_id: canonicalEmpId,
+      username,
+      display_name: displayName,
+      email,
+      internet_level: internetLevel,
+      job_title: jobTitle,
+      department,
+      company,
+      device_code: deviceCode,
+      authority_group: authorityGroup,
+      creation_date: creationDate,
+      expiry_date: expiryDate,
+      telephone_pass_code: telephonePassCode,
+      o365_license: o365License,
+    };
+
+    updatedUsersMap.set(canonicalEmpId, normalizedUser);
     newUserGroupsMap.set(canonicalEmpId, userGroupSet);
   }
 
@@ -497,6 +460,6 @@ export function processImportCSV(
       duplicatesPreventedCount,
       newGroupsCount,
     },
-    errors,
+    errors: [],
   };
 }
