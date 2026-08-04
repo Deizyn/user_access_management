@@ -185,6 +185,40 @@ export class DataService {
           groupMap.set(groupObj.group_id, groupObj);
           return groupObj;
         });
+      } else {
+        this.groupsCache = [];
+      }
+
+      // Sync active special_groups records into groups list if missing
+      try {
+        const [sgRows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1;`);
+        if (Array.isArray(sgRows)) {
+          for (const sg of sgRows) {
+            const gId = Number(sg.special_group_id);
+            if (!groupMap.has(gId)) {
+              const sgGroupObj: Group = {
+                group_id: gId,
+                group_name: String(sg.group_name),
+                description: sg.description || undefined,
+                is_special: true,
+              };
+              this.groupsCache.push(sgGroupObj);
+              groupMap.set(gId, sgGroupObj);
+
+              // Auto-insert into MySQL groups table
+              try {
+                await pool.query(
+                  `INSERT INTO \`groups\` (group_id, group_name, description, is_special) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), is_special=1;`,
+                  [gId, sg.group_name, sg.description || null]
+                );
+              } catch (e) {
+                // Ignore duplicate insert notice
+              }
+            }
+          }
+        }
+      } catch (sgErr) {
+        console.warn('[MySQL Sync] Special groups auto-sync notice:', sgErr);
       }
 
       const userGroupsLookup = new Map<string, Group[]>();

@@ -55,17 +55,6 @@ export function useUserAccessData() {
   useEffect(() => {
     async function initMySqlEngine() {
       try {
-        // Fetch Special Groups Catalog directly from special_groups database table
-        try {
-          const sgRes = await fetch('/api/special-groups');
-          const sgData = await sgRes.json();
-          if (sgData.success && Array.isArray(sgData.data)) {
-            updateSpecialGroupsCatalog(sgData.data);
-          }
-        } catch (e) {
-          console.warn('Special groups fetch notice:', e);
-        }
-
         const uRes = await fetch('/api/users');
         const gRes = await fetch('/api/groups');
         const ugRes = await fetch('/api/user-groups');
@@ -73,13 +62,41 @@ export function useUserAccessData() {
         const gData = await gRes.json();
         const ugData = await ugRes.json();
 
+        let fetchedGroups: Group[] = gData.success && Array.isArray(gData.data) ? gData.data : [];
+
+        // Fetch Special Groups Catalog directly from special_groups database table
+        try {
+          const sgRes = await fetch('/api/special-groups');
+          const sgData = await sgRes.json();
+          if (sgData.success && Array.isArray(sgData.data)) {
+            updateSpecialGroupsCatalog(sgData.data);
+
+            // Merge special groups into groups list if not already present
+            const existingGroupIds = new Set(fetchedGroups.map((g) => g.group_id));
+            sgData.data.forEach((rec: any) => {
+              const gId = Number(rec.special_group_id);
+              if (!existingGroupIds.has(gId)) {
+                fetchedGroups.push({
+                  group_id: gId,
+                  group_name: rec.group_name,
+                  description: rec.description || undefined,
+                  is_special: true,
+                });
+                existingGroupIds.add(gId);
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Special groups fetch notice:', e);
+        }
+
         if (uData.success && Array.isArray(uData.data)) {
           setUsers(uData.data);
-          if (gData.success && Array.isArray(gData.data)) setGroups(gData.data);
+          setGroups(fetchedGroups);
           if (ugData.success && Array.isArray(ugData.data)) setUserGroups(ugData.data);
           setIsSqliteReady(true);
           console.log(
-            `[MySQL Engine] Loaded ${uData.data.length} users, ${gData.data?.length || 0} groups, ${ugData.data?.length || 0} user-groups directly from MySQL Backend Database Server.`
+            `[MySQL Engine] Loaded ${uData.data.length} users, ${fetchedGroups.length} groups, ${ugData.data?.length || 0} user-groups directly from MySQL Backend Database Server.`
           );
           return;
         }
