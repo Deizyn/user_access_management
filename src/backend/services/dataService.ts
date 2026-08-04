@@ -248,13 +248,25 @@ export class DataService {
 
   public async getSpecialGroupsMasterCatalog() {
     try {
-      const pool = await this.getPool();
-      const [rows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1 ORDER BY special_group_id ASC;`);
-      return rows;
+      if (this.isMySqlConnected) {
+        const pool = await this.getPool();
+        const [rows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1 ORDER BY special_group_id ASC;`);
+        if (Array.isArray(rows) && rows.length > 0) return rows;
+      }
     } catch (err) {
       console.error('[MySQL Database Engine] Failed to fetch special groups catalog:', err);
-      return [];
     }
+    return [
+      { special_group_id: 101, group_name: 'Internet Level A', category: 'INTERNET_LEVEL', badge_color: 'bg-amber-100 text-amber-900 border-amber-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', is_active: 1 },
+      { special_group_id: 102, group_name: 'Internet Level B', category: 'INTERNET_LEVEL', badge_color: 'bg-sky-100 text-sky-900 border-sky-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', is_active: 1 },
+      { special_group_id: 103, group_name: 'Internet Level C', category: 'INTERNET_LEVEL', badge_color: 'bg-slate-100 text-slate-800 border-slate-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', is_active: 1 },
+      { special_group_id: 104, group_name: 'Video Access', category: 'RESOURCE', badge_color: 'bg-purple-100 text-purple-900 border-purple-200', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_active: 1 },
+      { special_group_id: 105, group_name: 'Communications', category: 'RESOURCE', badge_color: 'bg-indigo-100 text-indigo-900 border-indigo-200', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_active: 1 },
+      { special_group_id: 106, group_name: 'Free E-mail', category: 'RESOURCE', badge_color: 'bg-teal-100 text-teal-900 border-teal-200', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_active: 1 },
+      { special_group_id: 107, group_name: 'VPN Access', category: 'RESOURCE', badge_color: 'bg-emerald-100 text-emerald-900 border-emerald-200', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_active: 1 },
+      { special_group_id: 108, group_name: 'Printer Color (ปริ้นสี)', category: 'RESOURCE', badge_color: 'bg-slate-100 text-slate-800 border-slate-200', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_active: 1 },
+      { special_group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', category: 'RESOURCE', badge_color: 'bg-slate-100 text-slate-800 border-slate-200', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_active: 1 },
+    ];
   }
 
   public async syncData(users: User[], groups: Group[], userGroups: UserGroup[]) {

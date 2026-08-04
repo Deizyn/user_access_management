@@ -76,6 +76,30 @@ export function registerSpecialGroup(config: SpecialGroupConfig): void {
 }
 
 /**
+ * Update Special Groups catalog directly from special_groups database table
+ */
+export function updateSpecialGroupsCatalog(
+  dbRecords: Array<{
+    special_group_id: number;
+    group_name: string;
+    category?: string;
+    badge_color?: string;
+    description?: string;
+  }>
+): void {
+  dbRecords.forEach((rec) => {
+    const gId = Number(rec.special_group_id);
+    if (!isNaN(gId) && gId > 0) {
+      SPECIAL_GROUPS_CONFIG[gId] = {
+        id: gId,
+        name: rec.group_name,
+        badgeClass: rec.badge_color || 'bg-indigo-100 text-indigo-900 border-indigo-200',
+      };
+    }
+  });
+}
+
+/**
  * Get all registered Special Group IDs
  */
 export function getSpecialGroupIds(): number[] {

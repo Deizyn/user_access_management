@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Group, User, UserGroup, UserWithGroups } from '../../types';
-import { DEFAULT_MASTER_GROUPS } from '../../constants/specialGroups';
+import { DEFAULT_MASTER_GROUPS, updateSpecialGroupsCatalog } from '../../constants/specialGroups';
 import { INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS } from '../../data/initialData';
 import {
   STORAGE_KEY_GROUPS,
@@ -55,6 +55,17 @@ export function useUserAccessData() {
   useEffect(() => {
     async function initMySqlEngine() {
       try {
+        // Fetch Special Groups Catalog directly from special_groups database table
+        try {
+          const sgRes = await fetch('/api/special-groups');
+          const sgData = await sgRes.json();
+          if (sgData.success && Array.isArray(sgData.data)) {
+            updateSpecialGroupsCatalog(sgData.data);
+          }
+        } catch (e) {
+          console.warn('Special groups fetch notice:', e);
+        }
+
         const uRes = await fetch('/api/users');
         const gRes = await fetch('/api/groups');
         const ugRes = await fetch('/api/user-groups');
