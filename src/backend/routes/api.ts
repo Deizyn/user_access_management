@@ -47,6 +47,12 @@ apiRouter.get('/user-groups', async (req: Request, res: Response) => {
   res.json({ success: true, count: userGroups.length, data: userGroups });
 });
 
+// 4.5 Special Groups Master Catalog Endpoint
+apiRouter.get('/special-groups', async (req: Request, res: Response) => {
+  const catalog = await dataService.getSpecialGroupsMasterCatalog();
+  res.json({ success: true, count: catalog.length, data: catalog });
+});
+
 // 5. Database Schema Specification Endpoint
 apiRouter.get('/sqlite/schema', (req: Request, res: Response) => {
   const schema = dataService.getSchemaSpec();

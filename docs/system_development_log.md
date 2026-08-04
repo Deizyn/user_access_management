@@ -180,6 +180,11 @@
 ### 2.33 ปรับปรุงระบบสกัดระดับอินเทอร์เน็ต (Internet Level Smart Fallback) จากคอลัมน์ Groups
 - **การปรับปรุง**: 
   1. อัปเดตฟังก์ชันนำเข้า CSV ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) กรณีคอลัมน์ `Internet Level` ถูกเว้นว่างไว้ (`""`) ระบบจะตรวจเช็กชื่อกลุ่มสิทธิ์ในคอลัมน์ `Groups` โดยอัตโนมัติ (เช่น `"Internet Level C, Sales Team"`) เพื่อสกัดค่าระดับอินเทอร์เน็ต `A`, `B`, `C` ที่ระบุในชื่อกลุ่ม ก่อนตกไปใช้ค่า Default `'B'`
+### 2.34 พัฒนาตารางมาสเตอร์ `special_groups` ใน MySQL Database & เพิ่ม API Catalog
+- **การปรับปรุง**: 
+  1. **สร้างตาราง Master Catalog `special_groups`**: เพิ่มตาราง `special_groups` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) เพื่อเก็บสิทธิ์พิเศษทั้ง 7 หมวดหมู่หลัก (`Internet Level A/B/C`, `Video Access`, `Communications`, `Free E-mail`, `VPN Access`, `Printer Color`, `Printer Mono`) พร้อมค่าตั้งต้น `category`, `badge_color`, `description`
+  2. **เพิ่ม REST API Endpoint**: เพิ่มเส้นทาง `GET /api/special-groups` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) สำหรับดึงรายการกฎ Special Groups ไปใช้ตรวจสอบและแสดงผลบน UI แบบไดนามิก
+  3. **คงรูปแบบ CSV ดั้งเดิม**: รักษาคอลัมน์ CSV มาตรฐานไว้ครบถ้วน โดยระบบจะแมปกลุ่มสิทธิ์กับตาราง `special_groups` ใน DB เพื่อแยกสิทธิ์ระดับอินเทอร์เน็ต (Internet Level) กับสิทธิ์พิเศษอื่นๆ ให้อัตโนมัติ ป้องกันข้อมูลแสดงซ้ำซ้อนบน UI Table
 
 ---
 

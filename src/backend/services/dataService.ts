@@ -104,13 +104,46 @@ export class DataService {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
 
-      // Seed Initial Groups if empty
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS \`special_groups\` (
+          \`special_group_id\` INT PRIMARY KEY,
+          \`group_name\` VARCHAR(100) NOT NULL UNIQUE,
+          \`category\` VARCHAR(50) NOT NULL DEFAULT 'RESOURCE',
+          \`badge_color\` VARCHAR(100) NULL,
+          \`description\` TEXT NULL,
+          \`is_active\` TINYINT(1) DEFAULT 1
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+      `);
+
+      // Seed Initial Groups & Special Groups Master Catalog if empty
       const [groupRows]: any = await pool.query(`SELECT COUNT(*) as count FROM \`groups\`;`);
       if (groupRows[0].count === 0) {
         for (const g of INITIAL_GROUPS) {
           await pool.query(
             `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name);`,
             [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
+          );
+        }
+      }
+
+      const [sgRows]: any = await pool.query(`SELECT COUNT(*) as count FROM \`special_groups\`;`);
+      if (sgRows[0].count === 0) {
+        const initialSpecialCatalog = [
+          { id: 101, name: 'Internet Level A', category: 'INTERNET_LEVEL', color: 'bg-amber-100 text-amber-900 border-amber-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)' },
+          { id: 102, name: 'Internet Level B', category: 'INTERNET_LEVEL', color: 'bg-sky-100 text-sky-900 border-sky-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)' },
+          { id: 103, name: 'Internet Level C', category: 'INTERNET_LEVEL', color: 'bg-slate-100 text-slate-800 border-slate-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)' },
+          { id: 104, name: 'Video Access', category: 'RESOURCE', color: 'bg-purple-100 text-purple-900 border-purple-200', desc: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง' },
+          { id: 105, name: 'Communications', category: 'RESOURCE', color: 'bg-indigo-100 text-indigo-900 border-indigo-200', desc: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร' },
+          { id: 106, name: 'Free E-mail', category: 'RESOURCE', color: 'bg-teal-100 text-teal-900 border-teal-200', desc: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร' },
+          { id: 107, name: 'VPN Access', category: 'RESOURCE', color: 'bg-emerald-100 text-emerald-900 border-emerald-200', desc: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก' },
+          { id: 108, name: 'Printer Color (ปริ้นสี)', category: 'RESOURCE', color: 'bg-slate-100 text-slate-800 border-slate-200', desc: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)' },
+          { id: 109, name: 'Printer Mono (ปริ้นขาวดำ)', category: 'RESOURCE', color: 'bg-slate-100 text-slate-800 border-slate-200', desc: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)' },
+        ];
+
+        for (const item of initialSpecialCatalog) {
+          await pool.query(
+            `INSERT INTO \`special_groups\` (special_group_id, group_name, category, badge_color, description) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name);`,
+            [item.id, item.name, item.category, item.color, item.desc]
           );
         }
       }
@@ -168,6 +201,17 @@ export class DataService {
 
   public getAllUserGroups(): UserGroup[] {
     return this.userGroupsCache;
+  }
+
+  public async getSpecialGroupsMasterCatalog() {
+    try {
+      const pool = await this.getPool();
+      const [rows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1 ORDER BY special_group_id ASC;`);
+      return rows;
+    } catch (err) {
+      console.error('[MySQL Database Engine] Failed to fetch special groups catalog:', err);
+      return [];
+    }
   }
 
   public async syncData(users: User[], groups: Group[], userGroups: UserGroup[]) {
