@@ -89,12 +89,18 @@ export class DataService {
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`groups\` (
           group_id INT PRIMARY KEY,
-          group_name VARCHAR(100) NOT NULL,
+          group_name VARCHAR(100) NOT NULL UNIQUE,
           description TEXT NULL,
           internet_level VARCHAR(10) NULL,
-          is_special TINYINT(1) DEFAULT 0
+          is_special TINYINT(1) DEFAULT 0,
+          category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL',
+          badge_color VARCHAR(100) NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
+
+      // Ensure columns exist if table was created previously
+      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL';`); } catch (e) {}
+      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN badge_color VARCHAR(100) NULL;`); } catch (e) {}
 
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`user_groups\` (
@@ -112,48 +118,22 @@ export class DataService {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
 
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS \`special_groups\` (
-          \`special_group_id\` INT PRIMARY KEY,
-          \`group_name\` VARCHAR(100) NOT NULL UNIQUE,
-          \`category\` VARCHAR(50) NOT NULL DEFAULT 'RESOURCE',
-          \`badge_color\` VARCHAR(100) NULL,
-          \`description\` TEXT NULL,
-          \`is_active\` TINYINT(1) DEFAULT 1
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-      `);
-
-      // Seed Initial Groups & Special Groups Master Catalog if empty
-      const [groupRows]: any = await pool.query(`SELECT COUNT(*) as count FROM \`groups\`;`);
-      if (groupRows[0].count === 0) {
-        for (const g of DEFAULT_MASTER_GROUPS) {
-          await pool.query(
-            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name);`,
-            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
-          );
-        }
-      }
-
-      const [sgRows]: any = await pool.query(`SELECT COUNT(*) as count FROM \`special_groups\`;`);
-      if (sgRows[0].count === 0) {
-        const initialSpecialCatalog = [
-          { id: 101, name: 'Internet Level A', category: 'INTERNET_LEVEL', color: 'bg-amber-100 text-amber-900 border-amber-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)' },
-          { id: 102, name: 'Internet Level B', category: 'INTERNET_LEVEL', color: 'bg-sky-100 text-sky-900 border-sky-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)' },
-          { id: 103, name: 'Internet Level C', category: 'INTERNET_LEVEL', color: 'bg-slate-100 text-slate-800 border-slate-300', desc: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)' },
-          { id: 104, name: 'Video Access', category: 'RESOURCE', color: 'bg-purple-100 text-purple-900 border-purple-200', desc: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง' },
-          { id: 105, name: 'Communications', category: 'RESOURCE', color: 'bg-indigo-100 text-indigo-900 border-indigo-200', desc: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร' },
-          { id: 106, name: 'Free E-mail', category: 'RESOURCE', color: 'bg-teal-100 text-teal-900 border-teal-200', desc: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร' },
-          { id: 107, name: 'VPN Access', category: 'RESOURCE', color: 'bg-emerald-100 text-emerald-900 border-emerald-200', desc: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก' },
-          { id: 108, name: 'Printer Color (ปริ้นสี)', category: 'RESOURCE', color: 'bg-slate-100 text-slate-800 border-slate-200', desc: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)' },
-          { id: 109, name: 'Printer Mono (ปริ้นขาวดำ)', category: 'RESOURCE', color: 'bg-slate-100 text-slate-800 border-slate-200', desc: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)' },
-        ];
-
-        for (const item of initialSpecialCatalog) {
-          await pool.query(
-            `INSERT INTO \`special_groups\` (special_group_id, group_name, category, badge_color, description) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name);`,
-            [item.id, item.name, item.category, item.color, item.desc]
-          );
-        }
+      // Seed Initial Groups & Special Groups Master Catalog
+      for (const g of DEFAULT_MASTER_GROUPS) {
+        await pool.query(
+          `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special, category, badge_color)
+           VALUES (?, ?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), category=VALUES(category), badge_color=VALUES(badge_color);`,
+          [
+            g.group_id,
+            g.group_name,
+            g.description || null,
+            g.internet_level || null,
+            g.is_special ? 1 : 0,
+            g.category || 'RESOURCE_ENTITLEMENT',
+            g.badge_color || null,
+          ]
+        );
       }
 
       this.isMySqlConnected = true;
@@ -181,44 +161,14 @@ export class DataService {
             description: g.description || undefined,
             internet_level: g.internet_level || undefined,
             is_special: Boolean(g.is_special),
+            category: g.category || undefined,
+            badge_color: g.badge_color || undefined,
           };
           groupMap.set(groupObj.group_id, groupObj);
           return groupObj;
         });
       } else {
         this.groupsCache = [];
-      }
-
-      // Sync active special_groups records into groups list if missing
-      try {
-        const [sgRows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1;`);
-        if (Array.isArray(sgRows)) {
-          for (const sg of sgRows) {
-            const gId = Number(sg.special_group_id);
-            if (!groupMap.has(gId)) {
-              const sgGroupObj: Group = {
-                group_id: gId,
-                group_name: String(sg.group_name),
-                description: sg.description || undefined,
-                is_special: true,
-              };
-              this.groupsCache.push(sgGroupObj);
-              groupMap.set(gId, sgGroupObj);
-
-              // Auto-insert into MySQL groups table
-              try {
-                await pool.query(
-                  `INSERT INTO \`groups\` (group_id, group_name, description, is_special) VALUES (?, ?, ?, 1) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), is_special=1;`,
-                  [gId, sg.group_name, sg.description || null]
-                );
-              } catch (e) {
-                // Ignore duplicate insert notice
-              }
-            }
-          }
-        }
-      } catch (sgErr) {
-        console.warn('[MySQL Sync] Special groups auto-sync notice:', sgErr);
       }
 
       const userGroupsLookup = new Map<string, Group[]>();
@@ -284,23 +234,22 @@ export class DataService {
     try {
       if (this.isMySqlConnected) {
         const pool = await this.getPool();
-        const [rows]: any = await pool.query(`SELECT * FROM \`special_groups\` WHERE is_active = 1 ORDER BY special_group_id ASC;`);
+        const [rows]: any = await pool.query(
+          `SELECT group_id AS special_group_id, group_name, COALESCE(category, 'RESOURCE_ENTITLEMENT') AS category, badge_color, description, is_special AS is_active FROM \`groups\` WHERE is_special = 1 ORDER BY group_id ASC;`
+        );
         if (Array.isArray(rows) && rows.length > 0) return rows;
       }
     } catch (err) {
       console.error('[MySQL Database Engine] Failed to fetch special groups catalog:', err);
     }
-    return [
-      { special_group_id: 101, group_name: 'Internet Level A', category: 'INTERNET_LEVEL', badge_color: 'bg-amber-100 text-amber-900 border-amber-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', is_active: 1 },
-      { special_group_id: 102, group_name: 'Internet Level B', category: 'INTERNET_LEVEL', badge_color: 'bg-sky-100 text-sky-900 border-sky-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', is_active: 1 },
-      { special_group_id: 103, group_name: 'Internet Level C', category: 'INTERNET_LEVEL', badge_color: 'bg-slate-100 text-slate-800 border-slate-300', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', is_active: 1 },
-      { special_group_id: 104, group_name: 'Video Access', category: 'RESOURCE', badge_color: 'bg-purple-100 text-purple-900 border-purple-200', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_active: 1 },
-      { special_group_id: 105, group_name: 'Communications', category: 'RESOURCE', badge_color: 'bg-indigo-100 text-indigo-900 border-indigo-200', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_active: 1 },
-      { special_group_id: 106, group_name: 'Free E-mail', category: 'RESOURCE', badge_color: 'bg-teal-100 text-teal-900 border-teal-200', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_active: 1 },
-      { special_group_id: 107, group_name: 'VPN Access', category: 'RESOURCE', badge_color: 'bg-emerald-100 text-emerald-900 border-emerald-200', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_active: 1 },
-      { special_group_id: 108, group_name: 'Printer Color (ปริ้นสี)', category: 'RESOURCE', badge_color: 'bg-slate-100 text-slate-800 border-slate-200', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_active: 1 },
-      { special_group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', category: 'RESOURCE', badge_color: 'bg-slate-100 text-slate-800 border-slate-200', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_active: 1 },
-    ];
+    return DEFAULT_MASTER_GROUPS.map((g) => ({
+      special_group_id: g.group_id,
+      group_name: g.group_name,
+      category: g.category || 'RESOURCE_ENTITLEMENT',
+      badge_color: g.badge_color || 'bg-indigo-100 text-indigo-900 border-indigo-200',
+      description: g.description,
+      is_active: 1,
+    }));
   }
 
   public async syncData(users: User[], groups: Group[], userGroups: UserGroup[]) {
@@ -319,10 +268,10 @@ export class DataService {
         await pool.query(`DELETE FROM \`groups\` WHERE group_id NOT IN (?);`, [groupIds]);
         for (const g of groups) {
           await pool.query(
-            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special)
-             VALUES (?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), description=VALUES(description), internet_level=VALUES(internet_level), is_special=VALUES(is_special);`,
-            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
+            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special, category, badge_color)
+             VALUES (?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), description=VALUES(description), internet_level=VALUES(internet_level), is_special=VALUES(is_special), category=VALUES(category), badge_color=VALUES(badge_color);`,
+            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0, g.category || null, g.badge_color || null]
           );
         }
       }

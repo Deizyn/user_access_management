@@ -4,6 +4,8 @@ export interface Group {
   description?: string;
   internet_level?: InternetLevel;
   is_special?: boolean;
+  category?: string;
+  badge_color?: string;
 }
 
 export type InternetLevel = 'A' | 'B' | 'C';

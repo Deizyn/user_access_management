@@ -75,15 +75,15 @@ export const DEFAULT_SPECIAL_GROUPS_CONFIG: Record<number, SpecialGroupConfig> =
 };
 
 export const DEFAULT_MASTER_GROUPS: Group[] = [
-  { group_id: 101, group_name: 'Internet Level A', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', internet_level: 'A', is_special: true },
-  { group_id: 102, group_name: 'Internet Level B', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', internet_level: 'B', is_special: true },
-  { group_id: 103, group_name: 'Internet Level C', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', internet_level: 'C', is_special: true },
-  { group_id: 104, group_name: 'Video Access', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_special: true },
-  { group_id: 105, group_name: 'Communications', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_special: true },
-  { group_id: 106, group_name: 'Free E-mail', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_special: true },
-  { group_id: 107, group_name: 'VPN Access', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_special: true },
-  { group_id: 108, group_name: 'Printer Color (ปริ้นสี)', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_special: true },
-  { group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_special: true },
+  { group_id: 101, group_name: 'Internet Level A', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', internet_level: 'A', is_special: true, category: 'INTERNET_LEVEL', badge_color: 'bg-amber-100 text-amber-900 border-amber-300' },
+  { group_id: 102, group_name: 'Internet Level B', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', internet_level: 'B', is_special: true, category: 'INTERNET_LEVEL', badge_color: 'bg-sky-100 text-sky-900 border-sky-300' },
+  { group_id: 103, group_name: 'Internet Level C', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', internet_level: 'C', is_special: true, category: 'INTERNET_LEVEL', badge_color: 'bg-slate-100 text-slate-800 border-slate-300' },
+  { group_id: 104, group_name: 'Video Access', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_special: true, category: 'RESOURCE_ENTITLEMENT', badge_color: 'bg-purple-100 text-purple-900 border-purple-200' },
+  { group_id: 105, group_name: 'Communications', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_special: true, category: 'RESOURCE_ENTITLEMENT', badge_color: 'bg-indigo-100 text-indigo-900 border-indigo-200' },
+  { group_id: 106, group_name: 'Free E-mail', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_special: true, category: 'RESOURCE_ENTITLEMENT', badge_color: 'bg-teal-100 text-teal-900 border-teal-200' },
+  { group_id: 107, group_name: 'VPN Access', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_special: true, category: 'NETWORK_VPN', badge_color: 'bg-emerald-100 text-emerald-900 border-emerald-200' },
+  { group_id: 108, group_name: 'Printer Color (ปริ้นสี)', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_special: true, category: 'PRINT_QUOTA', badge_color: 'bg-slate-100 text-slate-800 border-slate-200' },
+  { group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_special: true, category: 'PRINT_QUOTA', badge_color: 'bg-slate-100 text-slate-800 border-slate-200' },
 ];
 
 export const SPECIAL_GROUPS_CONFIG: Record<number, SpecialGroupConfig> = { ...DEFAULT_SPECIAL_GROUPS_CONFIG };
