@@ -1,5 +1,11 @@
 import { Group, User, UserWithGroups, InternetLevel } from '../types';
-import { SPECIAL_GROUPS_CONFIG, SPECIAL_GROUP_IDS } from '../constants/specialGroups';
+import {
+  SPECIAL_GROUPS_CONFIG,
+  SPECIAL_GROUP_IDS,
+  isRegisteredSpecialGroupId,
+  isRegisteredSpecialGroupName,
+  getSpecialGroupConfigByName,
+} from '../constants/specialGroups';
 export { SPECIAL_GROUP_IDS };
 
 export type SpecialGroupCategory =
@@ -18,83 +24,62 @@ export interface SpecialGroupBadgeInfo {
 }
 
 /**
- * Dedicated function to check if a group is a Special Group
+ * 100% Table-Driven Function to check if a group is a Special Group
  */
 export function isSpecialGroup(groupOrIdOrName: Group | number | string | undefined | null): boolean {
   if (!groupOrIdOrName) return false;
 
   if (typeof groupOrIdOrName === 'number') {
-    return SPECIAL_GROUP_IDS.includes(groupOrIdOrName) || SPECIAL_GROUPS_CONFIG[groupOrIdOrName] !== undefined;
+    return isRegisteredSpecialGroupId(groupOrIdOrName);
   }
 
   if (typeof groupOrIdOrName === 'string') {
     const idNum = Number(groupOrIdOrName);
-    if (!isNaN(idNum) && idNum > 0) {
-      if (SPECIAL_GROUP_IDS.includes(idNum) || SPECIAL_GROUPS_CONFIG[idNum] !== undefined) return true;
+    if (!isNaN(idNum) && idNum > 0 && isRegisteredSpecialGroupId(idNum)) {
+      return true;
     }
-    const nameLower = groupOrIdOrName.toLowerCase();
-    return (
-      nameLower.includes('internet level') ||
-      nameLower.includes('video access') ||
-      nameLower.includes('communication') ||
-      nameLower.includes('free e-mail') ||
-      nameLower.includes('free email') ||
-      nameLower.includes('vpn access') ||
-      nameLower.includes('vpn') ||
-      nameLower.includes('printer color') ||
-      nameLower.includes('printer mono') ||
-      nameLower.includes('ปริ้นสี') ||
-      nameLower.includes('ปริ้นขาวดำ') ||
-      nameLower.startsWith('special')
-    );
+    return isRegisteredSpecialGroupName(groupOrIdOrName);
   }
 
   // Object case: Group
   const idNum = Number(groupOrIdOrName.group_id);
-  if (!isNaN(idNum) && (SPECIAL_GROUP_IDS.includes(idNum) || SPECIAL_GROUPS_CONFIG[idNum] !== undefined)) {
+  if (!isNaN(idNum) && isRegisteredSpecialGroupId(idNum)) {
     return true;
   }
 
-  if (groupOrIdOrName.internet_level) return true;
-
-  const name = (groupOrIdOrName.group_name || '').toLowerCase();
-  if (
-    name.includes('internet level') ||
-    name.includes('video access') ||
-    name.includes('communication') ||
-    name.includes('free e-mail') ||
-    name.includes('free email') ||
-    name.includes('vpn access') ||
-    name.includes('vpn') ||
-    name.includes('printer color') ||
-    name.includes('printer mono') ||
-    name.includes('ปริ้นสี') ||
-    name.includes('ปริ้นขาวดำ')
-  ) {
+  if (groupOrIdOrName.group_name && isRegisteredSpecialGroupName(groupOrIdOrName.group_name)) {
     return true;
   }
 
-  if (groupOrIdOrName.is_special === true && idNum < 200) return true;
+  if (groupOrIdOrName.internet_level && idNum >= 101 && idNum <= 103) {
+    return true;
+  }
 
-  return false;
+  return Boolean(groupOrIdOrName.is_special && idNum < 200);
 }
 
 /**
  * Determine the category of a Special Group
  */
 export function getSpecialGroupCategory(group: Group | number | string): SpecialGroupCategory {
+  const gId = typeof group === 'object' ? Number(group.group_id) : typeof group === 'number' ? group : Number(group);
+  const name = typeof group === 'object' ? (group.group_name || '') : typeof group === 'string' ? group : '';
+
+  const cfg = isNaN(gId) ? getSpecialGroupConfigByName(name) : SPECIAL_GROUPS_CONFIG[gId] || getSpecialGroupConfigByName(name);
+  if (cfg?.category) {
+    return cfg.category as SpecialGroupCategory;
+  }
+
   if (!isSpecialGroup(group)) return 'ORGANIZATIONAL';
 
-  const gId = typeof group === 'object' ? Number(group.group_id) : typeof group === 'number' ? group : Number(group);
-  const name = typeof group === 'object' ? (group.group_name || '').toLowerCase() : typeof group === 'string' ? group.toLowerCase() : '';
-
-  if (gId === 101 || gId === 102 || gId === 103 || name.includes('internet level')) {
+  const nameLower = name.toLowerCase();
+  if (gId === 101 || gId === 102 || gId === 103 || nameLower.includes('internet level')) {
     return 'INTERNET_LEVEL';
   }
-  if (gId === 107 || name.includes('vpn')) {
+  if (gId === 107 || nameLower.includes('vpn')) {
     return 'NETWORK_VPN';
   }
-  if (gId === 108 || gId === 109 || name.includes('printer') || name.includes('ปริ้น')) {
+  if (gId === 108 || gId === 109 || nameLower.includes('printer') || nameLower.includes('ปริ้น')) {
     return 'PRINT_QUOTA';
   }
   return 'RESOURCE_ENTITLEMENT';
@@ -119,104 +104,31 @@ export function getSpecialGroupCategoryLabel(category: SpecialGroupCategory): st
 }
 
 /**
- * Get display badge info (label, CSS variant, category) for any group
+ * 100% Table-driven display badge info (label, CSS variant, category) for any group
  */
 export function getGroupBadgeInfo(group: Group): SpecialGroupBadgeInfo {
-  const isSpecial = isSpecialGroup(group);
-  const category = getSpecialGroupCategory(group);
-  const categoryLabel = getSpecialGroupCategoryLabel(category);
   const idNum = Number(group.group_id);
+  const config = SPECIAL_GROUPS_CONFIG[idNum] || getSpecialGroupConfigByName(group.group_name);
+  const isSpecial = isSpecialGroup(group);
 
-  const config = SPECIAL_GROUPS_CONFIG[idNum];
   if (config) {
+    const category = (config.category as SpecialGroupCategory) || getSpecialGroupCategory(group);
     return {
       label: config.name || group.group_name,
-      variant: config.badgeClass,
+      variant: config.badgeClass || 'bg-indigo-100 text-indigo-900 border-indigo-200',
       category,
-      categoryLabel,
-      isSpecial: true,
-    };
-  }
-
-  const name = (group.group_name || '').toLowerCase();
-
-  if (name.includes('video access')) {
-    return {
-      label: 'Video Access',
-      variant: 'bg-purple-100 text-purple-900 border-purple-200',
-      category: 'RESOURCE_ENTITLEMENT',
-      categoryLabel: getSpecialGroupCategoryLabel('RESOURCE_ENTITLEMENT'),
-      isSpecial: true,
-    };
-  }
-  if (name.includes('communication')) {
-    return {
-      label: 'Communications',
-      variant: 'bg-indigo-100 text-indigo-900 border-indigo-200',
-      category: 'RESOURCE_ENTITLEMENT',
-      categoryLabel: getSpecialGroupCategoryLabel('RESOURCE_ENTITLEMENT'),
-      isSpecial: true,
-    };
-  }
-  if (name.includes('free e-mail') || name.includes('free email')) {
-    return {
-      label: 'Free E-mail',
-      variant: 'bg-teal-100 text-teal-900 border-teal-200',
-      category: 'RESOURCE_ENTITLEMENT',
-      categoryLabel: getSpecialGroupCategoryLabel('RESOURCE_ENTITLEMENT'),
-      isSpecial: true,
-    };
-  }
-  if (name.includes('vpn')) {
-    return {
-      label: 'VPN Access',
-      variant: 'bg-emerald-100 text-emerald-900 border-emerald-200',
-      category: 'NETWORK_VPN',
-      categoryLabel: getSpecialGroupCategoryLabel('NETWORK_VPN'),
-      isSpecial: true,
-    };
-  }
-  if (name.includes('printer color') || name.includes('ปริ้นสี')) {
-    return {
-      label: 'Printer Color (ปริ้นสี)',
-      variant: 'bg-slate-100 text-slate-800 border-slate-200',
-      category: 'PRINT_QUOTA',
-      categoryLabel: getSpecialGroupCategoryLabel('PRINT_QUOTA'),
-      isSpecial: true,
-    };
-  }
-  if (name.includes('printer mono') || name.includes('ปริ้นขาวดำ')) {
-    return {
-      label: 'Printer Mono (ปริ้นขาวดำ)',
-      variant: 'bg-slate-100 text-slate-800 border-slate-200',
-      category: 'PRINT_QUOTA',
-      categoryLabel: getSpecialGroupCategoryLabel('PRINT_QUOTA'),
-      isSpecial: true,
-    };
-  }
-  if (group.internet_level || name.includes('internet level')) {
-    const level = group.internet_level || (name.includes('level a') ? 'A' : name.includes('level c') ? 'C' : 'B');
-    const levelClass =
-      level === 'A'
-        ? 'bg-amber-100 text-amber-900 border-amber-300'
-        : level === 'B'
-        ? 'bg-sky-100 text-sky-900 border-sky-300'
-        : 'bg-slate-100 text-slate-800 border-slate-300';
-    return {
-      label: `Internet Level ${level}`,
-      variant: levelClass,
-      category: 'INTERNET_LEVEL',
-      categoryLabel: getSpecialGroupCategoryLabel('INTERNET_LEVEL'),
+      categoryLabel: getSpecialGroupCategoryLabel(category),
       isSpecial: true,
     };
   }
 
   if (isSpecial) {
+    const category = getSpecialGroupCategory(group);
     return {
       label: group.group_name,
       variant: 'bg-violet-100 text-violet-900 border-violet-200',
       category,
-      categoryLabel,
+      categoryLabel: getSpecialGroupCategoryLabel(category),
       isSpecial: true,
     };
   }
