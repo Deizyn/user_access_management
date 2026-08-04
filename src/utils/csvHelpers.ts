@@ -444,7 +444,7 @@ export function processImportCSV(
     const authorityGroup = getValue('authority_group', '-');
     const deviceCode = getValue('device_code', '-');
     const creationDate = getValue('creation_date', '-');
-    
+
     let expiryDateRaw = getValue('expiry_date');
     let expiryDate: string | null = null;
     if (expiryDateRaw && expiryDateRaw !== 'N/A' && expiryDateRaw !== 'null' && expiryDateRaw !== '-') {
@@ -505,7 +505,7 @@ export function processImportCSV(
             group_id: newGroupId,
             group_name: token,
             description: `กลุ่มสิทธิ์การใช้งาน ${token} (สร้างอัตโนมัติจากการนำเข้า CSV)`,
-            is_special: true,
+            is_special: false,
           };
           updatedGroupsMap.set(newGroupId, newGroup);
           groupNameToId.set(lowerToken, newGroupId);

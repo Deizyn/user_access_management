@@ -50,8 +50,6 @@ export function isSpecialGroup(groupOrIdOrName: Group | number | string | undefi
   }
 
   // Object case: Group
-  if (groupOrIdOrName.is_special === true) return true;
-
   const idNum = Number(groupOrIdOrName.group_id);
   if (!isNaN(idNum) && (SPECIAL_GROUP_IDS.includes(idNum) || SPECIAL_GROUPS_CONFIG[idNum] !== undefined)) {
     return true;
@@ -60,7 +58,7 @@ export function isSpecialGroup(groupOrIdOrName: Group | number | string | undefi
   if (groupOrIdOrName.internet_level) return true;
 
   const name = (groupOrIdOrName.group_name || '').toLowerCase();
-  return (
+  if (
     name.includes('internet level') ||
     name.includes('video access') ||
     name.includes('communication') ||
@@ -72,7 +70,13 @@ export function isSpecialGroup(groupOrIdOrName: Group | number | string | undefi
     name.includes('printer mono') ||
     name.includes('ปริ้นสี') ||
     name.includes('ปริ้นขาวดำ')
-  );
+  ) {
+    return true;
+  }
+
+  if (groupOrIdOrName.is_special === true && idNum < 200) return true;
+
+  return false;
 }
 
 /**
