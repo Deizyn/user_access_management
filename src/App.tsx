@@ -7,7 +7,6 @@ import {
   KPISummary, 
   FilterBar, 
   UserTable, 
-  AnalyticsOverview, 
   UserDetailModal, 
   UserFormModal, 
   GroupManagerModal, 
@@ -52,10 +51,7 @@ export default function App() {
     resetFilters,
   } = useUserFilters(users, groups, userGroups);
 
-  // 3. View Mode State ('table' | 'analytics')
-  const [viewMode, setViewMode] = useState<'table' | 'analytics'>('table');
-
-  // 4. Modals State
+  // 3. Modals State
   const [selectedUserForDetail, setSelectedUserForDetail] = useState<UserWithGroups | null>(null);
   const [userToEdit, setUserToEdit] = useState<UserWithGroups | null>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -161,31 +157,19 @@ export default function App() {
           o365Licenses={o365Licenses}
           totalFilteredCount={sortedUsers.length}
           totalUsersCount={users.length}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
         />
 
-        {/* View Mode Switching: Table vs Analytics */}
-        {viewMode === 'table' ? (
-          <UserTable
-            users={sortedUsers}
-            sortState={sortState}
-            onSortChange={handleSortChange}
-            onViewUser={(user) => setSelectedUserForDetail(user)}
-            onQuickFilter={handleQuickFilter}
-            onOpenExplorer={handleOpenLevelGroupExplorer}
-            allGroups={groups}
-            activeGroupIds={filters.groupIds || (filters.groupId !== 'all' ? [filters.groupId] : [])}
-          />
-        ) : (
-          <AnalyticsOverview 
-            users={filteredUsers} 
-            groups={groups} 
-            onOpenLevelGroupExplorer={handleOpenLevelGroupExplorer}
-            onSelectUserForDetail={(user) => setSelectedUserForDetail(user)}
-            onGoToTableView={() => setViewMode('table')}
-          />
-        )}
+        {/* User Table */}
+        <UserTable
+          users={sortedUsers}
+          sortState={sortState}
+          onSortChange={handleSortChange}
+          onViewUser={(user) => setSelectedUserForDetail(user)}
+          onQuickFilter={handleQuickFilter}
+          onOpenExplorer={handleOpenLevelGroupExplorer}
+          allGroups={groups}
+          activeGroupIds={filters.groupIds || (filters.groupId !== 'all' ? [filters.groupId] : [])}
+        />
 
       </main>
 

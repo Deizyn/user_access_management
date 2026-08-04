@@ -147,6 +147,41 @@
   3. **ย้ายตำแหน่ง M365 License**: ย้ายข้อมูลสิทธิ์ Microsoft 365 License จากส่วน System Privileges Summary ขึ้นมาจัดเรียงในส่วน **Primary Contact Details** เพื่อความสะดวกและต่อเนื่องในการดูโปรไฟล์ผู้ใช้
 ### 2.25 ปรับโทนสีป้ายสิทธิ์การพิมพ์ (Printer Badge) ให้เป็นสีเทาเบสเรียบเดียวกันทั้งหมด
 - **การปรับปรุง**: ปรับเปลี่ยน Class สีของกลุ่มสิทธิ์การพิมพ์ (Printer Color และ Printer Mono) ใน [specialGroups.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/constants/specialGroups.ts) จากเดิมที่เป็นสีฟ้า/น้ำเงินตัดกัน ให้เป็น **โทนสีเทาสว่างเบสเดียวกันทั้งหมด (`bg-slate-100 text-slate-800 border-slate-200`)** ช่วยให้ตารางข้อมูลพนักงานดูสะอาด สบายตา และไม่ก่อให้เกิดความสับสนหรือตาลายจากการฉูดฉาดของสี
+### 2.26 ถอดหน้า Analytics View และปรับรูปแบบการแสดงผลเป็น Table View ทางเดียว
+- **การปรับปรุง**: 
+  1. ถอดส่วนแสดงผล `AnalyticsOverview.tsx` และ State `viewMode` ออกจาก [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx)
+  2. ลบชุดปุ่มสลับมุมมอง (Table View / Analytics View) และ Props ที่เกี่ยวข้องออกจาก [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx)
+  3. ปรับแต่ง Type Checking ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) รองรับการตรวจลินต์ `npm run lint` ผ่าน 100%
+### 2.27 แก้ไขการตรวจสอบสถานะฐานข้อมูลใน DbStatusModal และอัปเดตชื่อหัวข้อ Navbar
+- **การปรับปรุง**: 
+  1. ปรับปรุงฟังก์ชัน `runConnectionCheck` ใน [DbStatusModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/DbStatusModal.tsx) ให้จัดการ Error กรณี client WASM memory ไม่ได้ถูก Initialize (ในโหมดที่เชื่อมต่อกับ REST API Engine) อย่างละมุน ไม่ให้โยนข้ามไปแสดงกล่องแดง `DATABASE CONNECTION ERROR`
+  2. ยืนยันการเปลี่ยนชื่อหัวข้อบน [Navbar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/Navbar.tsx) เป็น `User Authorization` และจัดรูปแบบการเว้นบรรทัดสโลแกนระบบ
+### 2.28 Auto-Initialize และ ซิงค์ข้อมูลลง SQLite WASM ในหน้า SQL Terminal (SqliteManagerModal)
+- **การปรับปรุง**: 
+  1. อัปเดต `useEffect` และฟังก์ชัน `handleRunSqlQuery` ใน [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/SqliteManagerModal.tsx) ให้เรียก `getOrInitSqliteDb` และซิงค์ข้อมูล `users`, `groups`, `userGroups` เข้าเอนจิน SQLite WASM memory เสมอเมื่อเปิดหน้าต่างหรือกดปุ่ม Execute SQL
+  2. แก้ไขปัญหาป๊อปอัปแจ้งเตือนสีแดง `SQLite database is not initialized.` ในแท็บ `4. SQL Terminal (คำสั่ง SQL)` ทำให้ผู้ใช้สามารถรัน SQL Query (`SELECT`, `GROUP BY` ฯลฯ) ประมวลผลข้อมูลสด 60 รายการได้ทันที 100%
+### 2.29 ซิงค์คำสั่งรีเซ็ตข้อมูลลงฐานข้อมูล MySQL / SQLite Server Backend (`/api/db/sync`)
+- **การปรับปรุง**: 
+  1. อัปเดตฟังก์ชัน `handleResetData` ใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts) ให้เรียก `syncToBackendPhysicalFile(INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS)` ยิงก้อนรีเซ็ตตรงเข้า REST API `/api/db/sync`
+  2. ทำให้เมื่อผู้ใช้กดปุ่มรีเซ็ตข้อมูล ระบบจะทำการลบข้อมูลพนักงานที่เคยเพิ่ม/นำเข้าใหม่ในตาราง `users`, `groups`, `user_groups` บน MySQL Database Server ออกทั้งหมด คืนค่ากลับไปเป็น Seed เริ่มต้นในตาราง 100%
+### 2.30 ปรับปรุง SQL Sync Engine ให้ทำความสะอาดตาราง `user_groups` และอัปเดต React State ทันที
+- **การปรับปรุง**: 
+  1. แก้ไข `syncData` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) โดยสั่ง `DELETE FROM user_groups;` เคลียร์ความสัมพันธ์เก่าออกทั้งหมดก่อนเขียนค่าใหม่เข้าตาราง ป้องกันปัญหา SQL Syntax Error จากการทำ `NOT IN ()` เมื่อข้อมูลเป็นอาร์เรย์ว่าง `[]`
+  2. ปรับปรุง `handleResetData` ใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts) ให้สั่งลบข้อมูลใน React State ทันทีและ `await` คำสั่งยิงซิงค์ไปยัง MySQL Database Server
+### 2.31 พัฒนา Direct Database Reset Endpoint (`POST /api/db/reset`) ลบข้อมูลทุก Row โดยตรง
+- **การปรับปรุง**: 
+  1. พัฒนาเมธอด `resetDatabase()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) รันคำสั่ง SQL `DELETE FROM user_groups;`, `DELETE FROM users;`, `DELETE FROM groups;` ลบข้อมูลพนักงานและกลุ่มสิทธิ์ทุก Row ออกจากตารางของ MySQL Server โดยตรง
+  2. เพิ่ม REST API Route `POST /api/db/reset` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) และเชื่อมต่อปุ่มกดรีเซ็ตใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts) เพื่อลบข้อมูลทุก Row บน MySQL Server 100%
+### 2.32 แก้ไขปัญหา MySQL Connection Pool Leak (`Too many connections`)
+- **การปรับปรุง**: 
+  1. แก้ไข `getPool()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) จากการสร้าง connection pool ใหม่ทุกครั้งที่มีการคิวรี เปลี่ยนเป็น Singleton Pattern โดยการใช้ตัวแปร `this.pool` เพื่อนำ Connection Pool เดิมมาใช้งานซ้ำ
+  2. ป้องกันข้อผิดพลาด `Too many connections` ซึ่งเคยทำให้คำสั่ง SQL `DELETE` ไม่ถูกส่งไปยัง MySQL Server
+  3. ทดสอบเรียก `POST /api/db/reset` และตรวจสอบ `GET /api/users` ผลลัพธ์ยืนยันการลบข้อมูลพนักงานในตารางสำเร็จ 100% (`count: 0`)
+### 2.33 ปรับปรุงระบบสกัดระดับอินเทอร์เน็ต (Internet Level Smart Fallback) จากคอลัมน์ Groups
+- **การปรับปรุง**: 
+  1. อัปเดตฟังก์ชันนำเข้า CSV ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) กรณีคอลัมน์ `Internet Level` ถูกเว้นว่างไว้ (`""`) ระบบจะตรวจเช็กชื่อกลุ่มสิทธิ์ในคอลัมน์ `Groups` โดยอัตโนมัติ (เช่น `"Internet Level C, Sales Team"`) เพื่อสกัดค่าระดับอินเทอร์เน็ต `A`, `B`, `C` ที่ระบุในชื่อกลุ่ม ก่อนตกไปใช้ค่า Default `'B'`
+
+---
 
 ---
 

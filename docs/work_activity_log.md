@@ -90,6 +90,38 @@
   - ย้ายข้อมูล M365 License ขึ้นมาไว้ในส่วน **Primary Contact Details** ของหน้า User Profile Modal
 - **[LOG-031] Base Gray Tone Uniformity for Printer Badges**:
   - ปรับเปลี่ยนโทนสีป้าย Printer Color และ Printer Mono ใน [specialGroups.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/constants/specialGroups.ts) ให้เป็นสีเทาเบสเนียนนุ่มเดียวกัน (`bg-slate-100 text-slate-800 border-slate-200`) ไม่ฉูดฉาด ป้องกันอาการตาลาย
+- **[LOG-032] Remove Analytics View & Simplify Dashboard View Mode**:
+  - ถอดส่วนแสดงผลหน้า `AnalyticsOverview.tsx` และ State `viewMode` ออกจาก [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx)
+  - ซ่อนปุ่มสลับมุมมอง (Table View / Analytics View) ออกจาก [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx) ให้ระบบแสดงผลเฉพาะ Table View เป็นมุมมองหลัก
+  - ปรับปรุง Type Definitions ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) รองรับการตรวจสอบ Type Safety ด้วย `npm run lint` (`tsc --noEmit`) ให้ผ่าน 100%
+- **[LOG-033] Fix DbStatusModal Error Handling & Update Header Title**:
+  - ปรับแก้ไขการจัดการ Error ใน [DbStatusModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/DbStatusModal.tsx) ให้ครอบ `try...catch` รอบการคิวรี SQLite WASM memory เพื่อรองรับระบบที่ดึงข้อมูลผ่าน REST API Engine ไม่ให้ขึ้นกล่องแดง `DATABASE CONNECTION ERROR`
+  - ยืนยันการอัปเดตชื่อหัวข้อบน [Navbar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/Navbar.tsx) เป็น `User Authorization` และจัดระเบียบบรรทัดคำอธิบาย
+- **[LOG-034] Auto-Initialize SQLite WASM Database in SQL Terminal (SqliteManagerModal)**:
+  - อัปเดต [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/SqliteManagerModal.tsx) ให้เรียก `getOrInitSqliteDb` และซิงค์ข้อมูล `users`, `groups`, `userGroups` โดยอัตโนมัติเมื่อเปิดหน้าต่างป๊อปอัปและก่อนประมวลผลคำสั่ง SQL ในหน้าแท็บ `4. SQL Terminal`
+  - แก้ไขปัญหาป๊อปอัปแจ้งเตือนสีแดง `SQLite database is not initialized.` เมื่อกดปุ่ม Execute SQL
+- **[LOG-035] Sync Reset Database Payload to MySQL Server Backend**:
+  - อัปเดตฟังก์ชัน `handleResetData` ใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts) ให้เรียก `syncToBackendPhysicalFile(INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS)` ยิงก้อนรีเซ็ตเข้า API `/api/db/sync`
+  - ลบข้อมูลพนักงานที่ถูกสร้างใหม่ในตาราง `users`, `groups`, `user_groups` บนฐานข้อมูล MySQL Server และคืนค่าเป็น Seed เริ่มต้น 100%
+- **[LOG-036] Fix MySQL Database Sync Data Query Logic & React State Reset**:
+  - แก้ไขฟังก์ชัน `syncData` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) ให้ทำการล้างข้อมูลตาราง `user_groups` ด้วยคำสั่ง `DELETE FROM user_groups;` ก่อนแทรกความสัมพันธ์ใหม่เสมอ ป้องกันปัญหาคิวรีขัดข้องเมื่อยิงข้อมูลรีเซ็ต
+  - อัปเดต `handleResetData` ใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts) ให้เซ็ต React state (`setUsers`, `setGroups`, `setUserGroups`) และ `await` การส่ง API เพื่อให้หน้าเว็บและ MySQL Database ลบข้อมูลพนักงานออกพร้อมกันทันที
+- **[LOG-037] Implement Direct MySQL Reset Endpoint (`POST /api/db/reset`)**:
+  - เพิ่มเมธอด `resetDatabase()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) เพื่อรันคำสั่ง `DELETE FROM user_groups;`, `DELETE FROM users;`, `DELETE FROM groups;` ลบข้อมูลพนักงานและสิทธิ์ทุก Row จากฐานข้อมูล MySQL โดยตรง
+  - เพิ่ม REST API Endpoint `POST /api/db/reset` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts) และเชื่อมต่อกับปุ่มรีเซ็ตใน [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserAccessData.ts)
+- **[LOG-038] Fix MySQL Connection Pool Leak (`Too many connections`)**:
+  - แก้ไขการสร้าง connection pool ซ้ำใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) ให้ใช้ Singleton Pattern `this.pool` เพื่อป้องกันการเปิด Connection เกินโควตาทุกครั้งที่มี request เข้ามา
+  - ทดสอบรันคำสั่ง `POST /api/db/reset` และตรวจสอบผ่าน `GET /api/users` ยืนยันการลบข้อมูลพนักงานสำเร็จ 100% (`count: 0`)
+- **[LOG-039] Add Smart Fallback for Internet Level in CSV Import**:
+  - ปรับปรุง [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) ให้ตรวจสอบคอลัมน์ `Groups` โดยอัตโนมัติหากคอลัมน์ `Internet Level` ถูกเว้นว่างไว้ เพื่อตรวจจับค่าระดับอินเทอร์เน็ต `A`, `B`, `C` จากชื่อกลุ่มสิทธิ์ ก่อนที่จะตกไปใช้ค่าเริ่มต้น `'B'`
+
+
+
+
+
+
+
+
 
 
 

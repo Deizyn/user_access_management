@@ -23,17 +23,22 @@ export class DataService {
     this.initMySqlDatabase();
   }
 
+  private pool: mysql.Pool | null = null;
+
   private async getPool() {
-    return mysql.createPool({
-      host: this.dbConfig.dbHost,
-      port: this.dbConfig.dbPort,
-      user: this.dbConfig.dbUser,
-      password: this.dbConfig.dbPass,
-      database: this.dbConfig.dbName,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
+    if (!this.pool) {
+      this.pool = mysql.createPool({
+        host: this.dbConfig.dbHost,
+        port: this.dbConfig.dbPort,
+        user: this.dbConfig.dbUser,
+        password: this.dbConfig.dbPass,
+        database: this.dbConfig.dbName,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+      });
+    }
+    return this.pool;
   }
 
   public async initMySqlDatabase() {
@@ -225,7 +230,8 @@ export class DataService {
         }
       }
 
-      // 3. Sync User Groups Mapping
+      // 3. Sync User Groups Mapping (Clear first, then re-insert active relationships)
+      await pool.query(`DELETE FROM \`user_groups\`;`);
       if (userGroups.length > 0) {
         for (const ug of userGroups) {
           await pool.query(
@@ -238,6 +244,36 @@ export class DataService {
       console.log(`[MySQL Database Engine] Successfully synced state (${users.length} users, ${groups.length} groups, ${userGroups.length} user_groups) to MySQL Server.`);
     } catch (err: any) {
       console.error('[MySQL Database Engine] Sync error:', err?.message || err);
+      throw err;
+    }
+  }
+
+  public async resetDatabase() {
+    try {
+      const pool = await this.getPool();
+
+      // Direct SQL Truncate/Delete all rows from database tables
+      await pool.query(`DELETE FROM \`user_groups\`;`);
+      await pool.query(`DELETE FROM \`users\`;`);
+      await pool.query(`DELETE FROM \`groups\`;`);
+
+      // Re-seed default 9 Special Groups (101-109)
+      for (const g of INITIAL_GROUPS) {
+        await pool.query(
+          `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?);`,
+          [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
+        );
+      }
+
+      this.usersCache = [];
+      this.groupsCache = [...INITIAL_GROUPS];
+      this.userGroupsCache = [];
+
+      console.log(`[MySQL Database Engine] Direct SQL Reset Executed: Deleted all rows from 'users' and 'user_groups' tables.`);
+      return { success: true, message: 'MySQL Database reset to initial state successfully.' };
+    } catch (err: any) {
+      console.error('[MySQL Database Engine] Reset error:', err?.message || err);
+      throw err;
     }
   }
 

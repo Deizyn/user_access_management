@@ -27,7 +27,11 @@ import {
   exportSqliteToJson, 
   importSqliteFromJson, 
   executeRawSql, 
-  exportSqliteBinaryFile 
+  exportSqliteBinaryFile,
+  getOrInitSqliteDb,
+  syncUsersToSqlite,
+  syncGroupsToSqlite,
+  syncUserGroupsToSqlite
 } from '../../lib/sqliteDb';
 import { 
   exportUsersToCSV, 
@@ -64,7 +68,16 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
     if (isOpen && initialTab) {
       setActiveTab(initialTab);
     }
-  }, [isOpen, initialTab]);
+    if (isOpen) {
+      getOrInitSqliteDb(users, groups, userGroups).then((db) => {
+        if (db) {
+          syncUsersToSqlite(users, db);
+          syncGroupsToSqlite(groups, db);
+          syncUserGroupsToSqlite(userGroups, db);
+        }
+      });
+    }
+  }, [isOpen, initialTab, users, groups, userGroups]);
 
   const [copiedSchema, setCopiedSchema] = useState(false);
 
@@ -239,14 +252,21 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
   };
 
   // Run SQL Query
-  const handleRunSqlQuery = () => {
+  const handleRunSqlQuery = async () => {
     setQueryError(null);
     setQueryResult(null);
 
     if (!sqlQuery.trim()) return;
 
     try {
-      const res = executeRawSql(sqlQuery);
+      const db = await getOrInitSqliteDb(users, groups, userGroups);
+      if (db) {
+        syncUsersToSqlite(users, db);
+        syncGroupsToSqlite(groups, db);
+        syncUserGroupsToSqlite(userGroups, db);
+      }
+
+      const res = executeRawSql(sqlQuery, db);
       if (res && res.length > 0) {
         setQueryResult({
           columns: res[0].columns,

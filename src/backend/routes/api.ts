@@ -70,12 +70,21 @@ apiRouter.post('/db/sync', async (req: Request, res: Response) => {
   }
 });
 
+// 6.5 Direct Database Reset Endpoint (Executes DELETE/TRUNCATE SQL directly on MySQL Server)
+apiRouter.post('/db/reset', async (req: Request, res: Response) => {
+  try {
+    const result = await dataService.resetDatabase();
+    res.json(result);
+  } catch (err: any) {
+    console.error('[Express API /api/db/reset] Error:', err);
+    res.status(500).json({ success: false, error: err.message || 'Failed to reset MySQL database' });
+  }
+});
+
 // 7. Physical SQLite Database File Download Endpoint
 apiRouter.get('/db/download', (req: Request, res: Response) => {
   try {
-    dataService.saveToDisk();
-    const filePath = dataService.dbFilePath;
-    res.download(filePath, 'user_access_dashboard_data.sqlite');
+    res.status(400).json({ success: false, error: 'MySQL mode active: SQLite file download is disabled.' });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message || 'Failed to download database file' });
   }
@@ -84,10 +93,7 @@ apiRouter.get('/db/download', (req: Request, res: Response) => {
 // 8. MySQL Workbench Data Sync Script Endpoint
 apiRouter.get('/db/mysql-dump', (req: Request, res: Response) => {
   try {
-    const dumpScript = dataService.generateMySqlDumpScript();
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="mysql_workbench_sync.sql"');
-    res.send(dumpScript);
+    res.status(400).json({ success: false, error: 'MySQL mode active: Dump script endpoint is disabled.' });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message || 'Failed to generate MySQL dump script' });
   }

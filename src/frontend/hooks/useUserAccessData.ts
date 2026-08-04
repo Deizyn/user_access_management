@@ -211,10 +211,26 @@ export function useUserAccessData() {
     syncToBackendPhysicalFile(importedUsers, importedGroups, importedUserGroups);
   };
 
-  const handleResetData = () => {
-    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลทั้งหมด และรีเซ็ตกลับไปใช้ seed เริ่มต้น?')) return;
-    resetSqliteDb(INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS);
-    refreshFromSqlite();
+  const handleResetData = async () => {
+    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการสั่งลบข้อมูลพนักงานและสิทธิ์การผูกทั้งหมดในตาราง MySQL Server หรือไม่?')) return;
+    try {
+      // 1. Call Backend API Endpoint /api/db/reset to run DELETE FROM users, user_groups, groups directly
+      await fetch('/api/db/reset', { method: 'POST' });
+
+      // 2. Clear React State
+      setUsers(INITIAL_USERS);
+      setGroups(INITIAL_GROUPS);
+      setUserGroups(INITIAL_USER_GROUPS);
+
+      // 3. Clear Local SQLite WASM memory
+      resetSqliteDb(INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS);
+      refreshFromSqlite();
+
+      alert('รันคำสั่ง SQL DELETE ลบข้อมูลพนักงานจากตาราง MySQL Database Server เรียบร้อยแล้ว!');
+    } catch (err) {
+      console.error('Failed to reset MySQL database:', err);
+      alert('เกิดข้อผิดพลาดในการสั่งลบข้อมูลจากฐานข้อมูล MySQL');
+    }
   };
 
   return {

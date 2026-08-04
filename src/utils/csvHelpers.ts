@@ -364,13 +364,23 @@ export function processImportCSV(
       email = `${username.toLowerCase()}@company.co.th`;
     }
 
-    // Normalized Internet Level
-    let internetLevelRaw = getValue('internet_level', 'B').toUpperCase();
+    // Normalized Internet Level (with fallback to Groups column if internet_level column is blank)
+    let internetLevelRaw = getValue('internet_level').toUpperCase();
+    let groupsRaw = getValue('groups').toUpperCase();
     let internetLevel: InternetLevel = 'B';
+
     if (internetLevelRaw === 'A' || internetLevelRaw.includes('LEVEL A') || internetLevelRaw.includes('ระดับ A')) {
       internetLevel = 'A';
     } else if (internetLevelRaw === 'C' || internetLevelRaw.includes('LEVEL C') || internetLevelRaw.includes('ระดับ C')) {
       internetLevel = 'C';
+    } else if (internetLevelRaw === 'B' || internetLevelRaw.includes('LEVEL B') || internetLevelRaw.includes('ระดับ B')) {
+      internetLevel = 'B';
+    } else if (groupsRaw.includes('INTERNET LEVEL A') || groupsRaw.includes('LEVEL A')) {
+      internetLevel = 'A';
+    } else if (groupsRaw.includes('INTERNET LEVEL C') || groupsRaw.includes('LEVEL C')) {
+      internetLevel = 'C';
+    } else if (groupsRaw.includes('INTERNET LEVEL B') || groupsRaw.includes('LEVEL B')) {
+      internetLevel = 'B';
     } else {
       internetLevel = 'B';
     }
@@ -428,15 +438,15 @@ export function processImportCSV(
     updatedUsersMap.set(canonicalEmpId, normalizedUser);
 
     // Process Groups Relationship
-    const groupsRaw = getValue('groups');
+    const groupsText = getValue('groups');
     const userGroupSet = new Set<number>();
 
     // Mandatory Internet Level Group mapping (101=A, 102=B, 103=C)
     const internetGroupId = internetLevel === 'A' ? 101 : internetLevel === 'B' ? 102 : 103;
     userGroupSet.add(internetGroupId);
 
-    if (groupsRaw) {
-      const groupTokens = groupsRaw.split(/[,|;]/).map((s) => s.trim()).filter((s) => s.length > 0);
+    if (groupsText) {
+      const groupTokens = groupsText.split(/[,|;]/).map((s) => s.trim()).filter((s) => s.length > 0);
       groupTokens.forEach((token) => {
         const lowerToken = token.toLowerCase();
         

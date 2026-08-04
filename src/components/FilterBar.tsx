@@ -5,8 +5,6 @@ import {
   ChevronDown,
   ChevronUp,
   SlidersHorizontal,
-  Table,
-  BarChart2,
   FilterX,
   Sparkles,
   Layers,
@@ -33,8 +31,6 @@ interface FilterBarProps {
   o365Licenses?: string[];
   totalFilteredCount: number;
   totalUsersCount: number;
-  viewMode?: 'table' | 'analytics';
-  onViewModeChange?: (mode: 'table' | 'analytics') => void;
 }
 
 interface ActiveToken {
@@ -69,8 +65,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   o365Licenses = [],
   totalFilteredCount,
   totalUsersCount,
-  viewMode = 'table',
-  onViewModeChange,
 }) => {
   // Popup & Search input local state
   const [isOmniOpen, setIsOmniOpen] = useState(false);
@@ -1079,33 +1073,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             )}
           </button>
 
-          {/* Integrated View Switcher */}
-          {onViewModeChange && (
-            <div className="flex items-center bg-slate-100/90 p-1 rounded-xl">
-              <button
-                onClick={() => onViewModeChange('table')}
-                className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-white text-slate-900 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                <Table className="w-3.5 h-3.5 mr-1.5" />
-                Table View
-              </button>
-              <button
-                onClick={() => onViewModeChange('analytics')}
-                className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'analytics'
-                    ? 'bg-white text-slate-900 shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-900'
-                }`}
-              >
-                <BarChart2 className="w-3.5 h-3.5 mr-1.5" />
-                Analytics View
-              </button>
-            </div>
-          )}
+
         </div>
 
       </div>
