@@ -252,6 +252,129 @@ export class DataService {
     }));
   }
 
+  // --- Dedicated Group Management API Methods ---
+
+  public async createGroup(payload: Partial<Group>): Promise<Group> {
+    const groupName = String(payload.group_name || '').trim();
+    if (!groupName) throw new Error('group_name is required');
+
+    let nextGroupId = payload.group_id;
+    if (!nextGroupId) {
+      const maxId = this.groupsCache.reduce((max, g) => (g.group_id > max ? g.group_id : max), 200);
+      nextGroupId = maxId + 1;
+    }
+
+    const newGroup: Group = {
+      group_id: nextGroupId,
+      group_name: groupName,
+      description: payload.description || undefined,
+      internet_level: payload.internet_level || undefined,
+      is_special: Boolean(payload.is_special),
+      category: payload.category || (payload.is_special ? 'RESOURCE_ENTITLEMENT' : 'ORGANIZATIONAL'),
+      badge_color: payload.badge_color || (payload.is_special ? 'bg-purple-100 text-purple-900 border-purple-200' : 'bg-indigo-50 text-indigo-900 border-indigo-200'),
+    };
+
+    if (this.isMySqlConnected) {
+      const pool = await this.getPool();
+      await pool.query(
+        `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special, category, badge_color)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), description=VALUES(description), internet_level=VALUES(internet_level), is_special=VALUES(is_special), category=VALUES(category), badge_color=VALUES(badge_color);`,
+        [
+          newGroup.group_id,
+          newGroup.group_name,
+          newGroup.description || null,
+          newGroup.internet_level || null,
+          newGroup.is_special ? 1 : 0,
+          newGroup.category || null,
+          newGroup.badge_color || null,
+        ]
+      );
+    }
+
+    this.groupsCache.push(newGroup);
+    return newGroup;
+  }
+
+  public async updateGroup(groupId: number, payload: Partial<Group>): Promise<Group> {
+    const existing = this.groupsCache.find((g) => g.group_id === groupId);
+    if (!existing) throw new Error(`Group with ID ${groupId} not found`);
+
+    const updatedGroup: Group = {
+      ...existing,
+      ...payload,
+      group_id: groupId,
+      group_name: payload.group_name !== undefined ? String(payload.group_name).trim() : existing.group_name,
+    };
+
+    if (this.isMySqlConnected) {
+      const pool = await this.getPool();
+      await pool.query(
+        `UPDATE \`groups\` SET group_name=?, description=?, internet_level=?, is_special=?, category=?, badge_color=? WHERE group_id=?;`,
+        [
+          updatedGroup.group_name,
+          updatedGroup.description || null,
+          updatedGroup.internet_level || null,
+          updatedGroup.is_special ? 1 : 0,
+          updatedGroup.category || null,
+          updatedGroup.badge_color || null,
+          groupId,
+        ]
+      );
+    }
+
+    const idx = this.groupsCache.findIndex((g) => g.group_id === groupId);
+    if (idx !== -1) this.groupsCache[idx] = updatedGroup;
+    return updatedGroup;
+  }
+
+  public async deleteGroup(groupId: number): Promise<{ deleted: boolean; groupId: number }> {
+    if (this.isMySqlConnected) {
+      const pool = await this.getPool();
+      await pool.query(`DELETE FROM \`user_groups\` WHERE group_id=?;`, [groupId]);
+      await pool.query(`DELETE FROM \`groups\` WHERE group_id=?;`, [groupId]);
+    }
+
+    this.groupsCache = this.groupsCache.filter((g) => g.group_id !== groupId);
+    this.userGroupsCache = this.userGroupsCache.filter((ug) => ug.group_id !== groupId);
+    return { deleted: true, groupId };
+  }
+
+  public async assignUsersToGroup(groupId: number, employeeIds: string[]): Promise<{ count: number }> {
+    if (!Array.isArray(employeeIds) || employeeIds.length === 0) return { count: 0 };
+
+    if (this.isMySqlConnected) {
+      const pool = await this.getPool();
+      for (const empId of employeeIds) {
+        await pool.query(
+          `INSERT INTO \`user_groups\` (employee_id, group_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE group_id=VALUES(group_id);`,
+          [empId, groupId]
+        );
+      }
+    }
+
+    employeeIds.forEach((empId) => {
+      if (!this.userGroupsCache.some((ug) => ug.employee_id === empId && ug.group_id === groupId)) {
+        this.userGroupsCache.push({ employee_id: empId, group_id: groupId });
+      }
+    });
+
+    return { count: employeeIds.length };
+  }
+
+  public async unassignUsersFromGroup(groupId: number, employeeIds: string[]): Promise<{ count: number }> {
+    if (!Array.isArray(employeeIds) || employeeIds.length === 0) return { count: 0 };
+
+    if (this.isMySqlConnected) {
+      const pool = await this.getPool();
+      await pool.query(`DELETE FROM \`user_groups\` WHERE group_id=? AND employee_id IN (?);`, [groupId, employeeIds]);
+    }
+
+    const empIdSet = new Set(employeeIds);
+    this.userGroupsCache = this.userGroupsCache.filter((ug) => !(ug.group_id === groupId && empIdSet.has(ug.employee_id)));
+    return { count: employeeIds.length };
+  }
+
   public async syncData(users: User[], groups: Group[], userGroups: UserGroup[]) {
     this.usersCache = users;
     this.groupsCache = groups;

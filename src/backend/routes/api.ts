@@ -33,11 +33,90 @@ apiRouter.get('/users', async (req: Request, res: Response) => {
   res.json({ success: true, count: users.length, data: users });
 });
 
-// 4. Master Groups Endpoint (Directly from MySQL Database Server)
+// 4. Master Groups Endpoint (Supports filtering: ?is_special=true/false & ?category=...)
 apiRouter.get('/groups', async (req: Request, res: Response) => {
   await dataService.loadFromMySql();
-  const groups = dataService.getAllGroups();
+  let groups = dataService.getAllGroups();
+
+  if (req.query.is_special !== undefined) {
+    const isSpec = req.query.is_special === 'true' || req.query.is_special === '1';
+    groups = groups.filter((g) => Boolean(g.is_special) === isSpec);
+  }
+
+  if (req.query.category && typeof req.query.category === 'string') {
+    const cat = req.query.category.toUpperCase();
+    groups = groups.filter((g) => (g.category || '').toUpperCase() === cat);
+  }
+
   res.json({ success: true, count: groups.length, data: groups });
+});
+
+// 4.1 Create New Group Endpoint (POST /api/groups)
+apiRouter.post('/groups', async (req: Request, res: Response) => {
+  try {
+    const newGroup = await dataService.createGroup(req.body);
+    res.status(201).json({ success: true, data: newGroup });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message || 'Failed to create group' });
+  }
+});
+
+// 4.2 Update Group Endpoint (PUT /api/groups/:id)
+apiRouter.put('/groups/:id', async (req: Request, res: Response) => {
+  try {
+    const groupId = Number(req.params.id);
+    if (isNaN(groupId)) return res.status(400).json({ success: false, error: 'Invalid group ID' });
+
+    const updated = await dataService.updateGroup(groupId, req.body);
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message || 'Failed to update group' });
+  }
+});
+
+// 4.3 Delete Group Endpoint (DELETE /api/groups/:id)
+apiRouter.delete('/groups/:id', async (req: Request, res: Response) => {
+  try {
+    const groupId = Number(req.params.id);
+    if (isNaN(groupId)) return res.status(400).json({ success: false, error: 'Invalid group ID' });
+
+    const result = await dataService.deleteGroup(groupId);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message || 'Failed to delete group' });
+  }
+});
+
+// 4.4 Assign Employees to Group Endpoint (POST /api/groups/:id/assign)
+apiRouter.post('/groups/:id/assign', async (req: Request, res: Response) => {
+  try {
+    const groupId = Number(req.params.id);
+    const { employee_ids } = req.body;
+    if (isNaN(groupId) || !Array.isArray(employee_ids)) {
+      return res.status(400).json({ success: false, error: 'Invalid groupId or employee_ids array' });
+    }
+
+    const result = await dataService.assignUsersToGroup(groupId, employee_ids);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message || 'Failed to assign users to group' });
+  }
+});
+
+// 4.5 Unassign Employees from Group Endpoint (POST /api/groups/:id/unassign)
+apiRouter.post('/groups/:id/unassign', async (req: Request, res: Response) => {
+  try {
+    const groupId = Number(req.params.id);
+    const { employee_ids } = req.body;
+    if (isNaN(groupId) || !Array.isArray(employee_ids)) {
+      return res.status(400).json({ success: false, error: 'Invalid groupId or employee_ids array' });
+    }
+
+    const result = await dataService.unassignUsersFromGroup(groupId, employee_ids);
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: err.message || 'Failed to unassign users from group' });
+  }
 });
 
 // 4.5 Master User Groups Mapping Endpoint (Directly from MySQL Database Server)

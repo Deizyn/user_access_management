@@ -85,16 +85,22 @@ To ensure strict enterprise compliance:
 
 ---
 
-## 4. API Specification & Integration Points
+## 4. Dedicated Group Management REST API Specification
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/users` | Returns list of all employee records |
-| `GET` | `/api/groups` | Returns list of all groups from `` `groups` `` table |
-| `GET` | `/api/user-groups` | Returns relational mappings from `` `user_groups` `` |
-| `GET` | `/api/special-groups` | Returns special groups (`SELECT * FROM groups WHERE is_special = 1`) |
-| `POST` | `/api/db/sync` | Atomically upserts users, groups, and user_groups to MySQL |
-| `POST` | `/api/db/reset` | Clears all employee records (`DELETE FROM users`) |
+The system exposes dedicated RESTful endpoints specifically designed for group CRUD operations, entitlement management, and employee assignment:
+
+| Method | Endpoint | Query / Body Payload | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/groups` | `?is_special=true/false`<br>`?category=PRINT_QUOTA` | Returns all groups from `` `groups` `` table with optional category/special filters |
+| `POST` | `/api/groups` | `{ group_name, description?, is_special?, category?, badge_color? }` | Creates a new group in database |
+| `PUT` | `/api/groups/:id` | `{ group_name?, description?, is_special?, category?, badge_color? }` | Updates an existing group by ID |
+| `DELETE` | `/api/groups/:id` | None | Deletes a group by ID (cascades `user_groups` mappings) |
+| `POST` | `/api/groups/:id/assign` | `{ employee_ids: ["EMP-88004"] }` | Assigns employee(s) to a group |
+| `POST` | `/api/groups/:id/unassign` | `{ employee_ids: ["EMP-88004"] }` | Unassigns employee(s) from a group |
+| `GET` | `/api/users` | None | Returns list of all employee records |
+| `GET` | `/api/user-groups` | None | Returns relational mappings from `` `user_groups` `` |
+| `POST` | `/api/db/sync` | `{ users, groups, userGroups }` | Atomically upserts users, groups, and user_groups to MySQL |
+| `POST` | `/api/db/reset` | None | Clears all employee records (`DELETE FROM users`) |
 
 ---
 
