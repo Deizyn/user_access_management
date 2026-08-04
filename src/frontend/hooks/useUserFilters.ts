@@ -1,36 +1,40 @@
 import { useState, useMemo } from 'react';
-import { User, Group, UserGroup, UserWithGroups, FilterState, SortState } from '../../types';
+import { User, Group, UserGroup, UserWithGroups, FilterState, SortState, InternetLevel } from '../../types';
 import { getExpiryStatus } from '../../utils/helpers';
+import { getUserPrimaryInternetLevel, getUserVpnStatus, getUserPrintQuotaGroup } from '../../utils/groupHelpers';
 
 export function useUserFilters(users: User[], groups: Group[], userGroups: UserGroup[]) {
-  // Join Users with Groups
+  // Join Users with Groups and compute dynamic access properties
   const usersWithGroups: UserWithGroups[] = useMemo(() => {
     return users.map((u) => {
       const assignedGroupIds = userGroups
         .filter((ug) => ug.employee_id === u.employee_id)
         .map((ug) => Number(ug.group_id));
 
-      // Always ensure the corresponding Internet Level Group (101 for A, 102 for B, 103 for C) is present
-      const internetGroupId = u.internet_level === 'A' ? 101 : u.internet_level === 'B' ? 102 : 103;
-      if (!assignedGroupIds.includes(internetGroupId)) {
-        assignedGroupIds.push(internetGroupId);
-      }
-
       const assignedGroups = groups.filter((g) => assignedGroupIds.includes(Number(g.group_id)));
 
-      // Always ensure the Level Group badge object is present in assignedGroups
-      const hasLevelGroupBadge = assignedGroups.some((g) => g.group_id === internetGroupId || g.internet_level === u.internet_level);
+      // Dynamically derive properties from assigned groups
+      const internetLevel: InternetLevel = getUserPrimaryInternetLevel(assignedGroups, u.internet_level || 'B');
+      const vpnStatus: boolean = getUserVpnStatus(assignedGroups);
+      const printQuotaGroup: string = getUserPrintQuotaGroup(assignedGroups);
+
+      // Always ensure the corresponding Internet Level Group (101 for A, 102 for B, 103 for C) is present in groups array
+      const internetGroupId = internetLevel === 'A' ? 101 : internetLevel === 'B' ? 102 : 103;
+      const hasLevelGroupBadge = assignedGroups.some((g) => g.group_id === internetGroupId || g.internet_level === internetLevel);
       if (!hasLevelGroupBadge) {
         assignedGroups.unshift({
           group_id: internetGroupId,
-          group_name: `Internet Level ${u.internet_level || 'B'}`,
-          description: `สิทธิ์ใช้งานอินเทอร์เน็ตระดับ ${u.internet_level || 'B'}`,
-          internet_level: u.internet_level || 'B',
+          group_name: `Internet Level ${internetLevel}`,
+          description: `สิทธิ์ใช้งานอินเทอร์เน็ตระดับ ${internetLevel}`,
+          internet_level: internetLevel,
         });
       }
 
       return {
         ...u,
+        internet_level: internetLevel,
+        vpn_status: vpnStatus,
+        print_quota_group: printQuotaGroup,
         groups: assignedGroups,
       };
     });

@@ -189,6 +189,10 @@
 - **การปรับปรุง**: 
   1. อัปเดต `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) เพิ่มข้อมูลจำลอง 8 แถวครอบคลุมตำแหน่ง CTO, HR Manager, Financial Controller, Security Specialist, Marketing Lead, Supply Chain, R&D Scientist, Intern
   2. ครอบคลุมการใช้งานทุกระดับสิทธิ์อินเทอร์เน็ต (A/B/C), สถานะ VPN, ปริ้นสี/ขาวดำ, ไลเซนส์ Office 365 (E5/E3/E1) และสิทธิ์กลุ่มพิเศษครบถ้วน
+### 2.36 ปรับปรุงเอนจินตัวกรอง Filter Custom Hook ให้สอดคล้องกับสถาปัตยกรรม AD Groups
+- **การปรับปรุง**: 
+  1. อัปเดต [useUserFilters.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserFilters.ts) เชื่อมต่อฟังก์ชันสกัดค่าสิทธิ์แบบคำนวณสด (`getUserPrimaryInternetLevel`, `getUserVpnStatus`, `getUserPrintQuotaGroup`) กับชุดข้อมูลกลุ่มสิทธิ์ใน `groups`
+  2. ทำให้ตัวกรองทุกเมนู (ระดับอินเทอร์เน็ต A/B/C, สถานะ VPN Active/Disabled, โควต้าการพิมพ์ Printer Color/Mono, กลุ่มสิทธิ์เฉพาะ) ทำงานอย่างถูกต้อง 100%
 
 ---
 

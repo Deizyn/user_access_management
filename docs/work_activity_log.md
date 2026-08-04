@@ -120,6 +120,9 @@
   - เพิ่มตาราง Master Catalog `special_groups` ในฐานข้อมูล MySQL และ REST API Endpoint `GET /api/special-groups`
 - **[LOG-041] Enrich CSV Import/Export Template with 8 Realistic Multidisciplinary Sample Rows**:
   - อัปเดตฟังก์ชัน `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) ให้มีข้อมูลจำลองพนักงาน 8 แถวสมบูรณ์ ครอบคลุมทุกระดับสิทธิ์อินเทอร์เน็ต (A/B/C), สถานะ VPN, โควต้าการพิมพ์ (Color/Mono), ไลเซนส์ O365 (E5/E3/E1), สิทธิ์พิเศษทรัพยากร (Video, Comms, Mail) และแผนกต่างๆ ทั่วทั้งองค์กร
+- **[LOG-042] Align Filter Engine & Custom Hooks with Normalized AD Groups Engine**:
+  - อัปเดต [useUserFilters.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserFilters.ts) ให้ใช้เมธอดคำนวณไดนามิก `getUserPrimaryInternetLevel`, `getUserVpnStatus`, `getUserPrintQuotaGroup` จากกลุ่มสิทธิ์ใน `groups` สำหรับตัวกรองทุกประเภท (Internet Level A/B/C, VPN Status Active/Disabled, Printer Quota Color/Mono) ทำให้ระบบกรองและค้นหาทำงานร่วมกับสถาปัตยกรรมใหม่ได้อย่างแม่นยำ 100%
+
 
 
 
