@@ -1,5 +1,5 @@
-import React from 'react';
-import { FolderKanban, Download, Upload, RefreshCw, Users, Database, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { FolderKanban, Download, Upload, RefreshCw, Users, Database, Sparkles, ChevronUp, ChevronDown, EyeOff, Eye } from 'lucide-react';
 
 interface NavbarProps {
   totalUsersCount: number;
@@ -19,8 +19,26 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenDbStatus,
   onResetData,
 }) => {
+  const [isHidden, setIsHidden] = useState(true);
+
+  if (isHidden) {
+    return (
+      <div className="sticky top-2 z-30 flex justify-end px-4 max-w-7xl mx-auto w-full pointer-events-none mb-[-2rem]">
+        <button
+          onClick={() => setIsHidden(false)}
+          title="แสดงแถบเมนู (Show Navbar)"
+          className="pointer-events-auto inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white/90 hover:bg-slate-900 text-slate-700 hover:text-white border border-slate-200/90 text-xs font-semibold rounded-full shadow-md backdrop-blur-md transition-all cursor-pointer hover:scale-105 group"
+        >
+          <Eye className="w-3.5 h-3.5 text-indigo-600 group-hover:text-indigo-400" />
+          <span>แสดงแถบเมนู (Show Navbar)</span>
+          <ChevronDown className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <header className="bg-white border-b border-slate-200/90 sticky top-0 z-30 shadow-xs">
+    <header className="bg-white border-b border-slate-200/90 sticky top-0 z-30 shadow-xs transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
@@ -36,8 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </h1>
               </div>
               <p className="text-xs text-slate-500 font-normal">
-                ระบบจัดการรายชื่อพนักงาน ข้อมูลสิทธิ์เข้าถึง และกลุ่มผู้ใช้งาน <br />
-                (Unified Master Dashboard)
+                ระบบแดชบอร์ดดูรายชื่อพนักงาน ข้อมูลสิทธิ์เข้าถึง และกลุ่มผู้ใช้งาน
               </p>
             </div>
           </div>
@@ -69,18 +86,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Data & SQLite Center (จัดการข้อมูล & ฐานข้อมูล)</span>
             </button>
 
-
-
-            {/* Quick Export Shortcut */}
-            <button
-              onClick={() => onOpenDataCenter('export')}
-              title="ส่งออกข้อมูล (CSV / JSON / SQLite)"
-              className="inline-flex items-center px-3 py-2 border border-slate-200 text-xs font-semibold rounded-xl text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5 mr-1 text-slate-600" />
-              Export
-            </button>
-
             {/* Reset Button */}
             <button
               onClick={() => onResetData()}
@@ -91,6 +96,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               Reset Data
             </button>
 
+            {/* Hide Navbar Toggle Button */}
+            <div className="h-5 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+            <button
+              onClick={() => setIsHidden(true)}
+              title="ซ่อนแถบเมนู (Hide Navbar)"
+              className="inline-flex items-center px-2.5 py-2 border border-slate-200 text-xs font-semibold rounded-xl text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer space-x-1"
+            >
+              <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden sm:inline text-xs">ซ่อนเมนู</span>
+              <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+            </button>
+
           </div>
 
         </div>
@@ -98,3 +115,4 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
+
