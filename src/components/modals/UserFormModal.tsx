@@ -61,24 +61,22 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
       setO365License(userToEdit.o365_license || 'Microsoft 365 E3');
       setSelectedGroupIds(userToEdit.groups.map((g) => g.group_id));
     } else {
-      // Auto-generate random new ID in AH format
-      const nextNum = Math.floor(10000000 + Math.random() * 90000000);
-      setEmployeeId(`AH${nextNum}`);
+      setEmployeeId('');
       setUsername('');
       setDisplayName('');
       setEmail('');
       setInternetLevel('B');
-      setJobTitle('engineer');
-      setDepartment('press');
-      setCompany('AH');
-      setDeviceCode(`AH25-IT${Math.floor(1000 + Math.random() * 9000)}`);
-      setAuthorityGroup('Domain Users');
+      setJobTitle('-');
+      setDepartment('-');
+      setCompany('-');
+      setDeviceCode('-');
+      setAuthorityGroup('-');
       setCreationDate(new Date().toISOString().slice(0, 10));
       setExpiryDate('');
-      setPrintQuotaGroup('ปริ้นขาวดำ/ปริ้นสี');
-      setTelephonePassCode(`PIN-${Math.floor(1000 + Math.random() * 9000)}`);
+      setPrintQuotaGroup('-');
+      setTelephonePassCode('-');
       setVpnStatus(false);
-      setO365License('Microsoft 365 E3');
+      setO365License('-');
       setSelectedGroupIds([]);
     }
     setErrors({});

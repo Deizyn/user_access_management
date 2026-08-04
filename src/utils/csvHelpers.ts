@@ -411,37 +411,39 @@ export function processImportCSV(
       if (rawEmpId) {
         canonicalEmpId = rawEmpId;
       } else if (rawUsername) {
-        canonicalEmpId = `EMP-${rawUsername.toUpperCase()}`;
+        canonicalEmpId = rawUsername;
       } else {
-        canonicalEmpId = `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
+        canonicalEmpId = '-';
       }
-      empIdLookupMap.set(canonicalEmpId.toLowerCase(), canonicalEmpId);
+      if (canonicalEmpId !== '-') {
+        empIdLookupMap.set(canonicalEmpId.toLowerCase(), canonicalEmpId);
+      }
       if (rawUsername) {
         usernameLookupMap.set(rawUsername.toLowerCase(), canonicalEmpId);
       }
     }
 
     if (!displayName) {
-      displayName = rawUsername || canonicalEmpId;
+      displayName = rawUsername || (canonicalEmpId !== '-' ? canonicalEmpId : '-');
     }
 
     let username = rawUsername;
     if (!username) {
-      username = displayName.toLowerCase().replace(/\s+/g, '.') || canonicalEmpId.toLowerCase();
+      username = '-';
     }
 
     let email = getValue('email');
     if (!email) {
-      email = `${username.toLowerCase()}@company.co.th`;
+      email = '-';
     }
 
-    const o365License = getValue('o365_license', 'Microsoft 365 E3');
-    const jobTitle = getValue('job_title', 'Staff');
-    const department = getValue('department', 'General');
-    const company = getValue('company', 'Alpha Group');
-    const authorityGroup = getValue('authority_group', 'Domain Users');
-    const deviceCode = getValue('device_code', `DEV-${Math.floor(1000 + Math.random() * 9000)}`);
-    const creationDate = getValue('creation_date', new Date().toISOString().slice(0, 10));
+    const o365License = getValue('o365_license', '-');
+    const jobTitle = getValue('job_title', '-');
+    const department = getValue('department', '-');
+    const company = getValue('company', '-');
+    const authorityGroup = getValue('authority_group', '-');
+    const deviceCode = getValue('device_code', '-');
+    const creationDate = getValue('creation_date', '-');
     
     let expiryDateRaw = getValue('expiry_date');
     let expiryDate: string | null = null;
@@ -449,7 +451,7 @@ export function processImportCSV(
       expiryDate = expiryDateRaw;
     }
 
-    const telephonePassCode = getValue('telephone_pass_code', `${Math.floor(100000 + Math.random() * 900000)}`);
+    const telephonePassCode = getValue('telephone_pass_code', '-');
 
     const empIdKeyLower = canonicalEmpId.toLowerCase();
     if (isExisting || processedKeysInBatch.has(empIdKeyLower)) {

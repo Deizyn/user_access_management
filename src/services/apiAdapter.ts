@@ -118,15 +118,15 @@ export function mapRawAdUserToNormalizedModel(
     display_name: displayName,
     email,
     internet_level: internetLevel,
-    job_title: adRecord.title || 'Specialist',
-    department: adRecord.department || 'General',
-    company: adRecord.company || 'Alpha Group',
-    device_code: adRecord.extensionAttribute2 || `DEV-${Math.floor(1000 + Math.random() * 9000)}`,
+    job_title: adRecord.title || '-',
+    department: adRecord.department || '-',
+    company: adRecord.company || '-',
+    device_code: adRecord.extensionAttribute2 || '-',
     authority_group: adRecord.memberOf?.some((m) => m.includes('Domain Admins')) ? 'Domain Admins' : 'Domain Users',
-    creation_date: new Date().toISOString().slice(0, 10),
+    creation_date: '-',
     expiry_date: adRecord.accountExpires && adRecord.accountExpires !== 'never' ? adRecord.accountExpires : null,
-    print_quota_group: adRecord.extensionAttribute3 || (internetLevel === 'A' ? 'VIP_UNLIMITED' : 'STD_500'),
-    telephone_pass_code: adRecord.telephoneNumber || `${Math.floor(100000 + Math.random() * 900000)}`,
+    print_quota_group: adRecord.extensionAttribute3 || '-',
+    telephone_pass_code: adRecord.telephoneNumber || '-',
     vpn_status: isVpnActive,
   };
 
@@ -177,10 +177,10 @@ export function mapRawSqlRecordToNormalizedModel(
   existingGroupsMap: Map<string, Group>,
   nextGroupIdRef: { current: number }
 ): { user: User; userGroups: UserGroup[]; newGroupsCreated: Group[] } {
-  const empId = sqlRecord.emp_id || sqlRecord.user_code || `EMP-${Math.floor(10000 + Math.random() * 90000)}`;
-  const username = sqlRecord.user_name || empId.toLowerCase();
+  const empId = sqlRecord.emp_id || sqlRecord.user_code || '-';
+  const username = sqlRecord.user_name || '-';
   const displayName = sqlRecord.full_name || username;
-  const email = sqlRecord.email_address || `${username}@company.co.th`;
+  const email = sqlRecord.email_address || '-';
 
   let internetLevel: InternetLevel = 'B';
   if (sqlRecord.inet_level) {
@@ -197,15 +197,15 @@ export function mapRawSqlRecordToNormalizedModel(
     display_name: displayName,
     email,
     internet_level: internetLevel,
-    job_title: sqlRecord.position_title || 'Employee',
-    department: sqlRecord.dept_name || 'General',
-    company: sqlRecord.company_name || 'Alpha Group',
-    device_code: sqlRecord.device_tag || `DEV-${Math.floor(1000 + Math.random() * 9000)}`,
-    authority_group: 'Domain Users',
-    creation_date: new Date().toISOString().slice(0, 10),
+    job_title: sqlRecord.position_title || '-',
+    department: sqlRecord.dept_name || '-',
+    company: sqlRecord.company_name || '-',
+    device_code: sqlRecord.device_tag || '-',
+    authority_group: '-',
+    creation_date: '-',
     expiry_date: sqlRecord.expire_dt || null,
-    print_quota_group: sqlRecord.quota_code || 'STD_500',
-    telephone_pass_code: sqlRecord.phone_pin || `${Math.floor(100000 + Math.random() * 900000)}`,
+    print_quota_group: sqlRecord.quota_code || '-',
+    telephone_pass_code: sqlRecord.phone_pin || '-',
     vpn_status: isVpnActive,
   };
 
@@ -653,12 +653,12 @@ export async function syncAutoDiscoverPipeline(
       job_title: rawUser.position_title,
       department: rawUser.dept_name,
       company: rawUser.company_name,
-      device_code: `DEV-${Math.floor(1000 + Math.random() * 9000)}`,
+      device_code: '-',
       authority_group: 'Domain Users',
-      creation_date: new Date().toISOString().slice(0, 10),
+      creation_date: '-',
       expiry_date: null,
-      print_quota_group: detectedLevel === 'A' ? 'VIP_UNLIMITED' : 'STD_500',
-      telephone_pass_code: `${Math.floor(100000 + Math.random() * 900000)}`,
+      print_quota_group: '-',
+      telephone_pass_code: '-',
       vpn_status: rawUser.is_vpn_enabled === 1,
     };
 
@@ -866,17 +866,17 @@ export async function syncHybridMultiSourcePipeline(
       employee_id: empId,
       username,
       display_name: sqlUser.full_name || username,
-      email: sqlUser.email_address || `${username}@company.co.th`,
+      email: sqlUser.email_address || '-',
       internet_level: inetLevel,
-      job_title: sqlUser.position_title || 'Employee',
-      department: sqlUser.dept_name || 'General',
-      company: sqlUser.company_name || 'Alpha Group',
-      device_code: `DEV-${Math.floor(1000 + Math.random() * 9000)}`,
+      job_title: sqlUser.position_title || '-',
+      department: sqlUser.dept_name || '-',
+      company: sqlUser.company_name || '-',
+      device_code: '-',
       authority_group: 'Domain Users',
-      creation_date: new Date().toISOString().slice(0, 10),
+      creation_date: '-',
       expiry_date: null,
-      print_quota_group: inetLevel === 'A' ? 'VIP_UNLIMITED' : 'STD_500',
-      telephone_pass_code: `${Math.floor(100000 + Math.random() * 900000)}`,
+      print_quota_group: '-',
+      telephone_pass_code: '-',
       vpn_status: sqlUser.is_vpn_enabled === 1,
     };
 
