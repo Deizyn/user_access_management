@@ -35,7 +35,23 @@ CREATE TABLE IF NOT EXISTS `groups` (
 - **`is_special` = 1:** Special Entitlement Group (System Master Catalog IDs 101–109 or special entitlement).
 - **`is_special` = 0:** Standard Organizational Security Group (IDs 200+ created via UI/CSV).
 
+#### Table 1.5: `` `special_groups` ``
+Master catalog for system special groups, rules, categories, and badge styling.
+
+```sql
+CREATE TABLE IF NOT EXISTS `special_groups` (
+  `special_group_id` INT PRIMARY KEY,
+  `group_name` VARCHAR(100) NOT NULL UNIQUE,
+  `category` VARCHAR(50) NOT NULL,
+  `badge_color` VARCHAR(100) NULL,
+  `description` TEXT NULL,
+  `is_active` TINYINT(1) DEFAULT 1,
+  FOREIGN KEY (`special_group_id`) REFERENCES `groups` (`group_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
 #### Table 2: `` `users` ``
+
 Stores employee profile records.
 
 ```sql
