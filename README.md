@@ -27,8 +27,10 @@
 - 📥 **CSV Bulk Import & Export**: นำเข้าไฟล์พนักงานพร้อมกัน 60+ รายการ พร้อมระบบตรวจสอบคอลัมน์ แมปกลุ่มสิทธิ์อัตโนมัติ และเขียนบันทึกลงดิสก์ MySQL ทันที
 - 📊 **Interactive Analytics View**: มุมมองการวิเคราะห์สถิติ สรุปสัดส่วนสิทธิ์ Internet Level, สถิติผู้ใช้งาน VPN Active, สถิติแยกตามบริษัท/แผนก และกลุ่มการพิมพ์
 - 🛠️ **Built-in Developer & DB Tools**:
+  - **Hideable Navbar UI**: ปุ่มซ่อน/แสดงแถบเมนูด้านบนเพื่อเพิ่มพื้นที่การมองเห็นบนหน้าจอ พร้อมปุ่มลอย Glassmorphic restore button
   - **Data & SQLite Center**: หน้าต่างจัดการ Schema SQL Console และ Export/Import
   - **Level Group Explorer**: หน้าต่างสำรวจสมาชิกกลุ่มสิทธิ์และแผนกในรูปแบบ Modal
+
 
 ---
 
@@ -72,14 +74,29 @@ DB_PASS=admin123456
 ### 3. Installation & Local Development (ติดตั้งและสั่งรัน)
 
 ```bash
-# 1. ติดตั้ง Dependencies ทั้งหมด
+# 1. Clone เฉพาะ branch user_dashboard_V3
+git clone -b user_dashboard_V3 https://github.com/Deizyn/user_access_management.git
+cd user_access_management
+
+# 2. ติดตั้ง Dependencies ทั้งหมด
 npm install
 
-# 2. สั่งรันเซิร์ฟเวอร์สำหรับพัฒนา (Vite + Express Backend)
+# 3. สั่งรันเซิร์ฟเวอร์สำหรับพัฒนา (Vite + Express Backend)
 npm run dev
 ```
 
 เปิดเบราว์เซอร์แล้วเข้าใช้งานที่: `http://localhost:3000`
+
+### 4. Git Workflow (`user_dashboard_V3`)
+
+```bash
+# พุชงานขึ้น branch user_dashboard_V3
+git checkout user_dashboard_V3
+git add .
+git commit -m "ข้อความ commit"
+git push origin user_dashboard_V3
+```
+
 
 ---
 

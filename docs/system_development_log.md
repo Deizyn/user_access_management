@@ -193,6 +193,16 @@
 - **การปรับปรุง**: 
   1. อัปเดต [useUserFilters.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserFilters.ts) เชื่อมต่อฟังก์ชันสกัดค่าสิทธิ์แบบคำนวณสด (`getUserPrimaryInternetLevel`, `getUserVpnStatus`, `getUserPrintQuotaGroup`) กับชุดข้อมูลกลุ่มสิทธิ์ใน `groups`
   2. ทำให้ตัวกรองทุกเมนู (ระดับอินเทอร์เน็ต A/B/C, สถานะ VPN Active/Disabled, โควต้าการพิมพ์ Printer Color/Mono, กลุ่มสิทธิ์เฉพาะ) ทำงานอย่างถูกต้อง 100%
+### 2.37 พัฒนาระบบ Hideable Navbar UI Toggle & Floating Restore Pill Button
+- **การปรับปรุง**:
+  1. อัปเดต [Navbar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/Navbar.tsx) เพิ่มสเตตควบคุมการซ่อน `isHidden`
+  2. เพิ่มปุ่ม "ซ่อนเมนู" พร้อมไอคอน `EyeOff` และ `ChevronUp` สำหรับซ่อนส่วนแถบเมนูด้านบนเพื่อเพิ่มพื้นที่การมองเห็นบนหน้าจอ
+  3. เพิ่มปุ่มลอย "แสดงแถบเมนู (Show Navbar)" สไตล์ Glassmorphism บริเวณมุมขวาบนเมื่อ Navbar ถูกซ่อนอยู่ เพื่อเปิดคืนค่า Navbar ได้สะดวก
+### 2.38 อัปเดตสถาปัตยกรรม Git Branch Release V3 (`user_dashboard_V3`)
+- **การปรับปรุง**:
+  1. รวมการปรับปรุงทั้งหมดเข้าสู่ Remote Branch `user_dashboard_V3`
+  2. อัปเดตเอกสารสถาปัตยกรรมและคู่มือการใช้งาน Git Clone / Push / Branch Management ทั้งหมดในระบบ
+
 
 ---
 

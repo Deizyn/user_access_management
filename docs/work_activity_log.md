@@ -129,6 +129,14 @@
   - เพิ่มการจัดการ Null Safety ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) และ [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/UserTable.tsx)
   - ปรับปรุงระบบฐานข้อมูลและการลบ/รีเซ็ตข้อมูลให้พึ่งพาข้อมูลจริงจาก MySQL Database และการนำเข้า CSV เป็นหลัก
   - ทำการบันทึก Git Commit เวอร์ชัน `user_dashboard_V3`
+- **[LOG-045] Implement Hideable Navbar UI Toggle & Floating Restore Pill Button**:
+  - เพิ่มสเตต `isHidden` ภายในคอมโพเนนต์ [Navbar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/Navbar.tsx) เพื่อควบคุมการแสดงผล/ซ่อน Navbar ส่วนหัวของระบบ
+  - เพิ่มปุ่ม "ซ่อนเมนู" พร้อมไอคอน `EyeOff` และ `ChevronUp` สำหรับยุบเก็บ Navbar
+  - ออกแบบปุ่มลอย "แสดงแถบเมนู (Show Navbar)" พร้อม Glassmorphism backdrop-blur สไตล์โมเดิร์นที่มุมขวาบน ให้ผู้ใช้เรียกคืน Navbar ได้อย่างง่ายดายตลอดเวลา
+- **[LOG-046] Synchronize Git Branch & Repository Documentation (`user_dashboard_V3`)**:
+  - ซิงค์โค้ดและทำการ Commit/Push การเปลี่ยนแปลงทั้งหมดเข้าสู่ Remote Branch `user_dashboard_V3` บน GitHub
+  - ปรับปรุงและอัปเดตเอกสารระบบทั้งหมด (`README.md`, `docs/README.md`, `docs/system_development_log.md` และ `docs/work_activity_log.md`) ให้รองรับฟีเจอร์เวอร์ชันล่าสุด
+
 
 
 
