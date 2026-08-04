@@ -47,9 +47,13 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose 
     if (!user) return { printQuota: '', specialPermissions: [], isVpnActive: false };
     const groups = user.groups || [];
 
-    // 1. Printer Permissions
-    const hasPrinterColor = groups.some(g => g.group_id === 108 || g.group_name.toLowerCase().includes('color') || g.group_name.includes('ปริ้นสี'));
-    const hasPrinterMono = groups.some(g => g.group_id === 109 || g.group_name.toLowerCase().includes('mono') || g.group_name.includes('ขาวดำ'));
+    // 1. Printer Permissions (Primary check by group_id & category)
+    const hasPrinterColor = groups.some(
+      (g) => g.group_id === 108 || (g.category === 'PRINT_QUOTA' && g.group_name.toLowerCase().includes('color')) || g.group_name.includes('ปริ้นสี')
+    );
+    const hasPrinterMono = groups.some(
+      (g) => g.group_id === 109 || (g.category === 'PRINT_QUOTA' && g.group_name.toLowerCase().includes('mono')) || g.group_name.includes('ขาวดำ')
+    );
 
     let printQuota = user.print_quota_group || 'Standard Quota';
     if (hasPrinterColor && hasPrinterMono) {
@@ -60,20 +64,20 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose 
       printQuota = 'Mono Only';
     }
 
-    // 2. Special Features & Network Privileges
+    // 2. Special Features & Network Privileges (Primary check by group_id & category)
     const specialPermissions: string[] = [];
-    if (groups.some(g => g.group_id === 104 || g.group_name.toLowerCase().includes('video'))) {
+    if (groups.some((g) => g.group_id === 104 || g.category === 'RESOURCE_ENTITLEMENT' && g.group_name.toLowerCase().includes('video'))) {
       specialPermissions.push('Video Access');
     }
-    if (groups.some(g => g.group_id === 105 || g.group_name.toLowerCase().includes('communication'))) {
+    if (groups.some((g) => g.group_id === 105 || g.category === 'RESOURCE_ENTITLEMENT' && g.group_name.toLowerCase().includes('communication'))) {
       specialPermissions.push('Communications');
     }
-    if (groups.some(g => g.group_id === 106 || g.group_name.toLowerCase().includes('free e-mail') || g.group_name.toLowerCase().includes('free email'))) {
+    if (groups.some((g) => g.group_id === 106 || g.group_name.toLowerCase().includes('free e-mail') || g.group_name.toLowerCase().includes('free email'))) {
       specialPermissions.push('External Free Mail');
     }
 
-    // 3. VPN Access Group
-    const hasVpnGroup = groups.some(g => g.group_id === 107 || g.group_name.toLowerCase().includes('vpn'));
+    // 3. VPN Access Group (Primary check by group_id & category)
+    const hasVpnGroup = groups.some((g) => g.group_id === 107 || g.category === 'NETWORK_VPN' || g.group_name.toLowerCase().includes('vpn'));
     const isVpnActive = user.vpn_status || hasVpnGroup;
 
     return {
