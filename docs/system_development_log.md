@@ -185,6 +185,10 @@
   1. **ลดคอลัมน์ CSV ซ้ำซ้อน**: ตัดคอลัมน์ `Level Group`, `Internet Level`, `Print Quota Group`, `VPN Status` ออกจากไฟล์ CSV ทำให้คอลัมน์คงเหลือเพียง **14 คอลัมน์หลักมาตรฐาน**
   2. **สกัดข้อมูลจาก Active Directory Groups อัตโนมัติ**: ปรับปรุงเอนจินใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts), [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) และ [groupHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/groupHelpers.ts) ให้ประมวลผลระดับอินเทอร์เน็ต (A/B/C), สถานะ VPN (Active/Disabled), โควต้าการพิมพ์ (Printer Color/Mono) และทรัพยากรอื่นๆ จากคอลัมน์ **`Groups`** โดยตรง
   3. **เพิ่มตาราง Master Catalog `special_groups` & API Endpoint**: สร้างตาราง `special_groups` ใน MySQL Database และเพิ่ม REST API `GET /api/special-groups` เพื่อให้ระบบนำกฎสิทธิ์พิเศษไปแมปกับกลุ่มสิทธิ์พนักงานอย่างยืดหยุ่นและรองรับการขยายตัวในอนาคต
+### 2.35 ปรับปรุงไฟล์เทมเพลต CSV เพิ่มข้อมูลจำลอง 8 แถวครอบคลุมทุกแผนกและสิทธิ์
+- **การปรับปรุง**: 
+  1. อัปเดต `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) เพิ่มข้อมูลจำลอง 8 แถวครอบคลุมตำแหน่ง CTO, HR Manager, Financial Controller, Security Specialist, Marketing Lead, Supply Chain, R&D Scientist, Intern
+  2. ครอบคลุมการใช้งานทุกระดับสิทธิ์อินเทอร์เน็ต (A/B/C), สถานะ VPN, ปริ้นสี/ขาวดำ, ไลเซนส์ Office 365 (E5/E3/E1) และสิทธิ์กลุ่มพิเศษครบถ้วน
 
 ---
 

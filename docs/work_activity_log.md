@@ -118,7 +118,9 @@
   - ลบคอลัมน์ซ้ำซ้อน (`Level Group`, `Internet Level`, `Print Quota Group`, `VPN Status`) ออกจากคอลัมน์ CSV ให้เหลือ 14 คอลัมน์หลักมาตรฐาน
   - ปรับปรุง [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts), [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts), [groupHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/groupHelpers.ts) ให้ประมวลผลและสกัดค่าระดับอินเทอร์เน็ต (A/B/C), สถานะ VPN (Active/Disabled), โควต้าการพิมพ์ (Printer Color/Mono) และสิทธิ์พิเศษทรัพยากรอื่นๆ จากคอลัมน์ **`Groups` (Active Directory Groups)** โดยอัตโนมัติ
   - เพิ่มตาราง Master Catalog `special_groups` ในฐานข้อมูล MySQL และ REST API Endpoint `GET /api/special-groups`
-  - สร้างไฟล์เอกสาร Mermaid Diagrams เชิงสถาปัตยกรรมใน [system_architecture_diagrams.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture_diagrams.md)
+- **[LOG-041] Enrich CSV Import/Export Template with 8 Realistic Multidisciplinary Sample Rows**:
+  - อัปเดตฟังก์ชัน `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) ให้มีข้อมูลจำลองพนักงาน 8 แถวสมบูรณ์ ครอบคลุมทุกระดับสิทธิ์อินเทอร์เน็ต (A/B/C), สถานะ VPN, โควต้าการพิมพ์ (Color/Mono), ไลเซนส์ O365 (E5/E3/E1), สิทธิ์พิเศษทรัพยากร (Video, Comms, Mail) และแผนกต่างๆ ทั่วทั้งองค์กร
+
 
 
 
