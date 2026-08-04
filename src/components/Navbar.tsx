@@ -83,11 +83,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Reset Button */}
             <button
-              onClick={onResetData}
-              title="รีเซ็ตข้อมูลทั้งหมดในระบบกลับสู่ค่าเริ่มต้น"
-              className="inline-flex items-center p-2 border border-slate-200 text-xs font-medium rounded-xl text-slate-500 hover:text-slate-800 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+              onClick={() => onResetData()}
+              title="รีเซ็ตคืนค่าข้อมูลทั้งหมดในระบบกลับสู่ค่าเริ่มต้น"
+              className="inline-flex items-center px-3 py-2 border border-rose-200 text-xs font-semibold rounded-xl text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5 text-rose-600" />
+              Reset Data
             </button>
 
           </div>

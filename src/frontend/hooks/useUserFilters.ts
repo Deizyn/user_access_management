@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { User, Group, UserGroup, UserWithGroups, FilterState, SortState, InternetLevel } from '../../types';
 import { getExpiryStatus } from '../../utils/helpers';
-import { getUserPrimaryInternetLevel, getUserVpnStatus, getUserPrintQuotaGroup } from '../../utils/groupHelpers';
+import { getUserPrimaryInternetLevel, getUserVpnStatus, getUserPrintQuotaGroup, ensureUserSpecialGroupsInAssigned } from '../../utils/groupHelpers';
 
 export function useUserFilters(users: User[], groups: Group[], userGroups: UserGroup[]) {
   // Join Users with Groups and compute dynamic access properties
@@ -11,24 +11,15 @@ export function useUserFilters(users: User[], groups: Group[], userGroups: UserG
         .filter((ug) => ug.employee_id === u.employee_id)
         .map((ug) => Number(ug.group_id));
 
-      const assignedGroups = groups.filter((g) => assignedGroupIds.includes(Number(g.group_id)));
+      const rawAssignedGroups = groups.filter((g) => assignedGroupIds.includes(Number(g.group_id)));
+
+      // Reconcile and ensure all Special Groups (Internet Level, VPN, Print Quota, etc.) are in user.groups
+      const assignedGroups = ensureUserSpecialGroupsInAssigned(rawAssignedGroups, u, groups);
 
       // Dynamically derive properties from assigned groups
       const internetLevel: InternetLevel = getUserPrimaryInternetLevel(assignedGroups, u.internet_level || 'B');
       const vpnStatus: boolean = getUserVpnStatus(assignedGroups);
       const printQuotaGroup: string = getUserPrintQuotaGroup(assignedGroups);
-
-      // Always ensure the corresponding Internet Level Group (101 for A, 102 for B, 103 for C) is present in groups array
-      const internetGroupId = internetLevel === 'A' ? 101 : internetLevel === 'B' ? 102 : 103;
-      const hasLevelGroupBadge = assignedGroups.some((g) => g.group_id === internetGroupId || g.internet_level === internetLevel);
-      if (!hasLevelGroupBadge) {
-        assignedGroups.unshift({
-          group_id: internetGroupId,
-          group_name: `Internet Level ${internetLevel}`,
-          description: `สิทธิ์ใช้งานอินเทอร์เน็ตระดับ ${internetLevel}`,
-          internet_level: internetLevel,
-        });
-      }
 
       return {
         ...u,

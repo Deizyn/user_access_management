@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Group, User, UserGroup, UserWithGroups } from '../../types';
-import { INITIAL_GROUPS, INITIAL_USERS, INITIAL_USER_GROUPS } from '../../data/initialData';
+import { DEFAULT_MASTER_GROUPS } from '../../constants/specialGroups';
+import { INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS } from '../../data/initialData';
 import {
   STORAGE_KEY_GROUPS,
   STORAGE_KEY_USERS,
@@ -67,7 +68,7 @@ export function useUserAccessData() {
           if (ugData.success && Array.isArray(ugData.data)) setUserGroups(ugData.data);
           setIsSqliteReady(true);
           console.log(
-            `[MySQL Engine] Restored ${uData.data.length} users, ${gData.data?.length || 0} groups, ${ugData.data?.length || 0} user-groups directly from MySQL Backend Database Server.`
+            `[MySQL Engine] Loaded ${uData.data.length} users, ${gData.data?.length || 0} groups, ${ugData.data?.length || 0} user-groups directly from MySQL Backend Database Server.`
           );
           return;
         }
@@ -211,25 +212,46 @@ export function useUserAccessData() {
     syncToBackendPhysicalFile(importedUsers, importedGroups, importedUserGroups);
   };
 
-  const handleResetData = async () => {
-    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการสั่งลบข้อมูลพนักงานและสิทธิ์การผูกทั้งหมดในตาราง MySQL Server หรือไม่?')) return;
+  const handleResetData = async (skipConfirm?: boolean) => {
+    if (!skipConfirm && !window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลพนักงานทั้งหมดออกจากฐานข้อมูล? (ข้อมูลพนักงานจะถูกลบทั้งหมด)')) return;
     try {
-      // 1. Call Backend API Endpoint /api/db/reset to run DELETE FROM users, user_groups, groups directly
-      await fetch('/api/db/reset', { method: 'POST' });
+      // 1. Call Backend API Endpoint /api/db/reset to delete all users & user_groups from MySQL
+      const res = await fetch('/api/db/reset', { method: 'POST' });
+      const resetRes = await res.json();
 
-      // 2. Clear React State
-      setUsers(INITIAL_USERS);
-      setGroups(INITIAL_GROUPS);
-      setUserGroups(INITIAL_USER_GROUPS);
+      if (!resetRes.success) {
+        throw new Error(resetRes.error || 'Failed to reset backend database');
+      }
 
-      // 3. Clear Local SQLite WASM memory
-      resetSqliteDb(INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS);
-      refreshFromSqlite();
+      // 2. Fetch fresh empty state from backend API
+      const uRes = await fetch('/api/users');
+      const gRes = await fetch('/api/groups');
+      const ugRes = await fetch('/api/user-groups');
+      const uData = await uRes.json();
+      const gData = await gRes.json();
+      const ugData = await ugRes.json();
 
-      alert('รันคำสั่ง SQL DELETE ลบข้อมูลพนักงานจากตาราง MySQL Database Server เรียบร้อยแล้ว!');
-    } catch (err) {
-      console.error('Failed to reset MySQL database:', err);
-      alert('เกิดข้อผิดพลาดในการสั่งลบข้อมูลจากฐานข้อมูล MySQL');
+      const freshUsers: User[] = (uData.success && Array.isArray(uData.data)) ? uData.data : [];
+      const freshGroups: Group[] = (gData.success && Array.isArray(gData.data) && gData.data.length > 0) ? gData.data : DEFAULT_MASTER_GROUPS;
+      const freshUserGroups: UserGroup[] = (ugData.success && Array.isArray(ugData.data)) ? ugData.data : [];
+
+      // 3. Update React state to 0 users
+      setUsers(freshUsers);
+      setGroups(freshGroups);
+      setUserGroups(freshUserGroups);
+
+      // 4. Reset WASM SQLite memory with 0 users
+      resetSqliteDb(freshUsers, freshGroups, freshUserGroups);
+
+      // 5. Save empty state to LocalStorage
+      safeSaveLocalStorage(STORAGE_KEY_USERS, freshUsers);
+      safeSaveLocalStorage(STORAGE_KEY_GROUPS, freshGroups);
+      safeSaveLocalStorage(STORAGE_KEY_USER_GROUPS, freshUserGroups);
+
+      alert('ลบข้อมูลพนักงานทั้งหมดในฐานข้อมูลเรียบร้อยแล้ว (จำนวนพนักงาน = 0)');
+    } catch (err: any) {
+      console.error('Failed to reset database:', err);
+      alert('เกิดข้อผิดพลาดในการสั่งลบข้อมูลพนักงาน: ' + (err?.message || err));
     }
   };
 
@@ -251,3 +273,4 @@ export function useUserAccessData() {
     handleResetData,
   };
 }
+

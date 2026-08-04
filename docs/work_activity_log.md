@@ -120,8 +120,15 @@
   - เพิ่มตาราง Master Catalog `special_groups` ในฐานข้อมูล MySQL และ REST API Endpoint `GET /api/special-groups`
 - **[LOG-041] Enrich CSV Import/Export Template with 8 Realistic Multidisciplinary Sample Rows**:
   - อัปเดตฟังก์ชัน `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) ให้มีข้อมูลจำลองพนักงาน 8 แถวสมบูรณ์ ครอบคลุมทุกระดับสิทธิ์อินเทอร์เน็ต (A/B/C), สถานะ VPN, โควต้าการพิมพ์ (Color/Mono), ไลเซนส์ O365 (E5/E3/E1), สิทธิ์พิเศษทรัพยากร (Video, Comms, Mail) และแผนกต่างๆ ทั่วทั้งองค์กร
-- **[LOG-042] Align Filter Engine & Custom Hooks with Normalized AD Groups Engine**:
-  - อัปเดต [useUserFilters.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserFilters.ts) ให้ใช้เมธอดคำนวณไดนามิก `getUserPrimaryInternetLevel`, `getUserVpnStatus`, `getUserPrintQuotaGroup` จากกลุ่มสิทธิ์ใน `groups` สำหรับตัวกรองทุกประเภท (Internet Level A/B/C, VPN Status Active/Disabled, Printer Quota Color/Mono) ทำให้ระบบกรองและค้นหาทำงานร่วมกับสถาปัตยกรรมใหม่ได้อย่างแม่นยำ 100%
+- **[LOG-043] Dedicated Special Group Module & Full Integration in Assigned Groups**:
+  - สร้างโมดูลเฉพาะ `specialGroupHelpers.ts` ([specialGroupHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/specialGroupHelpers.ts)) สำหรับตรวจสอบ (`isSpecialGroup`), จัดหมวดหมู่ (`getSpecialGroupCategory`), และตรวจสอบสิทธิ์กลุ่มสิทธิ์พิเศษ (Internet Level A/B/C, VPN Access, Printer Color/Mono, Video, Comms, Mail ฯลฯ)
+  - อัปเดต `useUserFilters.ts` ([useUserFilters.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/frontend/hooks/useUserFilters.ts)) ด้วยฟังก์ชัน `ensureUserSpecialGroupsInAssigned` เพื่อให้แน่ใจว่า Special Groups ทุกประเภทถูกผูกและบรรจุอยู่ในอาร์เรย์ `user.groups` อย่างสมบูรณ์
+  - ปรับปรุงแท็บ **Assigned Groups** ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) ให้แสดงผล Special Groups และ Organizational Groups อย่างชัดเจน พร้อมป้ายกำกับ `Special Group`, แบดจ์สีประจำกลุ่มสิทธิ์ และตัวกรองประเภทกลุ่มสิทธิ์ (All / Special Groups / Organizational)
+- **[LOG-044] Fix Circular Dependency, Database Schema Constraints & Release Version V3**:
+  - แก้ไขปัญหา Circular Dependency ระหว่าง [constants/specialGroups.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/constants/specialGroups.ts) และ [specialGroupHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/specialGroupHelpers.ts)
+  - เพิ่มการจัดการ Null Safety ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) และ [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/UserTable.tsx)
+  - ปรับปรุงระบบฐานข้อมูลและการลบ/รีเซ็ตข้อมูลให้พึ่งพาข้อมูลจริงจาก MySQL Database และการนำเข้า CSV เป็นหลัก
+  - ทำการบันทึก Git Commit เวอร์ชัน `user_dashboard_V3`
 
 
 

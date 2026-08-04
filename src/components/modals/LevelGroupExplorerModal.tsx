@@ -13,7 +13,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Group, UserWithGroups } from '../../types';
-import { getGroupBadgeInfo, SPECIAL_GROUP_IDS, getUserPrimaryInternetLevel } from '../../utils/groupHelpers';
+import { getGroupBadgeInfo, SPECIAL_GROUP_IDS, getUserPrimaryInternetLevel, isSpecialGroup } from '../../utils/groupHelpers';
 
 interface LevelGroupExplorerModalProps {
   isOpen: boolean;
@@ -21,6 +21,7 @@ interface LevelGroupExplorerModalProps {
   groups: Group[];
   users: UserWithGroups[];
   initialGroupId?: number | null;
+  initialCategoryId?: string | null;
   onSelectUserForDetail: (user: UserWithGroups) => void;
   onAddGroup?: (groupName: string) => void;
   onEditGroup?: (groupId: number, newName: string) => void;
@@ -33,6 +34,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
   groups,
   users,
   initialGroupId = null,
+  initialCategoryId = null,
   onSelectUserForDetail,
 }) => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(initialGroupId);
@@ -45,22 +47,23 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
   useEffect(() => {
     if (isOpen) {
       setSelectedGroupId(initialGroupId);
+      if (initialCategoryId === 'special') setCategoryTab('special');
+      else if (initialCategoryId === 'org') setCategoryTab('org');
+      else setCategoryTab('all');
       setGroupSearchQuery('');
       setMemberSearchQuery('');
     }
-  }, [isOpen, initialGroupId]);
+  }, [isOpen, initialGroupId, initialCategoryId]);
 
   if (!isOpen) return null;
-
-  const specialGroupIds = SPECIAL_GROUP_IDS;
 
   // Selected Group details
   const selectedGroup = groups.find((g) => g.group_id === selectedGroupId) || null;
 
   // Filtered Groups
   const filteredGroups = groups.filter((g) => {
-    if (categoryTab === 'special' && !specialGroupIds.includes(g.group_id)) return false;
-    if (categoryTab === 'org' && specialGroupIds.includes(g.group_id)) return false;
+    if (categoryTab === 'special' && !isSpecialGroup(g)) return false;
+    if (categoryTab === 'org' && isSpecialGroup(g)) return false;
 
     if (!groupSearchQuery.trim()) return true;
     const q = groupSearchQuery.toLowerCase();
@@ -176,7 +179,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Special Level Groups ({groups.filter((g) => specialGroupIds.includes(g.group_id)).length})
+                  Special Level Groups ({groups.filter((g) => isSpecialGroup(g)).length})
                 </button>
                 <button
                   onClick={() => setCategoryTab('org')}
@@ -186,7 +189,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  Organizational Groups ({groups.filter((g) => !specialGroupIds.includes(g.group_id)).length})
+                  Organizational Groups ({groups.filter((g) => !isSpecialGroup(g)).length})
                 </button>
               </div>
 

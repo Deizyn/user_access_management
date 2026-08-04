@@ -487,16 +487,6 @@ export const RAW_AD_API_JSON_RESPONSE: RawAdSyncApiResponse = generateRawAdApiRe
 // Step 2: Transform raw AD JSON payload into internal application data
 const transformedData = transformAdApiResponseToAppModel(RAW_AD_API_JSON_RESPONSE);
 
-export const INITIAL_GROUPS: Group[] = [
-  { group_id: 101, group_name: 'Internet Level A', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', internet_level: 'A', is_special: true },
-  { group_id: 102, group_name: 'Internet Level B', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', internet_level: 'B', is_special: true },
-  { group_id: 103, group_name: 'Internet Level C', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', internet_level: 'C', is_special: true },
-  { group_id: 104, group_name: 'Video Access', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_special: true },
-  { group_id: 105, group_name: 'Communications', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_special: true },
-  { group_id: 106, group_name: 'Free E-mail', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_special: true },
-  { group_id: 107, group_name: 'VPN Access', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_special: true },
-  { group_id: 108, group_name: 'Printer Color (ปริ้นสี)', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_special: true },
-  { group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_special: true },
-];
-export const INITIAL_USERS: User[] = [];
-export const INITIAL_USER_GROUPS: UserGroup[] = [];
+export const INITIAL_GROUPS: Group[] = transformedData.groups;
+export const INITIAL_USERS: User[] = transformedData.users;
+export const INITIAL_USER_GROUPS: UserGroup[] = transformedData.userGroups;

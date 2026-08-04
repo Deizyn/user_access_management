@@ -1,12 +1,12 @@
 import mysql from 'mysql2/promise';
-import { INITIAL_USERS, INITIAL_GROUPS, INITIAL_USER_GROUPS } from '../../data/initialData';
+import { DEFAULT_MASTER_GROUPS } from '../../constants/specialGroups';
 import { JSON_DATABASE_SCHEMA_DOC } from '../../data/databaseSchemaSpec';
 import { User, Group, UserGroup, InternetLevel } from '../../types';
 
 export class DataService {
   // Cache synced with MySQL Server for sub-millisecond API response
   private usersCache: User[] = [];
-  private groupsCache: Group[] = [...INITIAL_GROUPS];
+  private groupsCache: Group[] = [...DEFAULT_MASTER_GROUPS];
   private userGroupsCache: UserGroup[] = [];
   private isMySqlConnected = false;
 
@@ -71,9 +71,20 @@ export class DataService {
           creation_date VARCHAR(50) NOT NULL,
           expiry_date VARCHAR(50) NULL,
           telephone_pass_code VARCHAR(50) NOT NULL,
-          o365_license VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3'
+          o365_license VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
+          internet_level VARCHAR(10) NULL DEFAULT 'B'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
+
+      try {
+        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`internet_level\` VARCHAR(10) NULL DEFAULT 'B';`);
+      } catch (e) {}
+      try {
+        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`print_quota_group\` VARCHAR(100) NULL;`);
+      } catch (e) {}
+      try {
+        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`vpn_status\` TINYINT(1) NULL DEFAULT 0;`);
+      } catch (e) {}
 
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`groups\` (
@@ -115,7 +126,7 @@ export class DataService {
       // Seed Initial Groups & Special Groups Master Catalog if empty
       const [groupRows]: any = await pool.query(`SELECT COUNT(*) as count FROM \`groups\`;`);
       if (groupRows[0].count === 0) {
-        for (const g of INITIAL_GROUPS) {
+        for (const g of DEFAULT_MASTER_GROUPS) {
           await pool.query(
             `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE group_name=VALUES(group_name);`,
             [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
@@ -281,9 +292,9 @@ export class DataService {
 
         for (const u of users) {
           await pool.query(
-            `INSERT INTO \`users\` (employee_id, username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), telephone_pass_code=VALUES(telephone_pass_code), o365_license=VALUES(o365_license);`,
+            `INSERT INTO \`users\` (employee_id, username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license, internet_level)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), telephone_pass_code=VALUES(telephone_pass_code), o365_license=VALUES(o365_license), internet_level=VALUES(internet_level);`,
             [
               u.employee_id,
               u.username,
@@ -298,6 +309,7 @@ export class DataService {
               u.expiry_date || null,
               u.telephone_pass_code,
               u.o365_license || 'Microsoft 365 E3',
+              u.internet_level || 'B',
             ]
           );
         }
@@ -322,30 +334,34 @@ export class DataService {
   }
 
   public async resetDatabase() {
+    this.usersCache = [];
+    this.userGroupsCache = [];
+    this.groupsCache = [...DEFAULT_MASTER_GROUPS];
+
     try {
-      const pool = await this.getPool();
+      if (this.isMySqlConnected) {
+        const pool = await this.getPool();
 
-      // Direct SQL Truncate/Delete all rows from database tables
-      await pool.query(`DELETE FROM \`user_groups\`;`);
-      await pool.query(`DELETE FROM \`users\`;`);
-      await pool.query(`DELETE FROM \`groups\`;`);
+        // Direct SQL Truncate/Delete all rows from database tables
+        await pool.query(`DELETE FROM \`user_groups\`;`);
+        await pool.query(`DELETE FROM \`users\`;`);
+        await pool.query(`DELETE FROM \`groups\`;`);
 
-      // Re-seed default 9 Special Groups (101-109)
-      for (const g of INITIAL_GROUPS) {
-        await pool.query(
-          `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?);`,
-          [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
-        );
+        // Re-seed default 9 Special Groups (101-109)
+        for (const g of DEFAULT_MASTER_GROUPS) {
+          await pool.query(
+            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?);`,
+            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
+          );
+        }
+
+        await this.loadFromMySql();
       }
 
-      this.usersCache = [];
-      this.groupsCache = [...INITIAL_GROUPS];
-      this.userGroupsCache = [];
-
-      console.log(`[MySQL Database Engine] Direct SQL Reset Executed: Deleted all rows from 'users' and 'user_groups' tables.`);
-      return { success: true, message: 'MySQL Database reset to initial state successfully.' };
+      console.log(`[Database Engine] Direct SQL Reset Executed: Cleared all users and user_groups. Preserved 9 default Special Groups.`);
+      return { success: true, message: 'Database reset to clean state successfully.' };
     } catch (err: any) {
-      console.error('[MySQL Database Engine] Reset error:', err?.message || err);
+      console.error('[Database Engine] Reset error:', err?.message || err);
       throw err;
     }
   }

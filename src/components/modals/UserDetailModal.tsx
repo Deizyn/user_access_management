@@ -20,10 +20,13 @@ import {
   Cloud,
   User as UserIcon,
   Clock,
-  Key
+  Key,
+  Sparkles,
+  Layers
 } from 'lucide-react';
 import { UserWithGroups } from '../../types';
 import { getExpiryStatus, formatDate } from '../../utils/helpers';
+import { isSpecialGroup, getGroupBadgeInfo, partitionGroups } from '../../utils/groupHelpers';
 
 interface UserDetailModalProps {
   user: UserWithGroups | null;
@@ -37,6 +40,7 @@ type TabType = 'overview' | 'contact' | 'groups';
 export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [groupFilterTab, setGroupFilterTab] = useState<'all' | 'special' | 'org'>('all');
 
   // Map Special Groups & attributes to human-readable field attributes
   const derivedProfile = useMemo(() => {
@@ -398,44 +402,124 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
             </div>
           )}
 
-          {activeTab === 'groups' && (
-            <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <h3 className="text-sm font-bold text-slate-900">Assigned Access Groups</h3>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                  {user.groups.length} Groups Total
-                </span>
-              </div>
+          {activeTab === 'groups' && (() => {
+            const groupsList = user.groups || [];
+            const { specialGroups, organizationalGroups } = partitionGroups(groupsList);
+            const filteredGroupsList = groupsList.filter((g) => {
+              if (groupFilterTab === 'special') return isSpecialGroup(g);
+              if (groupFilterTab === 'org') return !isSpecialGroup(g);
+              return true;
+            });
 
-              {user.groups.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                  <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                  <p className="text-xs font-semibold text-slate-600">No security groups assigned to this user.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {user.groups.map((g) => (
-                    <div
-                      key={g.group_id}
-                      className="p-3.5 rounded-lg border border-slate-200/90 bg-slate-50/60 hover:bg-slate-50 text-slate-800 text-xs flex flex-col justify-between transition-all"
+            return (
+              <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-indigo-600" />
+                      <span>Assigned Access Groups & Level Groups</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      กลุ่มสิทธิ์ทั้งหมดที่พนักงานได้รับการสิทธิ์ ครอบคลุมทั้ง Special Groups และกลุ่มตามโครงสร้างองค์กร
+                    </p>
+                  </div>
+
+                  {/* Group Category Filter Tabs */}
+                  <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-bold shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setGroupFilterTab('all')}
+                      className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                        groupFilterTab === 'all'
+                          ? 'bg-white text-indigo-600 shadow-2xs font-extrabold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
                     >
-                      <div className="font-bold text-slate-900 leading-snug">
-                        {g.group_name}
-                      </div>
-                      <div className="text-[11px] font-mono text-slate-500 mt-2.5 pt-2 border-t border-slate-200/80 flex items-center justify-between">
-                        <span>Group ID: {g.group_id}</span>
-                        {g.internet_level && (
-                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-                            Level {g.internet_level}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                      ทั้งหมด ({groupsList.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGroupFilterTab('special')}
+                      className={`px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
+                        groupFilterTab === 'special'
+                          ? 'bg-white text-indigo-600 shadow-2xs font-extrabold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      <span>Special Groups ({specialGroups.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGroupFilterTab('org')}
+                      className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                        groupFilterTab === 'org'
+                          ? 'bg-white text-indigo-600 shadow-2xs font-extrabold'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Organizational ({organizationalGroups.length})
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+
+                {filteredGroupsList.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                    <AlertTriangle className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                    <p className="text-xs font-semibold text-slate-600">No security groups found matching current filter.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+                    {filteredGroupsList.map((g) => {
+                      const badgeInfo = getGroupBadgeInfo(g);
+                      const isSpec = isSpecialGroup(g);
+
+                      return (
+                        <div
+                          key={g.group_id}
+                          className={`p-3.5 rounded-xl border flex flex-col justify-between transition-all ${
+                            isSpec
+                              ? 'border-indigo-200/90 bg-indigo-50/30 hover:bg-indigo-50/60 shadow-2xs'
+                              : 'border-slate-200/90 bg-slate-50/60 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-1 mb-2 flex-wrap">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${badgeInfo.variant}`}>
+                                {isSpec && <Sparkles className="w-2.5 h-2.5 text-amber-500 shrink-0" />}
+                                {badgeInfo.label}
+                              </span>
+                              {isSpec && (
+                                <span className="text-[9px] font-extrabold text-indigo-600 bg-indigo-100/80 px-1.5 py-0.5 rounded border border-indigo-200">
+                                  Special Group
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="font-bold text-slate-900 leading-snug text-xs">
+                              {g.group_name}
+                            </div>
+                            {g.description && (
+                              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                                {g.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="text-[11px] font-mono text-slate-500 mt-3 pt-2 border-t border-slate-200/80 flex items-center justify-between">
+                            <span>Group ID: {g.group_id}</span>
+                            <span className="text-[10px] font-semibold text-slate-400">
+                              {(badgeInfo?.categoryLabel || '').split(' ')[0] || 'Group'}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
         </div>
 

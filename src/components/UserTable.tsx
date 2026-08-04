@@ -344,16 +344,16 @@ export const UserTable: React.FC<UserTableProps> = ({
                 // 1. Printer Group
                 const printerGroup = allSpecial.find(
                   (sg) =>
-                    sg.name.toLowerCase().includes('printer') ||
-                    sg.name.includes('ปริ้น') ||
-                    sg.id === 'special_108' ||
-                    sg.id === 'special_109'
+                    (sg?.name || '').toLowerCase().includes('printer') ||
+                    (sg?.name || '').includes('ปริ้น') ||
+                    sg?.id === 'special_108' ||
+                    sg?.id === 'special_109'
                 );
 
                 // 2. Remaining Special Groups (excluding Internet Level & Printer Group)
                 const remainingSpecial = allSpecial.filter((sg) => {
-                  if (sg.name.toLowerCase().includes('internet level')) return false;
-                  if (printerGroup && sg.id === printerGroup.id) return false;
+                  if ((sg?.name || '').toLowerCase().includes('internet level')) return false;
+                  if (printerGroup && sg?.id === printerGroup.id) return false;
                   return true;
                 });
 

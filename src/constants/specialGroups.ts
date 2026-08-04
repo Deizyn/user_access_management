@@ -54,6 +54,18 @@ export const DEFAULT_SPECIAL_GROUPS_CONFIG: Record<number, SpecialGroupConfig> =
   },
 };
 
+export const DEFAULT_MASTER_GROUPS: Group[] = [
+  { group_id: 101, group_name: 'Internet Level A', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ A (ไม่จำกัด)', internet_level: 'A', is_special: true },
+  { group_id: 102, group_name: 'Internet Level B', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ B (มาตรฐาน)', internet_level: 'B', is_special: true },
+  { group_id: 103, group_name: 'Internet Level C', description: 'สิทธิ์ใช้งานอินเทอร์เน็ตระดับ C (จำกัดเฉพาะเว็บภายใน)', internet_level: 'C', is_special: true },
+  { group_id: 104, group_name: 'Video Access', description: 'สิทธิ์เข้าถึงสื่อวิดีโอและสตรีมมิ่ง', is_special: true },
+  { group_id: 105, group_name: 'Communications', description: 'สิทธิ์ระบบสื่อสาร โทรศัพท์ และแชทองค์กร', is_special: true },
+  { group_id: 106, group_name: 'Free E-mail', description: 'สิทธิ์รับ-ส่งอีเมลภายนอกองค์กร', is_special: true },
+  { group_id: 107, group_name: 'VPN Access', description: 'สิทธิ์เชื่อมต่อเครือข่าย VPN จากภายนอก', is_special: true },
+  { group_id: 108, group_name: 'Printer Color (ปริ้นสี)', description: 'สิทธิ์สั่งพิมพ์งานสีและขาวดำ (Color Printer)', is_special: true },
+  { group_id: 109, group_name: 'Printer Mono (ปริ้นขาวดำ)', description: 'สิทธิ์สั่งพิมพ์งานขาวดำเท่านั้น (Mono Printer)', is_special: true },
+];
+
 export const SPECIAL_GROUPS_CONFIG: Record<number, SpecialGroupConfig> = { ...DEFAULT_SPECIAL_GROUPS_CONFIG };
 
 /**
@@ -71,76 +83,3 @@ export function getSpecialGroupIds(): number[] {
 }
 
 export const SPECIAL_GROUP_IDS = getSpecialGroupIds();
-
-/**
- * Check whether a group or groupId is considered a Special Group
- */
-export function isSpecialGroup(groupOrId: Group | number): boolean {
-  if (typeof groupOrId === 'number') {
-    return SPECIAL_GROUPS_CONFIG[groupOrId] !== undefined;
-  }
-  if (groupOrId.is_special === true) {
-    return true;
-  }
-  const idNum = Number(groupOrId.group_id);
-  if (SPECIAL_GROUPS_CONFIG[idNum] !== undefined) {
-    return true;
-  }
-  if (groupOrId.internet_level) return true;
-
-  const name = (groupOrId.group_name || '').toLowerCase();
-  return (
-    name.includes('internet level') ||
-    name.includes('video access') ||
-    name.includes('communication') ||
-    name.includes('free e-mail') ||
-    name.includes('free email') ||
-    name.includes('vpn') ||
-    name.includes('printer') ||
-    name.includes('ปริ้น')
-  );
-}
-
-/**
- * Get display badge info (label and CSS classes) for any group
- */
-export function getGroupBadgeInfo(group: Group) {
-  const idNum = Number(group.group_id);
-  const config = SPECIAL_GROUPS_CONFIG[idNum];
-  if (config) {
-    return { label: config.name || group.group_name, variant: config.badgeClass };
-  }
-
-  const name = (group.group_name || '').toLowerCase();
-  if (name.includes('video access')) {
-    return { label: 'Video Access', variant: 'bg-purple-100 text-purple-900 border-purple-200' };
-  }
-  if (name.includes('communication')) {
-    return { label: 'Communications', variant: 'bg-indigo-100 text-indigo-900 border-indigo-200' };
-  }
-  if (name.includes('free e-mail') || name.includes('free email')) {
-    return { label: 'Free E-mail', variant: 'bg-teal-100 text-teal-900 border-teal-200' };
-  }
-  if (name.includes('vpn')) {
-    return { label: 'VPN Access', variant: 'bg-emerald-100 text-emerald-900 border-emerald-200' };
-  }
-  if (name.includes('printer color') || name.includes('ปริ้นสี')) {
-    return { label: 'Printer Color (ปริ้นสี)', variant: 'bg-slate-100 text-slate-800 border-slate-200' };
-  }
-  if (name.includes('printer mono') || name.includes('ปริ้นขาวดำ')) {
-    return { label: 'Printer Mono (ปริ้นขาวดำ)', variant: 'bg-slate-100 text-slate-800 border-slate-200' };
-  }
-
-  if (group.internet_level || name.includes('internet level')) {
-    const level = group.internet_level || (name.includes('level a') ? 'A' : name.includes('level c') ? 'C' : 'B');
-    const levelClass =
-      level === 'A'
-        ? 'bg-amber-100 text-amber-900 border-amber-300'
-        : level === 'B'
-        ? 'bg-sky-100 text-sky-900 border-sky-300'
-        : 'bg-slate-100 text-slate-800 border-slate-300';
-    return { label: `Internet Level ${level}`, variant: levelClass };
-  }
-
-  return { label: group.group_name || 'Access Group', variant: 'bg-indigo-100 text-indigo-900 border-indigo-200' };
-}

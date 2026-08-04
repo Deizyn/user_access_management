@@ -1,7 +1,15 @@
 import { Group, InternetLevel, UserWithGroups } from '../types';
-import { SPECIAL_GROUPS_CONFIG, isSpecialGroup, getGroupBadgeInfo } from '../constants/specialGroups';
+import { isSpecialGroup, getGroupBadgeInfo } from './specialGroupHelpers';
 
-export * from '../constants/specialGroups';
+export type { SpecialGroupConfig } from '../constants/specialGroups';
+export {
+  DEFAULT_SPECIAL_GROUPS_CONFIG,
+  SPECIAL_GROUPS_CONFIG,
+  registerSpecialGroup,
+  getSpecialGroupIds,
+} from '../constants/specialGroups';
+
+export * from './specialGroupHelpers';
 
 export interface SpecialGroupItem {
   id: string;
@@ -88,4 +96,3 @@ export function getUserPrintQuotaGroup(groups: Group[]): string {
   if (hasMono) return 'Printer Mono (ปริ้นขาวดำ)';
   return 'Standard Print';
 }
-
