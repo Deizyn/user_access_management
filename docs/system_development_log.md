@@ -286,6 +286,21 @@
   4. **[work_activity_log.md]** เพิ่ม LOG-063 และ LOG-064 บันทึกผล Audit และการชี้แจงความแตกต่างระหว่าง SQLite (16 cols) และ MySQL (14 cols)
 - **สถานะ**: เอกสารทั้ง 4 ไฟล์ตรงกับโครงสร้างโค้ดจริง 100% ✅
 
+### 2.56 ถอดคอลัมน์ `internet_level` ออกจากตาราง `users` ให้เป็นไปตาม 13-Column Clean Schema 3NF
+- **การปรับปรุง**:
+  1. ยืนยันสถาปัตยกรรม Clean 3NF Schema โดยกำหนดให้ตาราง `users` มีเฉพาะ **13 คอลัมน์หลักมาตรฐาน** (ถอด `internet_level` ออกจากตาราง `users` ใน MySQL)
+  2. ระดับอินเทอร์เน็ต (A/B/C) จะถูกอ่านและประมวลผลแบบ Dynamic ใน Backend/Frontend จากการจับคู่กลุ่มสิทธิ์ในตาราง `user_groups` -> `groups` โดยไม่ต้องมีคอลัมน์เก็บซ้ำซ้อนในตาราง `users`
+  3. แก้ไขคำสั่ง `INSERT INTO users` ใน `syncData()` ของ [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/services/dataService.ts) ให้เหลือ 13 ฟิลด์ ป้องกันข้อผิดพลาด `Unknown column 'internet_level' in 'field list'` (Error 1054)
+  4. อัปเดตเอกสารระบบทั้งหมด (`docs/system_architecture.md`, `docs/database_integration_guide.md`, `docs/system_architecture_diagrams.md`) ให้เป็น 13 คอลัมน์ตรงตามโครงสร้างฐานข้อมูลจริง 100%
+### 2.57 ปรับปรุงการคงสถานะ Level Group Explorer Modal เมื่อปิดหน้าต่างรายละเอียดพนักงาน
+- **การปรับปรุง**:
+  1. แก้ไขปุ่ม "ดูรายละเอียด" ในหน้าต่าง [LevelGroupExplorerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/LevelGroupExplorerModal.tsx) โดยถอดคำสั่ง `onClose()` ออก
+  2. เมื่อคลิกดูรายละเอียดพนักงาน หน้าต่าง `UserDetailModal` (ที่ตั้งค่า `z-index` ไว้ที่ `z-[70]`) จะเปิดขึ้นมาแสดงซ้อนทับหน้าต่าง `LevelGroupExplorerModal` (`z-50`)
+  3. เมื่อผู้ใช้กดปิดหน้าต่างรายละเอียดพนักงาน `UserDetailModal` หน้าต่าง `LevelGroupExplorerModal` จะคงเปิดอยู่ พร้อมแสดงกลุ่มสิทธิ์ ตารางรายชื่อ และตัวกรองเดิมที่เพิ่งเปิดดูอยู่ล่วงหน้าโดยไม่ต้องค้นหาใหม่
+- **สถานะ**: เพิ่มความสะดวกในการใช้งาน (UX Enhancement) เรียบร้อย 100% ✅
+
+---
+
 
 ---
 

@@ -554,8 +554,8 @@ export function processImportCSV(
     const derivedPrintQuota = hasPrinterColor
       ? 'Printer Color (ปริ้นสี)'
       : hasPrinterMono
-      ? 'Printer Mono (ปริ้นขาวดำ)'
-      : 'Standard Print';
+        ? 'Printer Mono (ปริ้นขาวดำ)'
+        : 'Standard Print';
 
     const normalizedUser: User = {
       employee_id: canonicalEmpId,

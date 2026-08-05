@@ -335,7 +335,6 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
                               type="button"
                               onClick={() => {
                                 onSelectUserForDetail(member);
-                                onClose();
                               }}
                               className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg transition-colors cursor-pointer text-xs"
                             >

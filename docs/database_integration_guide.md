@@ -33,7 +33,7 @@ DB_PORT=3306
 CREATE DATABASE IF NOT EXISTS user_access_dashboard_data CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE user_access_dashboard_data;
 
--- 1. ตารางผู้ใช้งาน (users) — 14 คอลัมน์หลัก
+-- 1. ตารางผู้ใช้งาน (users) — 13 คอลัมน์หลัก
 CREATE TABLE IF NOT EXISTS `users` (
   `employee_id` VARCHAR(50) PRIMARY KEY,
   `username` VARCHAR(100) NOT NULL UNIQUE,
@@ -47,8 +47,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `creation_date` VARCHAR(50) NOT NULL,
   `expiry_date` VARCHAR(50) NULL,
   `telephone_pass_code` VARCHAR(50) NOT NULL,
-  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
-  `internet_level` VARCHAR(10) NULL DEFAULT 'B'
+  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. ตารางกลุ่มสิทธิ์ (groups)

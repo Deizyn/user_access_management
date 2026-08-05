@@ -71,20 +71,11 @@ export class DataService {
           creation_date VARCHAR(50) NOT NULL,
           expiry_date VARCHAR(50) NULL,
           telephone_pass_code VARCHAR(50) NOT NULL,
-          o365_license VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
-          internet_level VARCHAR(10) NULL DEFAULT 'B'
+          o365_license VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3'
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
 
-      try {
-        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`internet_level\` VARCHAR(10) NULL DEFAULT 'B';`);
-      } catch (e) {}
-      try {
-        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`print_quota_group\` VARCHAR(100) NULL;`);
-      } catch (e) {}
-      try {
-        await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`vpn_status\` TINYINT(1) NULL DEFAULT 0;`);
-      } catch (e) {}
+      await this.ensureUserColumnsExist(pool);
 
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`groups\` (
@@ -99,8 +90,8 @@ export class DataService {
       `);
 
       // Ensure columns exist if table was created previously
-      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL';`); } catch (e) {}
-      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN badge_color VARCHAR(100) NULL;`); } catch (e) {}
+      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL';`); } catch (e) { }
+      try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN badge_color VARCHAR(100) NULL;`); } catch (e) { }
 
       await pool.query(`
         CREATE TABLE IF NOT EXISTS \`user_groups\` (
@@ -144,7 +135,7 @@ export class DataService {
       // Set default ORGANIZATIONAL category for non-special organizational groups if empty
       try {
         await pool.query(`UPDATE \`groups\` SET \`category\` = 'ORGANIZATIONAL' WHERE (\`category\` IS NULL OR \`category\` = '') AND \`group_id\` < 100;`);
-      } catch (e) {}
+      } catch (e) { }
 
       this.isMySqlConnected = true;
       console.log(`[MySQL Database Engine] Connected & initialized MySQL database '${this.dbConfig.dbName}' on ${this.dbConfig.dbHost}:${this.dbConfig.dbPort}`);
@@ -153,6 +144,15 @@ export class DataService {
       console.error(`[MySQL Database Engine] Failed to initialize MySQL Server:`, err?.message || err);
       this.isMySqlConnected = false;
     }
+  }
+
+  public async ensureUserColumnsExist(pool: mysql.Pool) {
+    try { await pool.query(`ALTER TABLE \`users\` ADD COLUMN \`o365_license\` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3';`); } catch (e) { }
+    try { await pool.query(`ALTER TABLE \`users\` MODIFY COLUMN \`o365_license\` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3';`); } catch (e) { }
+
+    try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL';`); } catch (e) { }
+    try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN badge_color VARCHAR(100) NULL;`); } catch (e) { }
+    try { await pool.query(`ALTER TABLE \`groups\` ADD COLUMN internet_level VARCHAR(10) NULL;`); } catch (e) { }
   }
 
   public async loadFromMySql() {
@@ -196,7 +196,7 @@ export class DataService {
 
       this.usersCache = userRows.map((u: any) => {
         const userGroups = userGroupsLookup.get(String(u.employee_id)) || [];
-        
+
         // Dynamically compute derived properties from mapped groups
         const hasA = userGroups.some((g) => g.group_id === 101 || g.internet_level === 'A' || g.group_name.toLowerCase().includes('level a'));
         const hasC = userGroups.some((g) => g.group_id === 103 || g.internet_level === 'C' || g.group_name.toLowerCase().includes('level c'));
@@ -210,7 +210,7 @@ export class DataService {
 
         return {
           ...u,
-          internet_level: u.internet_level || internetLevel,
+          internet_level: internetLevel,
           vpn_status: u.vpn_status !== undefined ? Boolean(u.vpn_status) : vpnStatus,
           print_quota_group: u.print_quota_group || printQuota,
           o365_license: u.o365_license || 'Microsoft 365 E3',
@@ -392,6 +392,7 @@ export class DataService {
 
     try {
       const pool = await this.getPool();
+      await this.ensureUserColumnsExist(pool);
 
       // 1. Sync Groups (Delete removed groups, then Upsert remaining)
       if (groups.length === 0) {
@@ -420,9 +421,9 @@ export class DataService {
 
         for (const u of users) {
           await pool.query(
-            `INSERT INTO \`users\` (employee_id, username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license, internet_level)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), telephone_pass_code=VALUES(telephone_pass_code), o365_license=VALUES(o365_license), internet_level=VALUES(internet_level);`,
+            `INSERT INTO \`users\` (employee_id, username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE username=VALUES(username), display_name=VALUES(display_name), email=VALUES(email), job_title=VALUES(job_title), department=VALUES(department), company=VALUES(company), device_code=VALUES(device_code), authority_group=VALUES(authority_group), creation_date=VALUES(creation_date), expiry_date=VALUES(expiry_date), telephone_pass_code=VALUES(telephone_pass_code), o365_license=VALUES(o365_license);`,
             [
               u.employee_id,
               u.username,
@@ -437,7 +438,6 @@ export class DataService {
               u.expiry_date || null,
               u.telephone_pass_code,
               u.o365_license || 'Microsoft 365 E3',
-              u.internet_level || 'B',
             ]
           );
         }

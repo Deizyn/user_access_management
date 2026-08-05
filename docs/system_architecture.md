@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS `groups` (
 - **`is_special` = 0:** Standard Organizational Security Group (IDs 200+ created via UI/CSV).
 - **`category` Options:** `INTERNET_LEVEL`, `RESOURCE_ENTITLEMENT`, `NETWORK_VPN`, `PRINT_QUOTA`, `ORGANIZATIONAL`.
 
-#### Table 2: `` `users` `` (Clean 14-Column Schema)
-Stores employee profile records without redundant permission columns (internet_level is retained for fast filtering/caching; derived permissions computed from groups).
+#### Table 2: `` `users` `` (Clean 13-Column Schema)
+Stores employee profile records without permission columns (all permissions including internet level, VPN, print quota are derived dynamically from groups).
 
 ```sql
 CREATE TABLE IF NOT EXISTS `users` (
@@ -53,8 +53,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `creation_date` VARCHAR(50) NOT NULL,
   `expiry_date` VARCHAR(50) NULL,
   `telephone_pass_code` VARCHAR(50) NOT NULL,
-  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
-  `internet_level` VARCHAR(10) NULL DEFAULT 'B'
+  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 

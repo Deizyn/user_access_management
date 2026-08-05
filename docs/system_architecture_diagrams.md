@@ -1,6 +1,6 @@
-# 📐 System Architecture & Workflow Diagrams (14-Column AD Groups Engine)
+# 📐 System Architecture & Workflow Diagrams (13-Column Clean Schema Engine)
 
-เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V2)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 14 คอลัมน์หลัก โดยผูกสิทธิ์ทั้งหมดเข้ากับตาราง **Active Directory Groups (`groups`)** แบบ Clean 3NF Consolidated Schema
+เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V2)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 13 คอลัมน์หลักในตาราง `users` โดยผูกสิทธิ์ทั้งหมดรวมถึง Internet Level เข้ากับตาราง **Active Directory Groups (`groups`)** แบบ Clean 3NF Consolidated Schema
 
 ---
 
@@ -27,7 +27,6 @@ erDiagram
         string expiry_date "วันหมดอายุ"
         string telephone_pass_code "รหัสผ่านโทรศัพท์"
         string o365_license "สิทธิ์การใช้งาน O365"
-        string internet_level "ระดับอินเทอร์เน็ต A/B/C (cached from groups)"
     }
 
     groups {

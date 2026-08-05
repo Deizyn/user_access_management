@@ -261,7 +261,7 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
               <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <UserIcon className="w-4 h-4 text-indigo-600" />
-                  Primary Contact Details
+                  User Information
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -468,11 +468,11 @@ Assigned Groups: ${user.groups.map(g => g.group_name).join(', ')}
                             }`}
                         >
                           <div>
-                            <div className="flex items-center justify-between gap-1 mb-2 flex-wrap">
+                            {/* <div className="flex items-center justify-between gap-1 mb-2 flex-wrap">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${badgeInfo.variant}`}>
                                 {badgeInfo.label}
                               </span>
-                            </div>
+                            </div> */}
 
                             <div className="font-bold text-slate-900 leading-snug text-xs">
                               {g.group_name}

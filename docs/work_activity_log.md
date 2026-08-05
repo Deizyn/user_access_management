@@ -197,7 +197,18 @@
     - **SQLite `users` table** (16 cols): มีคอลัมน์ Legacy `print_quota_group` และ `vpn_status` เพิ่มเติมจาก 14 คอลัมน์หลัก เพื่อรองรับ Frontend Filtering, CSV Export, และ UserFormModal ที่ยังใช้งานอยู่
     - **MySQL `users` table** (14 cols): มีเฉพาะ 14 คอลัมน์หลักใน `CREATE TABLE` แต่ ALTER TABLE เพิ่ม `print_quota_group` และ `vpn_status` เป็น optional columns สำหรับ backward compatibility
     - **ข้อสรุป**: ทั้ง `print_quota_group` และ `vpn_status` ยังคงถูกใช้งานอยู่จริงใน Frontend Logic (filtering, display) และ SQLite — ไม่ใช่ dead code แต่เป็น "computed-cache columns" ที่ได้ค่ามาจาก `groups` ผ่าน Dynamic Derivation Engine
-  - บันทึกไว้เพื่อให้ Developer ทราบว่า MySQL และ SQLite มีโครงสร้างต่างกันโดยตั้งใจ
+- **[LOG-066] Enforce Clean 13-Column MySQL `users` Schema (Remove `internet_level` Column)**:
+  - **การปรับปรุงสถาปัตยกรรม**: ปรับเปลี่ยนตามข้อกำหนด Clean 3NF Architecture ที่สิทธิ์ `internet_level` (ระดับ A/B/C) ถูกคำนวณแบบ Dynamic จากการจับคู่กลุ่มสิทธิ์ในตาราง `user_groups` -> `groups` โดยตรง (ไม่ใช่คอลัมน์ในตาราง `users`)
+  - **การแก้ไขในโค้ด**:
+    1. ถอดคอลัมน์ `internet_level` ออกจากคำสั่ง `CREATE TABLE IF NOT EXISTS users` และ `INSERT INTO users` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/services/dataService.ts) ปรับตาราง `users` เป็น 13 คอลัมน์หลักมาตรฐาน
+    2. อัปเดตคำสั่ง SQL `INSERT INTO users` ใน `syncData()` ให้ส่งเฉพาะ 13 ฟิลด์หลัก ป้องกันข้อผิดพลาด `Unknown column 'internet_level' in 'field list'`
+    3. อัปเดตเอกสารสถาปัตยกรรม [docs/system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/system_architecture.md), [docs/database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/database_integration_guide.md), และ [docs/system_architecture_diagrams.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/system_architecture_diagrams.md) เป็น 13-Column Clean Schema ตรงตามโค้ดจริง 100%
+- **[LOG-067] Preserve Level Group Explorer Modal State on User Detail Closure**:
+  - **การปรับปรุง**: แก้ไขการทำงานของปุ่ม "ดูรายละเอียด" ใน [LevelGroupExplorerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/LevelGroupExplorerModal.tsx) โดยถอดคำสั่ง `onClose()` ออก เมื่อผู้ใช้กดดูรายละเอียดพนักงาน หน้าต่าง `UserDetailModal` (สไตล์ z-index สูงกว่า `z-[70]`) จะเปิดซ้อนทับหน้าต่าง `LevelGroupExplorerModal` (z-50)
+  - **ผลลัพธ์**: เมื่อผู้ใช้กดปิดหน้าต่างรายละเอียดพนักงาน (`UserDetailModal`) ระบบจะย้อนกลับมายังหน้าต่าง `LevelGroupExplorerModal` ในสถานะกลุ่มสิทธิ์ ตารางพนักงาน และตัวกรองเดิมที่กำลังรับชมอยู่อัตโนมัติ 100%
+
+
+
 
 
 
