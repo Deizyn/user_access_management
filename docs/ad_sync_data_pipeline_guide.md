@@ -1,6 +1,6 @@
 # Active Directory & API Data Pipeline Integration Guide
 
-เอกสารอธิบายกระบวนการทำงานทั้งระบบ (End-to-End Pipeline Workflow) ตั้งแต่การดึงข้อมูลพนักงานและสิทธิ์จาก **Active Directory (LDAP / Graph API)**, การแปลงข้อมูล (Data Transformation Engine), การบันทึกลง **MySQL Database**, ไปจนถึงการให้บริการผ่าน **REST API** และนำมาคำนวณประมวลผลแสดงผลบน **UI Table** ของระบบ User Access Management Dashboard V2
+เอกสารอธิบายกระบวนการทำงานทั้งระบบ (End-to-End Pipeline Workflow) ตั้งแต่การดึงข้อมูลพนักงานและสิทธิ์จาก **Active Directory (LDAP / Graph API)**, การแปลงข้อมูล (Data Transformation Engine), การบันทึกลง **MySQL Database**, ไปจนถึงการให้บริการผ่าน **REST API** และนำมาคำนวณประมวลผลแสดงผลบน **UI Table** ของระบบ User Access Management Dashboard V4
 
 ---
 
@@ -74,7 +74,7 @@ flowchart TD
 
 ## ⚙️ ขั้นตอนที่ 2: การแปลงข้อมูล (Data Transformation Engine)
 
-ฟังก์ชัน **`transformAdApiResponseToAppModel()`** ใน [`src/data/initialData.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/initialData.ts#L411-L476) และ **`syncFromActiveDirectory()`** ใน [`src/services/apiAdapter.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/services/apiAdapter.ts) จะทำหน้าที่แยกข้อมูลออกเป็น 3 ตารางสัมพันธ์ (Relational Triad):
+ฟังก์ชัน **`transformAdApiResponseToAppModel()`** ใน [`src/data/initialData.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/data/initialData.ts#L411-L476) และ **`syncFromActiveDirectory()`** ใน [`src/services/apiAdapter.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/services/apiAdapter.ts) จะทำหน้าที่แยกข้อมูลออกเป็น 3 ตารางสัมพันธ์ (Relational Triad):
 
 ### 2.1 ถอดรหัสกลุ่มสิทธิ์ (Master Group Catalog Normalization)
 * อ่านรายการ `cn` และ `distinguishedName` จาก AD
@@ -112,7 +112,7 @@ flowchart TD
 
 ## 💾 ขั้นตอนที่ 3: การบันทึกลงฐานข้อมูล MySQL (Database Persistence)
 
-ระบบ backend ผ่านบริการ **`dataService.syncData()`** ใน [`src/backend/services/dataService.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts#L388-L462) จะทำหน้าที่บันทึกข้อมูลเข้าสู่ฐานข้อมูล MySQL ผ่าน Parameterized SQL Queries:
+ระบบ backend ผ่านบริการ **`dataService.syncData()`** ใน [`src/backend/services/dataService.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/services/dataService.ts#L388-L462) จะทำหน้าที่บันทึกข้อมูลเข้าสู่ฐานข้อมูล MySQL ผ่าน Parameterized SQL Queries:
 
 ```sql
 -- 1. บันทึก/อัปเดตข้อมูลกลุ่มสิทธิ์
@@ -136,7 +136,7 @@ VALUES (?, ?);
 
 ## 🔌 ขั้นตอนที่ 4: การให้บริการผ่าน REST API (API Endpoints Layer)
 
-Backend Server (`express` ใน [`src/backend/routes/api.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/routes/api.ts)) จะอ่านข้อมูลจาก MySQL และให้บริการแก่อยู่บน REST Endpoints:
+Backend Server (`express` ใน [`src/backend/routes/api.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/routes/api.ts)) จะอ่านข้อมูลจาก MySQL และให้บริการแก่อยู่บน REST Endpoints:
 
 1. **`GET /api/users`**: ดึงข้อมูลพนักงานทั้งหมด พร้อม JOIN ข้อมูลความสัมพันธ์กลุ่มสิทธิ์จาก `user_groups`
 2. **`GET /api/groups`**: ดึงข้อมูลกลุ่มสิทธิ์ทั้งหมด พร้อมป้ายกำกับหมวดหมู่ `category` และ `is_special`
@@ -149,7 +149,7 @@ Backend Server (`express` ใน [`src/backend/routes/api.ts`](file:///c:/Users/
 เมื่อ Frontend ดึงข้อมูลผ่าน React Hook **`useUserAccessData`**:
 
 1. **คำนวณสิทธิ์สด (Dynamic Profile Derivation)**:
-   ฟังก์ชันใน [`src/utils/groupHelpers.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/groupHelpers.ts) จะอ่านรายการกลุ่มใน `user.groups` แล้วคำนวณผลสรุปสดทันที:
+   ฟังก์ชันใน [`src/utils/groupHelpers.ts`](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/utils/groupHelpers.ts) จะอ่านรายการกลุ่มใน `user.groups` แล้วคำนวณผลสรุปสดทันที:
    * **Internet Level**: ประมวลผลว่าพนักงานได้ Level A, B หรือ C (เรียงความสำคัญ A > B > C)
    * **VPN Status**: ประมวลผลว่าเปิดใช้งาน (Active / True) หรือไม่
    * **Print Quota**: ประมวลผลว่าเป็น ปริ้นสี (Color), ปริ้นขาวดำ (Mono) หรือ Standard

@@ -2,7 +2,7 @@
 
 ## 1. Overview & System Design Philosophy
 
-The **User Access Management Dashboard (V3 Architecture)** is designed following **Clean Architecture** principles and **Single Source of Truth** data management. It provides enterprise-grade identity, access entitlement tracking, CSV/Active Directory integration, and WebAssembly SQLite offline compatibility.
+The **User Access Management Dashboard (V4 Clean Architecture)** is designed following **Clean Architecture** principles and **Single Source of Truth** data management. It provides enterprise-grade identity, access entitlement tracking, CSV/Active Directory integration, and WebAssembly SQLite offline compatibility.
 
 ### Core Technology Stack
 - **Frontend Layer:** React (TypeScript), Tailwind CSS, Lucide Icons, WASM SQLite In-Memory Database (`sql.js`).

@@ -30,7 +30,7 @@
 ---
 
 ### 🚨 สาเหตุที่ 2: ปัญหา Timing Payload และ Async Execution ใน Express Route
-* **พฤติกรรมปัญหา**: Endpoint `/api/db/sync` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/routes/api.ts) เดิมยิงฟังก์ชัน `dataService.syncData()` แบบ Synchronous โดยไม่ได้ใส่ `async/await`
+* **พฤติกรรมปัญหา**: Endpoint `/api/db/sync` ใน [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/routes/api.ts) เดิมยิงฟังก์ชัน `dataService.syncData()` แบบ Synchronous โดยไม่ได้ใส่ `async/await`
 * **ผลกระทบ**: Express API ตอบกลับเบราว์เซอร์ไปก่อนที่ MySQL Connection Pool จะประมวลผลคำสั่ง `INSERT` ข้อมูลพนักงาน 60 คนลงตารางดิสก์เสร็จสมบูรณ์ และหาก Frontend ส่งก้อนข้อมูลว่าง `[]` มาเนื่องจากการสอบถามจาก SQLite WASM ความจำเบราว์เซอร์ล้มเหลว MySQL ก็จะถูกสั่งเขียนทับด้วยอาร์เรย์ว่าง `[]` ตามไปด้วย
 
 ---
@@ -44,7 +44,7 @@
 ## 🛠️ 3. การดำเนินการแก้ไขและป้องกันยั่งยืน (Resolution & Implementation)
 
 ### ✅ การแก้ไขที่ 1: ครอบเครื่องหมาย Backticks บนชื่อตาราง SQL ทุกจุด
-อัปเดตไฟล์ [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) โดยครอบชื่อตารางและชื่อคอลัมน์ด้วย Backticks (`` ` ``) ทั้งหมด:
+อัปเดตไฟล์ [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/services/dataService.ts) โดยครอบชื่อตารางและชื่อคอลัมน์ด้วย Backticks (`` ` ``) ทั้งหมด:
 ```sql
 CREATE TABLE IF NOT EXISTS `users` (...);
 CREATE TABLE IF NOT EXISTS `groups` (...);
@@ -55,7 +55,7 @@ INSERT INTO `groups` (group_id, group_name) VALUES (?, ?) ON DUPLICATE KEY UPDAT
 ```
 
 ### ✅ การแก้ไขที่ 2: ปรับปรุง Async Route Handler & Direct CSV Payload
-1. อัปเดต [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/routes/api.ts) ให้ `/api/db/sync` เป็น `async/await`:
+1. อัปเดต [api.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/routes/api.ts) ให้ `/api/db/sync` เป็น `async/await`:
    ```typescript
    apiRouter.post('/db/sync', async (req: Request, res: Response) => {
      const { users, groups, userGroups } = req.body;
@@ -63,10 +63,10 @@ INSERT INTO `groups` (group_id, group_name) VALUES (?, ?) ON DUPLICATE KEY UPDAT
      res.json({ success: true, count: users.length });
    });
    ```
-2. อัปเดต [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/frontend/hooks/useUserAccessData.ts) ในฟังก์ชัน `handleImportCSVSuccess` ให้ส่งก้อนข้อมูล `importedUsers` ยิงตรงเข้า API ยืนยันการลงดิสก์ทันที
+2. อัปเดต [useUserAccessData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/frontend/hooks/useUserAccessData.ts) ในฟังก์ชัน `handleImportCSVSuccess` ให้ส่งก้อนข้อมูล `importedUsers` ยิงตรงเข้า API ยืนยันการลงดิสก์ทันที
 
 ### ✅ การแก้ไขที่ 3: เพิ่มคำสั่งลบข้อมูลพนักงานที่ถูกลบออกจากดิสก์ (`DELETE ... WHERE NOT IN`)
-1. **ปัญหา**: เดิมคำสั่ง `syncData()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/src/backend/services/dataService.ts) มีเพียงคำสั่ง `INSERT ... ON DUPLICATE KEY UPDATE` เมื่อผู้ใช้สั่งลบพนักงานบนเว็บ ข้อมูลพนักงานใน MySQL Workbench จึงยังคงค้างอยู่
+1. **ปัญหา**: เดิมคำสั่ง `syncData()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/backend/services/dataService.ts) มีเพียงคำสั่ง `INSERT ... ON DUPLICATE KEY UPDATE` เมื่อผู้ใช้สั่งลบพนักงานบนเว็บ ข้อมูลพนักงานใน MySQL Workbench จึงยังคงค้างอยู่
 2. **การแก้ไข**: เพิ่มคำสั่งลบพนักงานและกลุ่มสิทธิ์ที่ไม่มีอยู่ในรายการอัปเดตปัจจุบัน:
    ```sql
    DELETE FROM `user_groups` WHERE employee_id NOT IN (?);
@@ -98,6 +98,6 @@ INSERT INTO `groups` (group_id, group_name) VALUES (?, ?) ON DUPLICATE KEY UPDAT
 ---
 
 ## 📁 5. ดรรชนีไฟล์เอกสารระบบที่เกี่ยวข้อง
-- **บันทึกการพัฒนาระบบหลัก**: [docs/system_development_log.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/docs/system_development_log.md) (หัวข้อ 2.12 - 2.15)
-- **บันทึกประวัติการทำงาน**: [docs/work_activity_log.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/docs/work_activity_log.md) (LOG-018 ถึง LOG-021)
-- **คู่มือโครงสร้างฐานข้อมูล**: [docs/database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user-management-dashboard/docs/database_integration_guide.md)
+- **บันทึกการพัฒนาระบบหลัก**: [docs/system_development_log.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/system_development_log.md)
+- **บันทึกประวัติการทำงาน**: [docs/work_activity_log.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/work_activity_log.md)
+- **คู่มือโครงสร้างฐานข้อมูล**: [docs/database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/database_integration_guide.md)

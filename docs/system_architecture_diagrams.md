@@ -1,6 +1,6 @@
 # 📐 System Architecture & Workflow Diagrams (13-Column Clean Schema Engine)
 
-เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V2)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 13 คอลัมน์หลักในตาราง `users` โดยผูกสิทธิ์ทั้งหมดรวมถึง Internet Level เข้ากับตาราง **Active Directory Groups (`groups`)** แบบ Clean 3NF Consolidated Schema
+เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V4 Clean Architecture)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 13 คอลัมน์หลักในตาราง `users` โดยผูกสิทธิ์ทั้งหมดรวมถึง Internet Level เข้ากับตาราง **Active Directory Groups (`groups`)** แบบ Clean 3NF Consolidated Schema
 
 ---
 
