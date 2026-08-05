@@ -223,3 +223,5 @@
   - **การแก้ไข**:
     1. อัปเดต [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) ปรับ `z-index` ของ Popover ลงมาเป็น `z-30` และเพิ่ม Global Click Listener ซ่อน Popover เมื่อคลิกนอกพื้นที่หรือกดดู Profile
     2. อัปเดต Modal ทั้งหมดใน `src/components/modals/` ให้ใช้ `z-[100]` ยืนยันว่าหน้าต่าง Modal จะแสดงผลทับทุก Dropdown และ Popover ภายในตารางอย่างสะอาดเรียบร้อย 100%
+- **[LOG-071] Fix Blob Constructor Parameter Type in SqliteManagerModal.tsx**:
+  - **การปรับปรุง**: แก้ไขการส่งพารามิเตอร์ `new Blob([binary], ...)` จากเดิม `binary.buffer` ใน [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/SqliteManagerModal.tsx) ให้ส่ง `Uint8Array` โดยตรง ป้องกันการแจ้งเตือน Type Warning เรื่อง `ArrayBufferLike` / `SharedArrayBuffer` ใน VS Code

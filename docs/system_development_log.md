@@ -313,6 +313,10 @@
   4. เพิ่มคำสั่ง `setOpenPopoverUserId(null)` เมื่อผู้ใช้กดปุ่ม "ดู Profile"
 - **สถานะ**: แก้ไขปัญหาสกรีนซ้อนทับเรียบร้อย 100% ✅
 
+### 2.60 ปรับปรุงความถูกต้องของ Type ในการสร้าง Blob ดาวน์โหลดไฟล์ SQLite Binary (.sqlite)
+- **การปรับปรุง**: แก้ไขใน [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/SqliteManagerModal.tsx) บรรทัด 191 โดยเปลี่ยนจากการส่ง `binary.buffer` (ซึ่งมี Type เป็น `ArrayBufferLike`) ไปเป็นการส่ง `binary` (`Uint8Array`) เข้า `new Blob([binary], { type: 'application/x-sqlite3' })` โดยตรง เพื่อขจัดข้อผิดพลาด Type Warning ใน VS Code และรองรับ Web Blob Standards 100%
+- **สถานะ**: ขจัดข้อผิดพลาดเส้นใต้แดงใน VS Code เรียบร้อย 100% ✅
+
 ---
 
 

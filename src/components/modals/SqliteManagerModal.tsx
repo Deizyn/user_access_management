@@ -188,7 +188,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
   const handleDownloadSqliteBinary = () => {
     try {
       const binary = exportSqliteBinaryFile();
-      const blob = new Blob([binary.buffer], { type: 'application/x-sqlite3' });
+      const blob = new Blob([binary], { type: 'application/x-sqlite3' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
