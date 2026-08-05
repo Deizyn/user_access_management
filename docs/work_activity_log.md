@@ -136,6 +136,28 @@
 - **[LOG-046] Synchronize Git Branch & Repository Documentation (`user_dashboard_V3`)**:
   - ซิงค์โค้ดและทำการ Commit/Push การเปลี่ยนแปลงทั้งหมดเข้าสู่ Remote Branch `user_dashboard_V3` บน GitHub
   - ปรับปรุงและอัปเดตเอกสารระบบทั้งหมด (`README.md`, `docs/README.md`, `docs/system_development_log.md` และ `docs/work_activity_log.md`) ให้รองรับฟีเจอร์เวอร์ชันล่าสุด
+- **[LOG-047] Enrich CSV Import Template with Expired & Expiring Soon Sample Cases**:
+  - อัปเดตข้อมูลตัวอย่างจำลองในฟังก์ชัน `downloadCSVTemplate` ([csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts)) จาก 8 แถว เป็น 10 แถว
+  - เพิ่มตัวอย่างกรณี **วันหมดอายุแล้ว (Expired)** เช่น `2026-05-31`, `2026-06-30` (สัญญาหมดอายุแล้ว) และตัวอย่างกรณี **ใกล้หมดอายุ (Expiring Soon ภายใน 30 วัน)** เช่น `2026-08-10`, `2026-08-15` (สัญญาใกล้หมดอายุในเร็วๆ นี้) เพื่อให้ตัวอย่างไฟล์ CSV ครบถ้วนทุกสถานะ expiry status (Active, No Expiry, Expiring Soon, Expired)
+- **[LOG-049] Enable Multi-Token Accumulation Across All Filter Categories in Token Bar**:
+  - ปรับปรุงการทำงานของระบบ Token ใน [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx) และ [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx) ให้รองรับการสะสมหลาย Token พร้อมกันในทุกหมวดหมู่ (Multi-Token Accumulation Mode)
+  - ทำให้ผู้ใช้งานสามารถใส่ Token ดูข้อมูลหลายค่าพร้อมกันได้ตามต้องการ เช่น เลือก `Company: Alpha Group` ร่วมกับ `Company: Beta Corp` เพื่อดึงเฉพาะข้อมูลของ 2 บริษัทนี้ออกมาแสดง หรือเลือก `Internet: Level A` ร่วมกับ `Internet: Level B` เพื่อดูพนักงานระดับ A และ B พร้อมกัน
+  - เมนูดรอปดาวน์ (Dropdown Menu UI) ทำหน้าที่เป็นตัวเลือกหมวดหมู่ปกติ ในขณะที่ Token Bar ทำหน้าที่ประมวลผลเงื่อนไขการกรองร่วมแบบ Multi-Token Union Filtering ได้ 100%
+- **[LOG-050] Architect Hybrid Dual-Mode Filtering (Single-Select Dropdowns & Multi-Token Field Accumulation)**:
+  - ออกแบบสถาปัตยกรรมการกรองใหม่เพื่อแก้ไขข้อขัดแย้งของพฤติกรรมผู้ใช้งานอย่างลงตัวที่สุด:
+    1. **Dropdown UI & Dashboard KPI Clicks**: ทำหน้าที่เป็น **Single-Select Direct Switch** (สลับค่าตัวกรองใน 1 คลิกทันทีเมื่อเลือกตัวเลือกจาก Dropdown หรือคลิกการ์ด KPI บน Dashboard)
+    2. **Omni Token Popup & Token Field**: ทำหน้าที่เป็น **Multi-Token Accumulator** (สะสม Token หลายตัวพร้อมกันเมื่อเลือกจาก Token Popup Overlay หรือพิมพ์สร้าง Token เช่น แสดง 2 บริษัท หรือ Level A + B พร้อมกัน)
+  - เพิ่มฟังก์ชันช่วยเหลือเฉพาะ `selectSingle...` สำหรับ Dropdown UI แยกต่างหากจาก `toggle...` ของระบบ Token Bar ทำให้พฤติกรรมทั้งสองแบบทำงานอย่างเป็นอิสระ ไร้การทับซ้อน 100%
+- **[LOG-051] Fix KPI Summary Card Quick Filters to Single-Select Direct Switch Mode**:
+  - อัปเดต `handleQuickFilter` ใน [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx) ปรับให้การกดปุ่ม Internet Level (Level A / Level B / Level C) บนการ์ด KPI Summary ([KPISummary.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/KPISummary.tsx)) ทำงานเป็นแบบ **Single-Select Direct Switch** สลับดูสิทธิ์ทีละระดับได้ทันทีใน 1 คลิก โดยไม่เอาค่าใหม่ไปรวมหรือสะสมกับค่าเดิม (เมื่อกด Level A แล้วกด Level B ระบบจะสลับไปกรอง Level B ทันทีโดยปลด Level A ออกให้อัตโนมัติ)
+- **[LOG-052] Refine Clean Color Palette for Token Popup Header & Category Tabs**:
+  - ปรับปรุงโทนสีของส่วน **POPUP HEADER & CATEGORY TABS** ใน [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx) ให้มีความ Clean โมเดิร์น และเข้ากับดีไซน์ระบบ:
+    1. เปลี่ยนส่วน Header Container ให้ใช้โทนสี `bg-slate-900` พร้อมขอบล่าง `border-b border-slate-800` ที่เนียนเรียบสบายตา
+    2. เปลี่ยนไอคอน Sparkles ให้ใช้สี Indigo (`text-indigo-400`) เพื่อเข้ากับ Indigo Theme หลักของระบบ
+    3. ปรับเปลี่ยน Category Tabs ปุ่ม Active ให้เป็นโทนสี Indigo โมเดิร์น (`bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500`) และปุ่ม Inactive ให้เป็น `bg-slate-800/80 text-slate-300 hover:bg-slate-800` ดูสะอาดและกลมกลืนกับ Dashboard 100%
+- **[LOG-053] Align Database Interchange Specification with Clean MySQL Users Table Schema**:
+  - อัปเดตไฟล์ข้อกำหนดสคีมาฐานข้อมูล [databaseSchemaSpec.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/databaseSchemaSpec.ts) ให้ตรงกับโครงสร้างจริงใน MySQL `user_access_dashboard_data.users` 100%
+  - ถอดฟิลด์สิทธิ์ซ้ำซ้อน (`internet_level`, `vpn_status`, `print_quota_group`) ออกจากโครงสร้างตาราง `users` เพื่อให้ข้อมูลสิทธิ์ทั้งหมดถูกประมวลผลผ่านตาราง `groups` และ `user_groups` อย่างสมบูรณ์และไม่มีความซ้ำซ้อนของข้อมูลในระบบ
 
 
 

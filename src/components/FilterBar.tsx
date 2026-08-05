@@ -88,6 +88,79 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     return [];
   }, [filters.companies, filters.company]);
 
+  // --- Single Select Direct Switch Helpers for Dropdown UI ---
+  const selectSingleCompany = (comp: string) => {
+    if (comp === 'all') {
+      onFilterChange('companies', []);
+      onFilterChange('company', 'all');
+    } else {
+      onFilterChange('companies', [comp]);
+      onFilterChange('company', comp);
+    }
+  };
+
+  const selectSingleAuthorityGroup = (auth: string) => {
+    if (auth === 'all') {
+      onFilterChange('authorityGroups', []);
+      onFilterChange('authorityGroup', 'all');
+    } else {
+      onFilterChange('authorityGroups', [auth]);
+      onFilterChange('authorityGroup', auth);
+    }
+  };
+
+  const selectSingleDepartment = (dept: string) => {
+    if (dept === 'all') {
+      onFilterChange('departments', []);
+      onFilterChange('department', 'all');
+    } else {
+      onFilterChange('departments', [dept]);
+      onFilterChange('department', dept);
+    }
+  };
+
+  const selectSingleInternetLevel = (lvl: string) => {
+    if (lvl === 'all') {
+      onFilterChange('internetLevels', []);
+      onFilterChange('internetLevel', 'all');
+    } else {
+      onFilterChange('internetLevels', [lvl]);
+      onFilterChange('internetLevel', lvl);
+    }
+  };
+
+  const selectSinglePrintQuotaGroup = (quota: string) => {
+    if (quota === 'all') {
+      onFilterChange('printQuotaGroups', []);
+      onFilterChange('printQuotaGroup', 'all');
+    } else {
+      onFilterChange('printQuotaGroups', [quota]);
+      onFilterChange('printQuotaGroup', quota);
+    }
+  };
+
+  const selectSingleO365License = (lic: string) => {
+    if (lic === 'all') {
+      onFilterChange('o365Licenses', []);
+      onFilterChange('o365License', 'all');
+    } else {
+      onFilterChange('o365Licenses', [lic]);
+      onFilterChange('o365License', lic);
+    }
+  };
+
+  const selectSingleGroupId = (gid: string | number) => {
+    if (gid === 'all') {
+      onFilterChange('groupIds', []);
+      onFilterChange('groupId', 'all');
+    } else {
+      const gidStr = String(gid);
+      onFilterChange('groupIds', [gidStr]);
+      onFilterChange('groupId', gidStr);
+    }
+  };
+
+  // --- Multi-Token Accumulation Helpers for Token Bar / Token Popup Overlay ---
   const toggleCompany = (comp: string) => {
     const updated = currentCompanies.includes(comp)
       ? currentCompanies.filter((item) => item !== comp)
@@ -854,14 +927,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-50 overflow-hidden max-h-[420px] flex flex-col animate-fadeIn">
 
               {/* POPUP HEADER & CATEGORY TABS */}
-              <div className="p-3 bg-slate-900 text-white flex flex-col gap-2 shrink-0">
+              <div className="p-3 bg-slate-700 text-white flex flex-col gap-2 shrink-0 border-b border-slate-800">
                 <div className="flex items-center justify-between text-xs font-extrabold">
                   <div className="flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Search & Filter Token Popup</span>
+                    <Sparkles className="w-4 h-4 text-indigo-400" />
+                    <span className="text-slate-100">Search & Filter Token Popup</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-normal text-slate-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       พบ {omniSuggestions.length} รายการ
                     </span>
                     <button
@@ -879,13 +952,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 </div>
 
                 {/* Category Tabs */}
-                <div className="flex items-center gap-1 overflow-x-auto pb-0.5 text-[11px] font-bold">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-[11px] font-bold">
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('all')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'all'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'all'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     ทั้งหมด (All)
@@ -893,9 +966,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('company')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'company'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'company'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     Company
@@ -903,9 +976,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('authority')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'authority'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'authority'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     Authority
@@ -913,9 +986,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('department')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'department'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'department'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     Department
@@ -923,9 +996,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('level_group')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'level_group'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'level_group'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     Groups
@@ -933,9 +1006,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   <button
                     type="button"
                     onClick={() => setOmniCategoryTab('attribute')}
-                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 ${omniCategoryTab === 'attribute'
-                      ? 'bg-amber-400 text-slate-950 font-extrabold'
-                      : 'bg-slate-800 text-slate-300 hover:text-white'
+                    className={`px-2.5 py-1 rounded-lg transition-all shrink-0 cursor-pointer ${omniCategoryTab === 'attribute'
+                      ? 'bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
                       }`}
                   >
                     Attributes
@@ -1088,11 +1161,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('companies', []);
-                      onFilterChange('company', 'all');
-                    } else if (val !== 'multi') {
-                      toggleCompany(val);
+                    if (val !== 'multi') {
+                      selectSingleCompany(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentCompanies.length > 0
@@ -1138,11 +1208,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('authorityGroups', []);
-                      onFilterChange('authorityGroup', 'all');
-                    } else if (val !== 'multi') {
-                      toggleAuthorityGroup(val);
+                    if (val !== 'multi') {
+                      selectSingleAuthorityGroup(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentAuthorityGroups.length > 0
@@ -1188,11 +1255,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('departments', []);
-                      onFilterChange('department', 'all');
-                    } else if (val !== 'multi') {
-                      toggleDepartment(val);
+                    if (val !== 'multi') {
+                      selectSingleDepartment(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentDepartments.length > 0
@@ -1238,11 +1302,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('internetLevels', []);
-                      onFilterChange('internetLevel', 'all');
-                    } else if (val !== 'multi') {
-                      toggleInternetLevel(val);
+                    if (val !== 'multi') {
+                      selectSingleInternetLevel(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentInternetLevels.length > 0
@@ -1289,11 +1350,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('groupIds', []);
-                      onFilterChange('groupId', 'all');
-                    } else if (val !== 'multi') {
-                      toggleGroupId(val);
+                    if (val !== 'multi') {
+                      selectSingleGroupId(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentGroupIds.length > 0
@@ -1393,11 +1451,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   }
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === 'all') {
-                      onFilterChange('o365Licenses', []);
-                      onFilterChange('o365License', 'all');
-                    } else if (val !== 'multi') {
-                      toggleO365License(val);
+                    if (val !== 'multi') {
+                      selectSingleO365License(val);
                     }
                   }}
                   className={`w-full appearance-none border text-xs font-semibold rounded-xl px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all cursor-pointer ${currentO365Licenses.length > 0

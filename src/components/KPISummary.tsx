@@ -11,10 +11,10 @@ interface KPISummaryProps {
   onOpenLevelGroupExplorer?: (groupId?: number) => void;
 }
 
-export const KPISummary: React.FC<KPISummaryProps> = ({ 
-  users, 
-  totalUsersCount = users.length, 
-  groups, 
+export const KPISummary: React.FC<KPISummaryProps> = ({
+  users,
+  totalUsersCount = users.length,
+  groups,
   onQuickFilter,
   onOpenLevelGroupExplorer
 }) => {
@@ -35,7 +35,7 @@ export const KPISummary: React.FC<KPISummaryProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
       {/* Employee Count Widget */}
-      <div 
+      <div
         onClick={() => onQuickFilter('all', '')}
         className="bg-white p-4.5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer group"
       >
@@ -64,21 +64,21 @@ export const KPISummary: React.FC<KPISummaryProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-1.5 mt-1">
-          <button 
+          <button
             onClick={() => onQuickFilter('internetLevel', 'A')}
             className="flex-1 text-center py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200/90 rounded-lg transition-colors"
           >
             <span className="block text-[10px] text-amber-700 font-semibold">Level A</span>
             <span className="text-sm font-bold text-amber-900">{levelA}</span>
           </button>
-          <button 
+          <button
             onClick={() => onQuickFilter('internetLevel', 'B')}
             className="flex-1 text-center py-1 bg-sky-50 hover:bg-sky-100 border border-sky-200/90 rounded-lg transition-colors"
           >
             <span className="block text-[10px] text-sky-700 font-semibold">Level B</span>
             <span className="text-sm font-bold text-sky-900">{levelB}</span>
           </button>
-          <button 
+          <button
             onClick={() => onQuickFilter('internetLevel', 'C')}
             className="flex-1 text-center py-1 bg-slate-100 hover:bg-slate-200/80 border border-slate-300/80 rounded-lg transition-colors"
           >
@@ -98,14 +98,14 @@ export const KPISummary: React.FC<KPISummaryProps> = ({
           </div>
         </div>
         <div className="flex items-baseline justify-between">
-          <button 
+          <button
             onClick={() => onQuickFilter('vpnStatus', 'active')}
             className="text-left group"
           >
             <span className="text-2xl font-bold text-emerald-600 group-hover:underline">{vpnActive}</span>
             <span className="text-xs text-slate-500 block">เปิดใช้งาน (Active)</span>
           </button>
-          <button 
+          <button
             onClick={() => onQuickFilter('vpnStatus', 'disabled')}
             className="text-right group"
           >
@@ -127,14 +127,14 @@ export const KPISummary: React.FC<KPISummaryProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={() => onQuickFilter('expiryStatus', 'expiring_30')}
             className="flex-1 px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200/90 rounded-lg transition-colors text-left"
           >
             <span className="text-[10px] text-amber-700 font-semibold block">หมดอายุเร็วๆ นี้</span>
             <span className="text-base font-bold text-amber-900">{expiringSoon}</span>
           </button>
-          <button 
+          <button
             onClick={() => onQuickFilter('expiryStatus', 'expired')}
             className="flex-1 px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-200/90 rounded-lg transition-colors text-left"
           >
@@ -146,7 +146,7 @@ export const KPISummary: React.FC<KPISummaryProps> = ({
       </div>
 
       {/* Level Group Widget */}
-      <div 
+      <div
         onClick={() => {
           if (onOpenLevelGroupExplorer) {
             onOpenLevelGroupExplorer();

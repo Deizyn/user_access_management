@@ -202,6 +202,42 @@
 - **การปรับปรุง**:
   1. รวมการปรับปรุงทั้งหมดเข้าสู่ Remote Branch `user_dashboard_V3`
   2. อัปเดตเอกสารสถาปัตยกรรมและคู่มือการใช้งาน Git Clone / Push / Branch Management ทั้งหมดในระบบ
+### 2.39 ปรับปรุงแม่แบบข้อมูล CSV Template เพิ่มตัวอย่างวันหมดอายุแล้ว (Expired) และใกล้หมดอายุ (Expiring Soon)
+- **การปรับปรุง**:
+  1. อัปเดตฟังก์ชันดาวน์โหลดแม่แบบ CSV `downloadCSVTemplate` ใน [csvHelpers.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/utils/csvHelpers.ts) เพิ่มข้อมูลพนักงานตัวอย่างจาก 8 แถวเป็น 10 แถว
+  2. ครอบคลุมสถานะการหมดอายุ (Expiry Status) ครบทั้ง 4 ประเภทหลัก:
+     - **Active (ปกติ)**: เช่น `2027-12-31`, `2028-03-01`, `2029-04-15`
+     - **No Expiry (ไม่มีวันหมดอายุ)**: เช่น `N/A`
+     - **Expiring Soon (ใกล้หมดอายุภายใน 30 วัน)**: เช่น `2026-08-10`, `2026-08-15`
+     - **Expired (หมดอายุแล้ว)**: เช่น `2026-05-31`, `2026-06-30`
+### 2.41 พัฒนาระบบ Multi-Token Accumulation รองรับการกรองตาม Token หลายตัวในทุกหมวดหมู่
+- **การปรับปรุง**:
+  1. อัปเดตเอนจินการจัดการ Token ใน [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx) และ [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx)
+  2. เปิดใช้งานระบบ **Multi-Token Accumulation Mode**: เมื่อผู้ใช้อัปเดต Token ใน Token Bar (เช่น เลือก Company หรือ Internet Level เพิ่ม) ระบบจะทำการเก็บสะสม Token เหล่านั้นร่วมกันในหมวดหมู่เดียวกัน เช่น:
+     - เมื่อมี Token `Company: Alpha Group` และ `Company: Beta Corp` ระบบจะกรองและแสดงเฉพาะพนักงานจาก 2 บริษัทนี้ออกมา
+     - เมื่อมี Token `Internet: Level A` และ `Internet: Level B` ระบบจะแสดงเฉพาะพนักงานระดับ A และ B พร้อมกัน
+  3. เมนูดรอปดาวน์ (Dropdown Menu UI) ทำหน้าที่เป็นตัวเลือกปกติ ขณะที่แถบ Token Bar ทำหน้าที่จัดการเงื่อนไขการกรองแบบ Multi-Token Unionได้อย่างแม่นยำ 100%
+### 2.42 สถาปัตยกรรม Hybrid Dual-Mode Filtering (แยกพฤติกรรม Dropdown Single-Select กับ Token Field Accumulator)
+- **การปรับปรุง**:
+  1. แก้ไขและแยกพฤติกรรมการใช้งานตัวกรองอย่างเด็ดขาดเพื่อตอบโจทย์ทั้ง 2 รูปแบบอย่างสมบูรณ์:
+     - **รูปแบบที่ 1 (Dropdown & Dashboard Clicks)**: เมื่อผู้ใช้งานเลือกหมวดหมู่จาก Dropdown Menu (`<select>`) หรือคลิกการ์ด KPI บน Dashboard ระบบจะทำหน้าที่เป็น **Single-Select Direct Switch** (สลับเปลี่ยนค่าตัวกรองทันทีใน 1 คลิก เช่น จาก Level A สลับเป็น B โดยไม่ต้องกดปลดเลือก A ก่อน)
+     - **รูปแบบที่ 2 (Omni Token Popup & Token Field)**: เมื่อผู้ใช้งานเลือกรายการจาก Token Popup Overlay หรือพิมพ์สร้าง Token ในช่องค้นหา ระบบจะทำหน้าที่เป็น **Multi-Token Accumulator** (เก็บสะสม Token หลายตัวพร้อมกันในหมวดหมู่เดียวกัน เช่น มีทั้ง `Company: Alpha Group` และ `Company: Beta Corp` พร้อมกัน)
+  2. เพิ่มชุดฟังก์ชัน `selectSingle...` แยกจาก `toggle...` ใน [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx) และ [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx) ทำให้ทั้งสองระบบทำงานได้อย่างลงตัว ปราศจากการทับซ้อนหรือขัดแย้งกัน 100%
+### 2.43 ปรับปรุงปุ่มการ์ด KPI Summary บน Dashboard ให้สลับเลือก Internet Level แบบ Single-Select
+- **การปรับปรุง**:
+  1. อัปเดต `handleQuickFilter` ใน [App.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/App.tsx) เมื่อผู้ใช้งานกดปุ่ม **Level A / Level B / Level C** บนการ์ด **INTERNET LEVEL** ([KPISummary.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/KPISummary.tsx)) ระบบจะทำหน้าที่เป็น **Single-Select Direct Switch**
+  2. เมื่อกด Level A ระบบจะแสดงพนักงานสิทธิ์ A และเมื่อกด Level B ต่อทันที ระบบจะสลับมาแสดงพนักงานสิทธิ์ B ใน 1 คลิกโดยอัตโนมัติ (ไม่เอาค่า A และ B มาสะสมรวมกัน) หากกดที่ปุ่ม Level B ซ้ำอีกครั้ง ระบบจะสลับปลดการกรองออกให้โดยอัตโนมัติ
+### 2.44 ปรับปรุงโทนสี Clean Aesthetic สำหรับ POPUP HEADER & CATEGORY TABS ใน FilterBar
+- **การปรับปรุง**:
+  1. อัปเดตสไตล์สีของส่วน **POPUP HEADER & CATEGORY TABS** ใน [FilterBar.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/FilterBar.tsx):
+     - ปรับพื้นหลัง Header เป็น `bg-slate-900` พร้อม `border-b border-slate-800` ที่ให้ความสะอาด ตา และดูเป็นมืออาชีพ
+     - ปรับเปลี่ยนโทนสี Category Tabs ฝั่ง Active ให้เป็นโทนสี Indigo โมเดิร์น (`bg-indigo-600 text-white font-extrabold shadow-2xs border border-indigo-500`) สอดคล้องกับธีมสีหลักของแอปพลิเคชัน
+     - ปรับเปลี่ยนปุ่ม Tab Inactive ให้เป็น `bg-slate-800/80 text-slate-300 hover:bg-slate-800` อ่านง่าย สบายตา และดู Clean เป็นระเบียบเรียบร้อย
+### 2.45 อัปเดตข้อกำหนดสคีมาฐานข้อมูล (Database Specification) ให้ตรงกับโครงสร้างจริงใน MySQL
+- **การปรับปรุง**:
+  1. อัปเดตไฟล์ [databaseSchemaSpec.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/databaseSchemaSpec.ts) ให้ตรงกับโครงสร้างจริงของตาราง `user_access_dashboard_data.users` ใน MySQL 100%:
+     - ประกอบด้วย 13 คอลัมน์หลัก: `employee_id` (PRI), `username`, `display_name`, `email`, `job_title`, `department`, `company`, `device_code`, `authority_group`, `creation_date`, `expiry_date`, `telephone_pass_code`, `o365_license`
+     - ยืนยันการถอดฟิลด์สิทธิ์ซ้ำซ้อน (`internet_level`, `vpn_status`, `print_quota_group`) ออกจากตาราง `users` เพื่อให้อ่านสิทธิ์แบบ Dynamic ผ่านตาราง `groups` และ `user_groups` อย่างสะอาดและเป็นระเบียบเรียบร้อย
 
 
 ---

@@ -77,31 +77,41 @@ export default function App() {
     setIsLevelGroupExplorerOpen(true);
   };
 
-  // Quick Filter Handler
+  // Quick Filter Handler (Single-Select Direct Switch Mode for KPI Cards)
   const handleQuickFilter = (key: string, value: any) => {
     if (key === 'department') {
       const current = filters.departments || [];
-      const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      setFilters((prev) => ({ ...prev, departments: updated }));
+      const updated = current.includes(value) ? [] : [value];
+      setFilters((prev) => ({ ...prev, departments: updated, department: updated.length === 1 ? value : 'all' }));
       return;
     }
     if (key === 'company') {
       const current = filters.companies || [];
-      const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      setFilters((prev) => ({ ...prev, companies: updated }));
+      const updated = current.includes(value) ? [] : [value];
+      setFilters((prev) => ({ ...prev, companies: updated, company: updated.length === 1 ? value : 'all' }));
       return;
     }
     if (key === 'internetLevel') {
       const current = filters.internetLevels || [];
-      const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
-      setFilters((prev) => ({ ...prev, internetLevels: updated }));
+      const updated = current.includes(value) ? [] : [value];
+      setFilters((prev) => ({ ...prev, internetLevels: updated, internetLevel: updated.length === 1 ? value : 'all' }));
       return;
     }
     if (key === 'groupId') {
       const current = filters.groupIds || [];
       const numericId = Number(value);
-      const updated = current.includes(numericId) ? current.filter((v) => v !== numericId) : [...current, numericId];
-      setFilters((prev) => ({ ...prev, groupIds: updated }));
+      const updated = current.includes(numericId) ? [] : [numericId];
+      setFilters((prev) => ({ ...prev, groupIds: updated, groupId: updated.length === 1 ? numericId : 'all' }));
+      return;
+    }
+    if (key === 'vpnStatus') {
+      const updated = filters.vpnStatus === value ? 'all' : value;
+      setFilters((prev) => ({ ...prev, vpnStatus: updated }));
+      return;
+    }
+    if (key === 'expiryStatus') {
+      const updated = filters.expiryStatus === value ? 'all' : value;
+      setFilters((prev) => ({ ...prev, expiryStatus: updated }));
       return;
     }
 

@@ -18,7 +18,6 @@ export interface JsonDatabaseExport {
       username: string;
       display_name: string;
       email: string;
-      internet_level: 'A' | 'B' | 'C';
       job_title: string;
       department: string;
       company: string;
@@ -26,9 +25,7 @@ export interface JsonDatabaseExport {
       authority_group: string;
       creation_date: string;
       expiry_date: string | null;
-      print_quota_group: string;
       telephone_pass_code: string;
-      vpn_status: boolean;
       o365_license: string;
     }>;
     groups: Array<{
@@ -46,16 +43,16 @@ export interface JsonDatabaseExport {
 }
 
 export const JSON_DATABASE_SCHEMA_DOC = {
-  title: "Active Directory SQLite Database JSON Interchange Specification",
-  version: "1.0",
-  description: "มาตรฐานโครงสร้างไฟล์ JSON สำหรับการสำรองข้อมูล (Backup) นำเข้า (Import) และส่งออก (Export) ของระบบ SQLite Database",
+  title: "Active Directory MySQL / SQLite Database JSON Interchange Specification",
+  version: "2.0",
+  description: "มาตรฐานโครงสร้างไฟล์ JSON และสคีมาสำหรับตาราง users, groups และ user_groups ในฐานข้อมูล user_access_dashboard_data",
   format: {
     $schema: "URI ระบุสคีมาของรูปแบบไฟล์ JSON",
     metadata: {
-      format_version: "เวอร์ชันของสคีมาข้อมูล (เช่น 1.0)",
+      format_version: "เวอร์ชันของสคีมาข้อมูล (เช่น 2.0)",
       exported_at: "วันเวลาที่ทำการส่งออกข้อมูลในรูปแบบ ISO 8601",
       system_name: "ชื่อระบบต้นทางที่สร้างไฟล์",
-      database_type: "ชนิดของฐานข้อมูลต้นทาง (SQLite 3)",
+      database_type: "ชนิดของฐานข้อมูลต้นทาง (MySQL / SQLite 3)",
       description: "คำอธิบายวัตถุประสงค์ของไฟล์"
     },
     summary: {
@@ -64,8 +61,8 @@ export const JSON_DATABASE_SCHEMA_DOC = {
       total_user_groups: "จำนวนความสัมพันธ์ทั้งหมดในตาราง user_groups"
     },
     data: {
-      users: "ตารางผู้ใช้งาน (users) ประกอบด้วย employee_id (Primary Key), username, display_name, email, internet_level (A/B/C), job_title, department, company, device_code, authority_group, creation_date, expiry_date, print_quota_group, telephone_pass_code, vpn_status (boolean), o365_license",
-      groups: "ตารางกลุ่มผู้ใช้ (groups) ประกอบด้วย group_id (Primary Key), group_name, description, internet_level, is_special",
+      users: "ตารางผู้ใช้งาน (users) ประกอบด้วย employee_id (PRI), username, display_name, email, job_title, department, company, device_code, authority_group, creation_date, expiry_date, telephone_pass_code, o365_license",
+      groups: "ตารางกลุ่มผู้ใช้ (groups) ประกอบด้วย group_id (PRI), group_name, description, internet_level, is_special",
       user_groups: "ตารางเชื่อมความสัมพันธ์หลายต่อหลาย (user_groups) ประกอบด้วย employee_id และ group_id"
     }
   }
