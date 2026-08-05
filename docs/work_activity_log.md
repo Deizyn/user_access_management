@@ -158,6 +158,46 @@
 - **[LOG-053] Align Database Interchange Specification with Clean MySQL Users Table Schema**:
   - อัปเดตไฟล์ข้อกำหนดสคีมาฐานข้อมูล [databaseSchemaSpec.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/databaseSchemaSpec.ts) ให้ตรงกับโครงสร้างจริงใน MySQL `user_access_dashboard_data.users` 100%
   - ถอดฟิลด์สิทธิ์ซ้ำซ้อน (`internet_level`, `vpn_status`, `print_quota_group`) ออกจากโครงสร้างตาราง `users` เพื่อให้ข้อมูลสิทธิ์ทั้งหมดถูกประมวลผลผ่านตาราง `groups` และ `user_groups` อย่างสมบูรณ์และไม่มีความซ้ำซ้อนของข้อมูลในระบบ
+- **[LOG-054] Remove Sparkles Icon Badge from Assigned Groups in User Detail Modal**:
+  - นำไอคอน `<Sparkles />` ออกจากป้าย Badge แสดงประเภทกลุ่มใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) ตามความต้องการของผู้ใช้ เพื่อความ Clean และเป็นระเบียบเรียบร้อยของหน้าต่างรายละเอียดพนักงาน
+- **[LOG-055] Format Special Entitlements into System Privileges Grid Cards**:
+  - ปรับปรุงโครงสร้างการแสดงผลส่วน **System Privileges Summary** ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) ให้นำรายการ **Special Entitlements** (เช่น Video Access, Communications ฯลฯ) มาจัดรูปแบบการแสดงผลเป็น **การ์ดตาราง (Grid Card)** ในดีไซน์รูปแบบเดียวกัน 100% กับการ์ด Internet Permission, Remote VPN Access และ Print Quota Policy (`p-3 rounded-lg bg-slate-50 border border-slate-200/80`) เพื่อความสวยงาม เป็นระเบียบ และสวยงามเป็นเอกภาพเดียวกันทั้งหน้าต่าง
+- **[LOG-056] Assign Contextual Icons & Color Accents to Special Entitlement Cards**:
+  - เพิ่มฟังก์ชัน `getSpecialEntitlementMeta` ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) เพื่อแมปไอคอนและโทนสีประจำสิทธิ์อย่างเหมาะสมตามประเภทเนื้อหา:
+    - **Video / Media Access**: ไอคอน `<Video />` สีม่วง (`text-purple-600`) และชื่อการ์ด `Media & Video Access`
+    - **Communications / VoIP**: ไอคอน `<MessageSquare />` สีฟ้า (`text-sky-600`) และชื่อการ์ด `Communications & VoIP`
+    - **External Mail**: ไอคอน `<Mail />` สีส้มอัมพัน (`text-amber-600`) และชื่อการ์ด `External Email Privilege`
+    - **Special Entitlements อื่นๆ**: ไอคอน `<Sparkles />` สีอินดิโก้ (`text-indigo-600`) และชื่อการ์ด `Special Entitlement`
+- **[LOG-057] Fix Auto-Sync Category Values for Special Groups 101-109 in MySQL Engine**:
+  - แก้ไขและปรับปรุงคำสั่งซิงค์ข้อมูลเริ่มต้นใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) โดยกำหนดให้คำสั่ง `ON DUPLICATE KEY UPDATE` อัปเดตคอลัมน์ `category` และ `description` ในตาราง `groups` ของ MySQL ให้ตรงตามหมวดหมู่จริงอัตโนมัติ (INTERNET_LEVEL, RESOURCE_ENTITLEMENT, NETWORK_VPN, PRINT_QUOTA) เมื่อระบบเริ่มต้นทำงาน พร้อมทั้งปรับกลุ่มที่ไม่ใช่สิทธิ์พิเศษให้มีค่าเริ่มต้นเป็น `ORGANIZATIONAL` 100%
+- **[LOG-058] Update Initial Data Transformer & SQLite Seed to Set Correct Group Categories**:
+  - อัปเดตฟังก์ชันแปลงข้อมูลและสร้างสคีมาใน [initialData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/initialData.ts) และ [sqliteDb.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/lib/sqliteDb.ts):
+    1. กำหนดให้เมื่อมีการตั้งค่าเริ่มต้น (Seed / Reset Data) กลุ่ม Special Groups 101 - 109 จะได้รับคอลัมน์ `category` ตรงตามหมวดหมู่จริงทันทีตั้งแต่แรกสร้าง (INTERNET_LEVEL, RESOURCE_ENTITLEMENT, NETWORK_VPN, PRINT_QUOTA)
+    2. เพิ่มคอลัมน์ `category` และ `badge_color` ลงในตาราง `groups` ของเอนจิน SQLite WebAssembly เพื่อความสอดคล้อง 100% กับ MySQL
+- **[LOG-059] Fix MySQL Reset Database Re-Seeding Query & Project-Wide System Audit**:
+  - แก้ไขจุดบกพร่องในเมธอด `resetDatabase()` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) โดยใส่คอลัมน์ `category` และ `badge_color` ในคำสั่ง `INSERT INTO groups` เมื่อรีเซ็ตฐานข้อมูล เพื่อให้ข้อมูล 9 Special Groups ใน MySQL มีค่าคอลัมน์สมบูรณ์ครบถ้วน 100%
+  - ตรวจสอบโค้ดทั้งโปรเจกต์ผ่านคำสั่ง `npx tsc --noEmit` ได้ผลลัพธ์ผ่าน 0 Errors พร้อมอัปเดตเอกสารสรุปสถาปัตยกรรมระบบในโฟลเดอร์ `docs/` สมบูรณ์เรียบร้อย
+- **[LOG-060] Update System Architecture Specification to Clean Schema 2.0 & Dual-Mode Filtering**:
+  - อัปเดตเอกสารข้อกำหนดสถาปัตยกรรมระบบ [docs/system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture.md) ให้เป็นข้อกำหนด Clean Schema 2.0 ล่าสุด 100%
+  - เพิ่มการอธิบายโครงสร้างระบบกรอง Hybrid Dual-Mode Filtering, Dynamic Profile Derivation Engine, และหมวดหมู่กลุ่มสิทธิ์ (Group Category System) เพื่อเป็นคู่มืออ้างอิงสถาปัตยกรรมระดับองค์กรที่สมบูรณ์ที่สุด
+- **[LOG-061] Create Active Directory & API Data Pipeline Integration Guide**:
+  - จัดทำเอกสารคู่มืออธิบายกระบวนการทำงานทั้งระบบ [docs/ad_sync_data_pipeline_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/ad_sync_data_pipeline_guide.md) ตั้งแต่การดึงข้อมูลจาก Active Directory (LDAP API), การแปลงข้อมูล (Data Transformation Engine), การบันทึกลง MySQL Database (Clean Schema), การให้บริการผ่าน Express REST API, ไปจนถึงการประมวลผลแสดงผลบน UI Table สมบูรณ์เรียบร้อย
+- **[LOG-062] Clean Up Legacy special_groups Table References from System Architecture ERD & Documentation**:
+  - ดำเนินการลบตารางซ้ำซ้อน `special_groups` ออกจากเอกสารไดอะแกรม ERD และสคริปต์สคีมาใน [docs/system_architecture_diagrams.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture_diagrams.md), [docs/database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/database_integration_guide.md) และ [docs/system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture.md)
+  - ยืนยันโครงสร้างตารางฐานข้อมูลระดับ Clean 3NF แบบ 3 ตารางหลัก (`users`, `groups`, `user_groups`) อย่างเป็นเอกภาพและถูกต้อง 100% ตรงตามฐานข้อมูลจริง
+
+### 🟢 2026-08-05
+- **[LOG-063] Comprehensive Docs-vs-Code Consistency Audit (Checkpoint 4)**:
+  - ดำเนินกระบวนการ **Full Consistency Audit** ตรวจสอบความสอดคล้องระหว่างเอกสาร `docs/` ทั้งหมดกับโครงสร้างโค้ดจริงใน `src/` แบบครบวงจรทุกไฟล์
+  - **ผลการตรวจสอบ**: พบความคลาดเคลื่อนสำคัญ 2 รายการ ได้แก่:
+    1. **Schema Column Count Error**: เอกสาร [system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture.md) และ [database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/database_integration_guide.md) ระบุ `users` table เป็น **13 คอลัมน์** แต่โค้ด `dataService.ts` (MySQL) จริงมี `internet_level` อยู่ในคำสั่ง `CREATE TABLE` — ทำให้มี **14 คอลัมน์** แก้ไขเอกสารทั้ง 2 ไฟล์เป็น 14 คอลัมน์แล้ว
+    2. **NULL Constraint Mismatch**: เอกสาร (ก่อนแก้ไข) ใช้ `NULL DEFAULT '-'` สำหรับคอลัมน์หลักของ `users` แต่โค้ด `dataService.ts` จริงใช้ `NOT NULL` สำหรับทุกคอลัมน์ (ยกเว้น `expiry_date`) แก้ไขเอกสารให้ตรงกับ `NOT NULL` แล้ว
+- **[LOG-064] Clarify SQLite vs MySQL Schema Divergence (Legacy Columns)**:
+  - ตรวจสอบและบันทึกความแตกต่างที่ตั้งใจระหว่างโครงสร้าง SQLite Frontend (16 คอลัมน์) และ MySQL Backend (14 คอลัมน์):
+    - **SQLite `users` table** (16 cols): มีคอลัมน์ Legacy `print_quota_group` และ `vpn_status` เพิ่มเติมจาก 14 คอลัมน์หลัก เพื่อรองรับ Frontend Filtering, CSV Export, และ UserFormModal ที่ยังใช้งานอยู่
+    - **MySQL `users` table** (14 cols): มีเฉพาะ 14 คอลัมน์หลักใน `CREATE TABLE` แต่ ALTER TABLE เพิ่ม `print_quota_group` และ `vpn_status` เป็น optional columns สำหรับ backward compatibility
+    - **ข้อสรุป**: ทั้ง `print_quota_group` และ `vpn_status` ยังคงถูกใช้งานอยู่จริงใน Frontend Logic (filtering, display) และ SQLite — ไม่ใช่ dead code แต่เป็น "computed-cache columns" ที่ได้ค่ามาจาก `groups` ผ่าน Dynamic Derivation Engine
+  - บันทึกไว้เพื่อให้ Developer ทราบว่า MySQL และ SQLite มีโครงสร้างต่างกันโดยตั้งใจ
 
 
 

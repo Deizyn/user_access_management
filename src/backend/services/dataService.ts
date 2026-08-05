@@ -118,12 +118,17 @@ export class DataService {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
       `);
 
-      // Seed Initial Groups & Special Groups Master Catalog
+      // Seed & Auto-Sync Initial Groups & Special Groups Master Catalog in MySQL
       for (const g of DEFAULT_MASTER_GROUPS) {
         await pool.query(
           `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special, category, badge_color)
            VALUES (?, ?, ?, ?, ?, ?, ?)
-           ON DUPLICATE KEY UPDATE group_name=VALUES(group_name), category=VALUES(category), badge_color=VALUES(badge_color);`,
+           ON DUPLICATE KEY UPDATE 
+             group_name=VALUES(group_name),
+             description=VALUES(description),
+             category=VALUES(category),
+             is_special=VALUES(is_special),
+             badge_color=VALUES(badge_color);`,
           [
             g.group_id,
             g.group_name,
@@ -135,6 +140,11 @@ export class DataService {
           ]
         );
       }
+
+      // Set default ORGANIZATIONAL category for non-special organizational groups if empty
+      try {
+        await pool.query(`UPDATE \`groups\` SET \`category\` = 'ORGANIZATIONAL' WHERE (\`category\` IS NULL OR \`category\` = '') AND \`group_id\` < 100;`);
+      } catch (e) {}
 
       this.isMySqlConnected = true;
       console.log(`[MySQL Database Engine] Connected & initialized MySQL database '${this.dbConfig.dbName}' on ${this.dbConfig.dbHost}:${this.dbConfig.dbPort}`);
@@ -465,11 +475,11 @@ export class DataService {
         await pool.query(`DELETE FROM \`users\`;`);
         await pool.query(`DELETE FROM \`groups\`;`);
 
-        // Re-seed default 9 Special Groups (101-109)
+        // Re-seed default 9 Special Groups (101-109) with full category & badge attributes
         for (const g of DEFAULT_MASTER_GROUPS) {
           await pool.query(
-            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special) VALUES (?, ?, ?, ?, ?);`,
-            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0]
+            `INSERT INTO \`groups\` (group_id, group_name, description, internet_level, is_special, category, badge_color) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+            [g.group_id, g.group_name, g.description || null, g.internet_level || null, g.is_special ? 1 : 0, g.category || null, g.badge_color || null]
           );
         }
 

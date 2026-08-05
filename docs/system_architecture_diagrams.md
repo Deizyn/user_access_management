@@ -1,16 +1,17 @@
 # 📐 System Architecture & Workflow Diagrams (14-Column AD Groups Engine)
 
-เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V2)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 14 คอลัมน์หลัก โดยผูกสิทธิ์ทั้งหมดเข้ากับตาราง **Active Directory Groups (`groups` / `special_groups`)**
+เอกสารนี้รวบรวมแผนภาพไดอะแกรมเชิงสถาปัตยกรรม (Mermaid Diagrams) ของระบบ **User Access Management System (V2)** หลังจากการปรับโครงสร้างฐานข้อมูลและ CSV Engine เหลือ 14 คอลัมน์หลัก โดยผูกสิทธิ์ทั้งหมดเข้ากับตาราง **Active Directory Groups (`groups`)** แบบ Clean 3NF Consolidated Schema
 
 ---
 
-## 1. 🗄️ โครงสร้างฐานข้อมูลเชิงสัมพันธ์ 3NF (Normalized AD Groups ERD)
+## 1. 🗄️ โครงสร้างฐานข้อมูลเชิงสัมพันธ์ 3NF (Normalized 3-Table ERD)
+
+คุณสมบัติกลุ่มสิทธิ์ทั้งหมด (รวมถึงสิทธิ์พิเศษ `is_special` และหมวดหมู่ `category`) ถูกจัดเก็บและรวบรวมไว้ในตารางเดียวคือ `` `groups` `` เพื่อความเป็นระเบียบและเป็นไปตามหลัก Single Source of Truth:
 
 ```mermaid
 erDiagram
     users ||--o{ user_groups : "assigned via"
     groups ||--o{ user_groups : "maps to"
-    special_groups ||--o{ groups : "catalog rule for"
 
     users {
         string employee_id PK "รหัสพนักงาน (Canonical Key)"
@@ -26,6 +27,7 @@ erDiagram
         string expiry_date "วันหมดอายุ"
         string telephone_pass_code "รหัสผ่านโทรศัพท์"
         string o365_license "สิทธิ์การใช้งาน O365"
+        string internet_level "ระดับอินเทอร์เน็ต A/B/C (cached from groups)"
     }
 
     groups {
@@ -33,16 +35,9 @@ erDiagram
         string group_name "ชื่อกลุ่มสิทธิ์ Active Directory"
         string description "คำอธิบายกลุ่มสิทธิ์"
         string internet_level "ระดับอินเทอร์เน็ต ('A'|'B'|'C'|null)"
-        boolean is_special "แฟล็กสิทธิ์พิเศษ (1=Special Group)"
-    }
-
-    special_groups {
-        int special_group_id PK "อ้างอิง groups.group_id"
-        string group_name "ชื่อกลุ่มสิทธิ์พิเศษ"
-        string category "หมวดหมู่สิทธิ์ ('INTERNET_LEVEL' | 'RESOURCE')"
+        boolean is_special "แฟล็กสิทธิ์พิเศษ (1=Special Group, 0=Org Group)"
+        string category "หมวดหมู่สิทธิ์ ('INTERNET_LEVEL'|'RESOURCE_ENTITLEMENT'|'NETWORK_VPN'|'PRINT_QUOTA'|'ORGANIZATIONAL')"
         string badge_color "สไตล์สี Badge (Tailwind CSS)"
-        string description "คำอธิบายสิทธิ์พิเศษ"
-        boolean is_active "สถานะการเปิดใช้ (1=Active)"
     }
 
     user_groups {

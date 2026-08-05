@@ -95,7 +95,9 @@ function ensureTablesExist(db: Database) {
       group_name TEXT NOT NULL,
       description TEXT,
       internet_level TEXT,
-      is_special INTEGER DEFAULT 0
+      is_special INTEGER DEFAULT 0,
+      category TEXT DEFAULT 'ORGANIZATIONAL',
+      badge_color TEXT
     );
   `);
 
@@ -168,8 +170,8 @@ function populateInitialData(
     stmtUser.free();
 
     const stmtGroup = db.prepare(`
-      INSERT OR REPLACE INTO groups (group_id, group_name, description, internet_level, is_special)
-      VALUES (?, ?, ?, ?, ?);
+      INSERT OR REPLACE INTO groups (group_id, group_name, description, internet_level, is_special, category, badge_color)
+      VALUES (?, ?, ?, ?, ?, ?, ?);
     `);
 
     for (const g of groups) {
@@ -179,6 +181,8 @@ function populateInitialData(
         g.description || '',
         g.internet_level || null,
         g.is_special ? 1 : 0,
+        g.category || 'ORGANIZATIONAL',
+        g.badge_color || null,
       ]);
     }
     stmtGroup.free();
@@ -277,7 +281,7 @@ export function queryGroupsFromSqlite(db?: Database | null): Group[] {
 
   try {
     const res = targetDb.exec(`
-      SELECT group_id, group_name, description, internet_level, is_special
+      SELECT group_id, group_name, description, internet_level, is_special, category, badge_color
       FROM groups;
     `);
 
@@ -296,6 +300,8 @@ export function queryGroupsFromSqlite(db?: Database | null): Group[] {
         description: obj.description || undefined,
         internet_level: obj.internet_level || undefined,
         is_special: Boolean(obj.is_special),
+        category: obj.category || undefined,
+        badge_color: obj.badge_color || undefined,
       } as Group;
     });
   } catch (err) {

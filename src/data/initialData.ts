@@ -1,4 +1,5 @@
 import { Group, User, UserGroup } from '../types';
+import { DEFAULT_SPECIAL_GROUPS_CONFIG } from '../constants/specialGroups';
 
 /**
  * ------------------------------------------------------------------
@@ -189,7 +190,7 @@ export function generateRawAdApiResponse(): RawAdSyncApiResponse {
 
     const empIdNum = 10000101 + i;
     const empId = `${company}${empIdNum}`;
-    
+
     const uniqueSuffix = i >= 30 ? String((i % 999) + 1) : '';
     const username = `${fn.toLowerCase()}.${ln.charAt(0).toLowerCase()}${uniqueSuffix}`;
     const displayName = `${fn} ${ln}`;
@@ -289,15 +290,15 @@ export function generateRawAdApiResponse(): RawAdSyncApiResponse {
       userGroupSet.add(101); userGroupSet.add(102); userGroupSet.add(103);
       userGroupSet.add(104); userGroupSet.add(105); userGroupSet.add(106);
       userGroupSet.add(107); userGroupSet.add(108); userGroupSet.add(1);
-      userGroupSet.add(3);   userGroupSet.add(11);  userGroupSet.add(16);
+      userGroupSet.add(3); userGroupSet.add(11); userGroupSet.add(16);
     } else if (i === 1) {
       userGroupSet.add(101); userGroupSet.add(102); userGroupSet.add(104);
       userGroupSet.add(105); userGroupSet.add(106); userGroupSet.add(108);
-      userGroupSet.add(2);   userGroupSet.add(5);   userGroupSet.add(14);
+      userGroupSet.add(2); userGroupSet.add(5); userGroupSet.add(14);
     } else if (i === 2) {
       userGroupSet.add(102); userGroupSet.add(103); userGroupSet.add(105);
       userGroupSet.add(106); userGroupSet.add(109); userGroupSet.add(6);
-      userGroupSet.add(7);   userGroupSet.add(15);
+      userGroupSet.add(7); userGroupSet.add(15);
     } else {
       if (internetLevel === 'A') {
         userGroupSet.add(101);
@@ -408,13 +409,18 @@ export function generateRawAdApiResponse(): RawAdSyncApiResponse {
  * response payload into clean application relational models.
  */
 export function transformAdApiResponseToAppModel(apiResponse: RawAdSyncApiResponse) {
-  const groups: Group[] = apiResponse.data.groups.map((g) => ({
-    group_id: g.gidNumber,
-    group_name: g.cn,
-    description: g.description,
-    internet_level: g.cn.includes('Internet Level A') ? 'A' : g.cn.includes('Internet Level B') ? 'B' : g.cn.includes('Internet Level C') ? 'C' : undefined,
-    is_special: g.isSpecialGroup,
-  }));
+  const groups: Group[] = apiResponse.data.groups.map((g) => {
+    const specCfg = DEFAULT_SPECIAL_GROUPS_CONFIG[g.gidNumber];
+    return {
+      group_id: g.gidNumber,
+      group_name: g.cn,
+      description: g.description,
+      internet_level: g.cn.includes('Internet Level A') ? 'A' : g.cn.includes('Internet Level B') ? 'B' : g.cn.includes('Internet Level C') ? 'C' : undefined,
+      is_special: g.isSpecialGroup,
+      category: specCfg?.category || (g.isSpecialGroup ? 'RESOURCE_ENTITLEMENT' : 'ORGANIZATIONAL'),
+      badge_color: specCfg?.badgeClass || undefined,
+    };
+  });
 
   // Create a DN (Distinguished Name) to GID lookup map
   const dnToGidMap = new Map<string, number>();

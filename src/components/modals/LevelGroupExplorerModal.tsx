@@ -1,15 +1,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  X, 
-  Layers, 
-  Users, 
-  Search, 
-  Building2, 
-  ChevronRight, 
-  ArrowLeft, 
-  UserCheck, 
-  CheckCircle2, 
-  FolderTree, 
+import {
+  X,
+  Layers,
+  Users,
+  Search,
+  Building2,
+  ChevronRight,
+  ArrowLeft,
+  UserCheck,
+  CheckCircle2,
+  FolderTree,
   ArrowRight
 } from 'lucide-react';
 import { Group, UserWithGroups } from '../../types';
@@ -71,7 +71,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
   });
 
   // Members of selected group
-  const groupMembers = users.filter((u) => 
+  const groupMembers = users.filter((u) =>
     selectedGroup ? u.groups.some((ug) => ug.group_id === selectedGroup.group_id) : false
   );
 
@@ -96,7 +96,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 overflow-y-auto animate-fadeIn">
       <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
-        
+
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
 
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
+
           {/* Breadcrumb Navigation when group is selected */}
           {selectedGroup && (
             <div className="flex items-center justify-between bg-indigo-50/60 border border-indigo-200/80 rounded-xl p-3">
@@ -158,36 +158,33 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
           {!selectedGroup ? (
             /* VIEW 1: All Level Groups Grid */
             <div className="space-y-4">
-              
+
               {/* Category Filter Tabs */}
               <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
                 <button
                   onClick={() => setCategoryTab('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    categoryTab === 'all'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${categoryTab === 'all'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
                 >
                   ทั้งหมด ({groups.length})
                 </button>
                 <button
                   onClick={() => setCategoryTab('special')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    categoryTab === 'special'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${categoryTab === 'special'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
                 >
                   Special Level Groups ({groups.filter((g) => isSpecialGroup(g)).length})
                 </button>
                 <button
                   onClick={() => setCategoryTab('org')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${
-                    categoryTab === 'org'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors ${categoryTab === 'org'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
                 >
                   Organizational Groups ({groups.filter((g) => !isSpecialGroup(g)).length})
                 </button>
@@ -224,12 +221,12 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
                     >
                       <div>
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badge.variant}`}>
+                          {/* <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${badge.variant}`}>
                             {badge.label}
-                          </span>
-                          <span className="font-mono text-[10px] font-bold text-slate-400">
+                          </span> */}
+                          {/* <span className="font-mono text-[10px] font-bold text-slate-400">
                             ID: {group.group_id}
-                          </span>
+                          </span> */}
                         </div>
                         <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-indigo-600 transition-colors">
                           {group.group_name}
@@ -259,7 +256,7 @@ export const LevelGroupExplorerModal: React.FC<LevelGroupExplorerModalProps> = (
           ) : (
             /* VIEW 2: Members of Selected Level Group */
             <div className="space-y-4">
-              
+
               {/* Member Filters */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <div className="relative flex-1">

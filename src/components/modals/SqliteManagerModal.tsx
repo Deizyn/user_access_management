@@ -1,18 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  X, 
-  Database, 
-  Download, 
-  Upload, 
-  Code2, 
-  CheckCircle, 
+import {
+  X,
+  Database,
+  Download,
+  Upload,
+  Code2,
+  CheckCircle,
   CheckCircle2,
-  AlertTriangle, 
-  Copy, 
-  Check, 
-  FileJson, 
-  Play, 
-  Server, 
+  AlertTriangle,
+  Copy,
+  Check,
+  FileJson,
+  Play,
+  Server,
   Table as TableIcon,
   HardDrive,
   RefreshCw,
@@ -23,21 +23,21 @@ import {
   Sparkles
 } from 'lucide-react';
 import { User, Group, UserGroup, UserWithGroups } from '../../types';
-import { 
-  exportSqliteToJson, 
-  importSqliteFromJson, 
-  executeRawSql, 
+import {
+  exportSqliteToJson,
+  importSqliteFromJson,
+  executeRawSql,
   exportSqliteBinaryFile,
   getOrInitSqliteDb,
   syncUsersToSqlite,
   syncGroupsToSqlite,
   syncUserGroupsToSqlite
 } from '../../lib/sqliteDb';
-import { 
-  exportUsersToCSV, 
-  processImportCSV, 
-  downloadCSVTemplate, 
-  ParseResult 
+import {
+  exportUsersToCSV,
+  processImportCSV,
+  downloadCSVTemplate,
+  ParseResult
 } from '../../utils/csvHelpers';
 import { JSON_DATABASE_SCHEMA_DOC } from '../../data/databaseSchemaSpec';
 
@@ -63,7 +63,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
   initialTab = 'import',
 }) => {
   const [activeTab, setActiveTab] = useState<'import' | 'export' | 'schema' | 'sql_console'>(initialTab);
-  
+
   useEffect(() => {
     if (isOpen && initialTab) {
       setActiveTab(initialTab);
@@ -293,7 +293,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh]">
-        
+
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200/90 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-3">
@@ -356,44 +356,40 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
         <div className="flex border-b border-slate-200 px-6 bg-white shrink-0 overflow-x-auto">
           <button
             onClick={() => setActiveTab('import')}
-            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${
-              activeTab === 'import'
+            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'import'
                 ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Upload className="w-4 h-4 text-indigo-600" />
             <span>1. นำเข้าข้อมูล (Import CSV / JSON)</span>
           </button>
           <button
             onClick={() => setActiveTab('export')}
-            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${
-              activeTab === 'export'
+            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'export'
                 ? 'border-emerald-600 text-emerald-700 bg-emerald-50/50'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Download className="w-4 h-4 text-emerald-600" />
             <span>2. ส่งออกและสำรองข้อมูล (Export Data)</span>
           </button>
           <button
             onClick={() => setActiveTab('schema')}
-            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${
-              activeTab === 'schema'
+            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'schema'
                 ? 'border-slate-800 text-slate-900 bg-slate-100/70'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <FileCode className="w-4 h-4 text-slate-600" />
             <span>3. โครงสร้าง SQLite Database (Schema)</span>
           </button>
           <button
             onClick={() => setActiveTab('sql_console')}
-            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${
-              activeTab === 'sql_console'
+            className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'sql_console'
                 ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             <Code2 className="w-4 h-4 text-indigo-600" />
             <span>4. SQL Terminal (คำสั่ง SQL)</span>
@@ -402,31 +398,29 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
 
         {/* Modal Content Body */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
-          
+
           {/* TAB 1: IMPORT DATA (CSV & JSON) */}
           {activeTab === 'import' && (
             <div className="space-y-6">
-              
+
               {/* Import Sub-mode selector */}
               <div className="flex items-center justify-between bg-slate-100 p-1 rounded-xl border border-slate-200">
                 <button
                   onClick={() => setImportMode('csv')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                    importMode === 'csv'
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${importMode === 'csv'
                       ? 'bg-white text-indigo-700 shadow-xs border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
                   <span>นำเข้าไฟล์ CSV (CSV Employee Master Data)</span>
                 </button>
                 <button
                   onClick={() => setImportMode('json')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                    importMode === 'json'
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${importMode === 'json'
                       ? 'bg-white text-emerald-700 shadow-xs border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   <FileJson className="w-4 h-4 text-emerald-600" />
                   <span>กู้คืนฐานข้อมูล JSON (Full System Restore)</span>
@@ -436,7 +430,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
               {/* MODE 1: CSV IMPORT WIZARD */}
               {importMode === 'csv' && (
                 <div className="space-y-5">
-                  
+
                   {/* CSV Template Banner */}
                   <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -462,11 +456,10 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
                       onDragOver={(e) => { e.preventDefault(); setIsCsvDragOver(true); }}
                       onDragLeave={() => setIsCsvDragOver(false)}
                       onClick={() => csvFileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
-                        isCsvDragOver
+                      className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${isCsvDragOver
                           ? 'border-indigo-500 bg-indigo-50/50 scale-[1.01]'
                           : 'border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-100/50'
-                      }`}
+                        }`}
                     >
                       <input
                         ref={csvFileInputRef}
@@ -618,11 +611,10 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
               {/* Status Banner */}
               {importStatus.type && (
                 <div
-                  className={`p-3.5 rounded-xl text-xs font-medium flex items-center gap-2.5 ${
-                    importStatus.type === 'success'
+                  className={`p-3.5 rounded-xl text-xs font-medium flex items-center gap-2.5 ${importStatus.type === 'success'
                       ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                       : 'bg-rose-50 text-rose-800 border border-rose-200'
-                  }`}
+                    }`}
                 >
                   {importStatus.type === 'success' ? (
                     <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -639,7 +631,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
           {/* TAB 2: EXPORT DATA & BACKUP */}
           {activeTab === 'export' && (
             <div className="space-y-6">
-              
+
               <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-100 flex items-start space-x-3 text-xs text-emerald-950">
                 <Sparkles className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
@@ -651,7 +643,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
+
                 {/* 1. CSV Export */}
                 <div className="p-5 rounded-xl bg-white border border-slate-200/90 space-y-3 shadow-2xs flex flex-col justify-between">
                   <div className="space-y-2">

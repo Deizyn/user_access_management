@@ -33,56 +33,46 @@ DB_PORT=3306
 CREATE DATABASE IF NOT EXISTS user_access_dashboard_data CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE user_access_dashboard_data;
 
--- 1. ตารางผู้ใช้งาน (users)
-CREATE TABLE IF NOT EXISTS users (
-  employee_id VARCHAR(50) PRIMARY KEY,
-  username VARCHAR(100) NOT NULL,
-  display_name VARCHAR(150) NOT NULL,
-  email VARCHAR(150) NOT NULL,
-  job_title VARCHAR(100) NULL DEFAULT '-',
-  department VARCHAR(100) NULL DEFAULT '-',
-  company VARCHAR(100) NULL DEFAULT '-',
-  device_code VARCHAR(50) NULL DEFAULT '-',
-  authority_group VARCHAR(100) NULL DEFAULT '-',
-  creation_date VARCHAR(50) NULL DEFAULT '-',
-  expiry_date VARCHAR(50) NULL,
-  telephone_pass_code VARCHAR(50) NULL DEFAULT '-',
-  o365_license VARCHAR(100) NULL DEFAULT 'Microsoft 365 E3'
+-- 1. ตารางผู้ใช้งาน (users) — 14 คอลัมน์หลัก
+CREATE TABLE IF NOT EXISTS `users` (
+  `employee_id` VARCHAR(50) PRIMARY KEY,
+  `username` VARCHAR(100) NOT NULL UNIQUE,
+  `display_name` VARCHAR(150) NOT NULL,
+  `email` VARCHAR(150) NOT NULL,
+  `job_title` VARCHAR(100) NOT NULL,
+  `department` VARCHAR(100) NOT NULL,
+  `company` VARCHAR(100) NOT NULL,
+  `device_code` VARCHAR(50) NOT NULL,
+  `authority_group` VARCHAR(100) NOT NULL,
+  `creation_date` VARCHAR(50) NOT NULL,
+  `expiry_date` VARCHAR(50) NULL,
+  `telephone_pass_code` VARCHAR(50) NOT NULL,
+  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
+  `internet_level` VARCHAR(10) NULL DEFAULT 'B'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. ตารางกลุ่มสิทธิ์ (groups)
-CREATE TABLE IF NOT EXISTS groups (
-  group_id INT AUTO_INCREMENT PRIMARY KEY,
-  group_name VARCHAR(100) NOT NULL UNIQUE,
-  description TEXT NULL,
-  internet_level VARCHAR(10) NULL,
-  is_special TINYINT(1) DEFAULT 0,
-  category VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL',
-  badge_color VARCHAR(100) NULL
+CREATE TABLE IF NOT EXISTS `groups` (
+  `group_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `group_name` VARCHAR(100) NOT NULL UNIQUE,
+  `description` TEXT NULL,
+  `internet_level` VARCHAR(10) NULL,
+  `is_special` TINYINT(1) DEFAULT 0,
+  `category` VARCHAR(50) NULL DEFAULT 'ORGANIZATIONAL',
+  `badge_color` VARCHAR(100) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 3. ตารางแคตตาล็อกสิทธิ์พิเศษ (special_groups)
-CREATE TABLE IF NOT EXISTS special_groups (
-  special_group_id INT PRIMARY KEY,
-  group_name VARCHAR(100) NOT NULL UNIQUE,
-  category VARCHAR(50) NOT NULL,
-  badge_color VARCHAR(100) NULL,
-  description TEXT NULL,
-  is_active TINYINT(1) DEFAULT 1,
-  FOREIGN KEY (special_group_id) REFERENCES groups(group_id) ON DELETE CASCADE
+-- 3. ตารางเชื่อมความสัมพันธ์หลายต่อหลาย (user_groups)
+CREATE TABLE IF NOT EXISTS `user_groups` (
+  `employee_id` VARCHAR(50) NOT NULL,
+  `group_id` INT NOT NULL,
+  PRIMARY KEY (`employee_id`, `group_id`),
+  FOREIGN KEY (`employee_id`) REFERENCES `users`(`employee_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`group_id`) REFERENCES `groups`(`group_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. ตารางเชื่อมความสัมพันธ์หลายต่อหลาย (user_groups)
-CREATE TABLE IF NOT EXISTS user_groups (
-  employee_id VARCHAR(50) NOT NULL,
-  group_id INT NOT NULL,
-  PRIMARY KEY (employee_id, group_id),
-  FOREIGN KEY (employee_id) REFERENCES users(employee_id) ON DELETE CASCADE,
-  FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 5. ตารางระบบ Metadata
-CREATE TABLE IF NOT EXISTS system_metadata (
+-- 4. ตารางระบบ Metadata
+CREATE TABLE IF NOT EXISTS `system_metadata` (
   `key` VARCHAR(50) PRIMARY KEY,
   `value` TEXT NOT NULL,
   `updated_at` VARCHAR(50) NOT NULL

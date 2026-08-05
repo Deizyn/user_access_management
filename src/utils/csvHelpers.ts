@@ -536,7 +536,7 @@ export function processImportCSV(
           const newGroup: Group = {
             group_id: newGroupId,
             group_name: token,
-            description: `กลุ่มสิทธิ์การใช้งาน ${token} (สร้างอัตโนมัติจากการนำเข้า CSV)`,
+            description: `กลุ่มสิทธิ์การใช้งาน ${token}`,
             is_special: false,
           };
           updatedGroupsMap.set(newGroupId, newGroup);
@@ -546,6 +546,16 @@ export function processImportCSV(
         }
       });
     }
+
+    // Derive vpn_status and print_quota_group from parsed group IDs (for SQLite compatibility)
+    const hasVpn = userGroupSet.has(107);
+    const hasPrinterColor = userGroupSet.has(108);
+    const hasPrinterMono = userGroupSet.has(109);
+    const derivedPrintQuota = hasPrinterColor
+      ? 'Printer Color (ปริ้นสี)'
+      : hasPrinterMono
+      ? 'Printer Mono (ปริ้นขาวดำ)'
+      : 'Standard Print';
 
     const normalizedUser: User = {
       employee_id: canonicalEmpId,
@@ -560,7 +570,9 @@ export function processImportCSV(
       authority_group: authorityGroup,
       creation_date: creationDate,
       expiry_date: expiryDate,
+      print_quota_group: derivedPrintQuota,
       telephone_pass_code: telephonePassCode,
+      vpn_status: hasVpn,
       o365_license: o365License,
     };
 

@@ -238,6 +238,53 @@
   1. อัปเดตไฟล์ [databaseSchemaSpec.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/databaseSchemaSpec.ts) ให้ตรงกับโครงสร้างจริงของตาราง `user_access_dashboard_data.users` ใน MySQL 100%:
      - ประกอบด้วย 13 คอลัมน์หลัก: `employee_id` (PRI), `username`, `display_name`, `email`, `job_title`, `department`, `company`, `device_code`, `authority_group`, `creation_date`, `expiry_date`, `telephone_pass_code`, `o365_license`
      - ยืนยันการถอดฟิลด์สิทธิ์ซ้ำซ้อน (`internet_level`, `vpn_status`, `print_quota_group`) ออกจากตาราง `users` เพื่อให้อ่านสิทธิ์แบบ Dynamic ผ่านตาราง `groups` และ `user_groups` อย่างสะอาดและเป็นระเบียบเรียบร้อย
+### 2.46 ถอดไอคอน Sparkles บนป้าย Badge หน้าต่างรายละเอียดพนักงาน (UserDetailModal)
+- **การปรับปรุง**:
+  1. อัปเดต [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) โดยถอดโค้ดแสดงไอคอน `<Sparkles />` ด้านหน้าป้าย Badge ประเภทกลุ่มออก ตามความต้องการของผู้ใช้ เพื่อความ Clean และเป็นระเบียบเรียบร้อยยิ่งขึ้น
+### 2.47 จัดรูปแบบ Special Entitlements ใน System Privileges Summary เป็นการ์ดตาราง (Grid Card Format)
+- **การปรับปรุง**:
+  1. อัปเดตโครงสร้างส่วน **System Privileges Summary** ใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx):
+     - นำรายการ **Special Entitlements** (เช่น Video Access, Communications ฯลฯ) มาเรนเดอร์ลงในตาราง Grid ควบคู่กับ Internet Permission, Remote VPN Access และ Print Quota Policy
+     - กำหนดให้ใช้การ์ดดีไซน์เดียวกัน 100% (`p-3 rounded-lg bg-slate-50 border border-slate-200/80`) พร้อมไอคอน Sparkles สีอัมพัน (`text-amber-500`) ให้มีความสวยงาม ดูเป็นระเบียบ และสมดุลสอดคล้องกันทั้งหน้าต่าง modal
+### 2.48 แมปไอคอนประจำสิทธิ์ (Contextual Icons & Colors) สำหรับการ์ด Special Entitlements
+- **การปรับปรุง**:
+  1. อัปเดตการแสดงผลไอคอนการ์ดใน [UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/components/modals/UserDetailModal.tsx) โดยเพิ่มฟังก์ชัน `getSpecialEntitlementMeta` เพื่อเลือกไอคอนและโทนสีที่สื่อความหมายเฉพาะของแต่ละสิทธิ์:
+     - **Video / Media Access**: ไอคอน `<Video />` สื่อถึงมีเดีย/วิดีโอ (สีม่วง `text-purple-600`) พร้อมชื่อ `Media & Video Access`
+     - **Communications**: ไอคอน `<MessageSquare />` สื่อถึงการสื่อสาร/แชต (สีฟ้า `text-sky-600`) พร้อมชื่อ `Communications & VoIP`
+     - **External Mail**: ไอคอน `<Mail />` สื่อถึงการรับส่งอีเมล (สีส้มอัมพัน `text-amber-600`) พร้อมชื่อ `External Email Privilege`
+     - **สิทธิ์พิเศษอื่นๆ**: ไอคอน `<Sparkles />` (สีอินดิโก้ `text-indigo-600`) พร้อมชื่อ `Special Entitlement`
+### 2.49 ปรับปรุงระบบซิงค์ข้อมูลหมวดหมู่ Group คอลัมน์ `category` อัตโนมัติใน Backend Data Engine
+- **การปรับปรุง**:
+  1. อัปเดตคำสั่ง SQL `ON DUPLICATE KEY UPDATE` ใน [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts):
+     - ซิงค์และอัปเดตค่าคอลัมน์ `category` และ `description` สำหรับ Special Groups (101 - 109) ลงตาราง `groups` ใน MySQL อัตโนมัติเมื่อ Server ทำการเริ่มต้นระบบ (Init Database)
+     - กำหนดให้กลุ่มสิทธิ์ Internet เป็น `INTERNET_LEVEL`, กลุ่มสิทธิ์สื่อสาร/มีเดีย/อีเมล เป็น `RESOURCE_ENTITLEMENT`, กลุ่ม VPN เป็น `NETWORK_VPN`, กลุ่มเครื่องพิมพ์เป็น `PRINT_QUOTA` และกลุ่มแผนกทั่วไปที่ไม่ใช่สิทธิ์พิเศษให้เป็น `ORGANIZATIONAL` โดยอัตโนมัติ 100%
+### 2.50 กำหนดค่าหมวดหมู่ `category` ในฟังก์ชันสร้างข้อมูลเริ่มต้น (Data Transformer & SQLite Seed)
+- **การปรับปรุง**:
+  1. อัปเดตฟังก์ชัน `transformAdApiResponseToAppModel` ใน [initialData.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/data/initialData.ts) ให้แมปค่า `category` และ `badge_color` สำหรับ Special Groups (101 - 109) จาก `DEFAULT_SPECIAL_GROUPS_CONFIG` ทันทีเมื่อสร้างข้อมูลเริ่มต้น หรือเมื่อกด Reset Data
+  2. อัปเดตโครงสร้างสคีมาและคำสั่งบันทึก/ดึงข้อมูลใน [sqliteDb.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/lib/sqliteDb.ts) ให้รองรับคอลัมน์ `category` และ `badge_color` ในตาราง `groups` สอดคล้องกับ MySQL 100%
+### 2.51 แก้ไขคำสั่ง Re-Seeding ใน resetDatabase() & ตรวจสอบคุณภาพระบบทั้งโปรเจกต์ (Full Project Review Audit)
+- **การปรับปรุง**:
+  1. แก้ไขคำสั่ง `INSERT INTO groups` ในเมธอด `resetDatabase()` ของ [dataService.ts](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/src/backend/services/dataService.ts) โดยเพิ่มการบันทึกคอลัมน์ `category` และ `badge_color` เมื่อกดรีเซ็ตฐานข้อมูลผ่าน API หรือปุ่มบน UI
+  2. ดำเนินการตรวจสอบคุณภาพโค้ด สถาปัตยกรรมระบบ และระบบประเภทข้อมูล (Type Check) ทั้งโปรเจกต์ด้วยคำสั่ง `npx tsc --noEmit` ได้ผลลัพธ์ผ่าน 0 Errors สมบูรณ์แบบ 100%
+### 2.52 อัปเดตเอกสารข้อกำหนดสถาปัตยกรรมระบบ (System Architecture Specification 2.0)
+- **การปรับปรุง**:
+  1. อัปเดตเอกสาร [docs/system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture.md) ให้เป็นข้อกำหนด Clean Schema 2.0 ล่าสุด 100%
+  2. สรุปโครงสร้าง **14 คอลัมน์** ของตาราง `users` (รวม `internet_level`), โครงสร้างหมวดหมู่สิทธิ์ (Group Category System), สถาปัตยกรรมระบบกรอง Hybrid Dual-Mode Filtering และ Dynamic Profile Derivation Engine ไว้อย่างครบถ้วนและสมบูรณ์แบบ
+### 2.53 จัดทำเอกสารคู่มือ Active Directory & API Data Pipeline Integration Guide
+- **การปรับปรุง**:
+  1. สร้างเอกสารคู่มือ [docs/ad_sync_data_pipeline_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/ad_sync_data_pipeline_guide.md) อธิบายกระบวนการนำเข้าข้อมูล 5 ขั้นตอน (Active Directory LDAP Fetch ➔ Data Transformation Engine ➔ MySQL Clean 3NF Schema ➔ Express REST API Endpoints ➔ Frontend Dynamic Calculation & Table UI) พร้อม Mermaid Architecture Diagram แสดงผังการทำงานชัดเจน 100%
+### 2.54 ปรับปรุงเอกสารไดอะแกรมและสคีมา Clean 3NF ปลดตารางซ้ำซ้อน special_groups ออก 100%
+- **การปรับปรุง**:
+  1. แก้ไขและปรับปรุงเอกสารไดอะแกรม ERD ใน [docs/system_architecture_diagrams.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture_diagrams.md) โดยปลดตาราง `special_groups` ออกคงเหลือตารางสัมพันธ์ 3NF แท้จริง 3 ตารางหลัก (`users`, `groups`, `user_groups`)
+  2. อัปเดตสคริปต์ SQL DDL ใน [docs/database_integration_guide.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/database_integration_guide.md) และข้อกำหนดสถาปัตยกรรมใน [docs/system_architecture.md](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V2/user_access_management/docs/system_architecture.md) ให้เป็นไปตามโครงสร้างยุบรวมตารางเดียว (Single-Table Consolidated Group Architecture) ตรงตามระบบจริง 100%
+### 2.55 Docs-vs-Code Full Consistency Audit (2026-08-05, Checkpoint 4)
+- **การตรวจสอบ**: ทำกระบวนการ Audit ตรวจสอบทุกไฟล์เอกสารใน `docs/` เทียบกับโค้ดจริงทั้งโปรเจกต์
+- **ผลการแก้ไข**:
+  1. **[system_architecture.md]** อัปเดตหัวข้อ Table 2 จาก `13-Column Schema` เป็น `14-Column Schema` และเพิ่มคอลัมน์ `internet_level` ใน SQL DDL
+  2. **[database_integration_guide.md]** อัปเดต DDL ของ users table ให้ตรงกับโค้ด `dataService.ts` จริง: เปลี่ยน `NULL DEFAULT '-'` เป็น `NOT NULL`, เพิ่ม `internet_level` และแก้เลขลำดับ comment `-- 4.` (ก่อนหน้าเป็น `-- 5.`)
+  3. **[system_architecture_diagrams.md]** เพิ่ม `internet_level` field ใน ERD Mermaid Diagram ของ entity `users`
+  4. **[work_activity_log.md]** เพิ่ม LOG-063 และ LOG-064 บันทึกผล Audit และการชี้แจงความแตกต่างระหว่าง SQLite (16 cols) และ MySQL (14 cols)
+- **สถานะ**: เอกสารทั้ง 4 ไฟล์ตรงกับโครงสร้างโค้ดจริง 100% ✅
 
 
 ---

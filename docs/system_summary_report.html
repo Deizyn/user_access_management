@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Access Management - Executive System Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --accent: #f59e0b;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --emerald: #10b981;
+      --sky: #0284c7;
+      --purple: #9333ea;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: var(--slate-800);
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* HEADER SECTION */
+    header {
+      background: linear-gradient(135deg, var(--slate-900) 0%, #1e1b4b 100%);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+      border-radius: 50%;
+    }
+
+    .badge-status {
+      display: inline-block;
+      background-color: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(165, 180, 252, 0.4);
+      color: #c7d2fe;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #ffffff, #c7d2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1.05rem;
+      max-width: 800px;
+    }
+
+    /* GRID METRICS */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .metric-card {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .metric-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--slate-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    .metric-desc {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    /* SECTION CARD */
+    .section-card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 30px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--slate-100);
+    }
+
+    .icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    /* TABLES */
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .custom-table th {
+      background-color: var(--slate-900);
+      color: white;
+      text-align: left;
+      padding: 12px 16px;
+      font-weight: 700;
+    }
+
+    .custom-table th:first-child {
+      border-top-left-radius: 8px;
+    }
+
+    .custom-table th:last-child {
+      border-top-right-radius: 8px;
+    }
+
+    .custom-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .custom-table tr:hover td {
+      background-color: var(--slate-50);
+    }
+
+    /* BADGES */
+    .pill-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pill-indigo {
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+
+    .pill-emerald {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .pill-sky {
+      background: #e0f2fe;
+      color: #075985;
+      border: 1px solid #bae6fd;
+    }
+
+    .pill-purple {
+      background: #f3e8ff;
+      color: #6b21a8;
+      border: 1px solid #e9d5ff;
+    }
+
+    .pill-amber {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    /* SQL BOX */
+    .sql-box {
+      background-color: #0f172a;
+      color: #38bdf8;
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 13.5px;
+      overflow-x: auto;
+      line-height: 1.5;
+      margin-top: 15px;
+    }
+
+    .sql-keyword {
+      color: #f472b6;
+      font-weight: bold;
+    }
+
+    .sql-string {
+      color: #a3e635;
+    }
+
+    .sql-comment {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+      font-size: 13px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <header>
+      <div class="badge-status">SYSTEM ARCHITECTURE SUMMARY</div>
+      <h1>User Access Management Dashboard V2</h1>
+      <div class="subtitle">
+        สรุปภาพรวมสถาปัตยกรรมระบบ โครงสร้างตารางฐานข้อมูล MySQL 100% Clean Schema, ระบบ Hybrid Dual-Mode Filtering
+        และคู่มือคำสั่ง SQL สำคัญ
+      </div>
+    </header>
+
+    <!-- METRICS -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-title">MySQL Database Schema</div>
+        <div class="metric-value">13 Columns</div>
+        <div class="metric-desc">Clean Schema ไร้คอลัมน์สิทธิ์ซ้ำซ้อนใน <code>users</code></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-title">Special Group Categories</div>
+        <div class="metric-value">5 Categories</div>
+        <div class="metric-desc">จำแนกหมวดหมู่สิทธิ์ใช้งานชัดเจน 100%</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-title">Filtering Architecture</div>
+        <div class="metric-value">Dual-Mode</div>
+        <div class="metric-desc">Dropdown Single-Switch + Token Accumulator</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-title">System Health & Verification</div>
+        <div class="metric-value">0 Errors</div>
+        <div class="metric-desc">TypeScript <code>npx tsc --noEmit</code> Passed Cleanly</div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: DATABASE SCHEMA -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon-box">🗄️</div>
+        <div>
+          <div class="section-title">1. โครงสร้างตารางฐานข้อมูล MySQL (Clean Schema Spec 2.0)</div>
+          <div style="font-size: 13px; color: #64748b;">ตาราง <code>user_access_dashboard_data.users</code>
+            ตรงตามโครงสร้างจริงในฐานข้อมูล MySQL 100%</div>
+        </div>
+      </div>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>ชื่อคอลัมน์ (Field Name)</th>
+            <th>ชนิดข้อมูล (Type)</th>
+            <th>Null Allowed</th>
+            <th>Key Type</th>
+            <th>คำอธิบายหน้าที่</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><code>employee_id</code></td>
+            <td><code>varchar(50)</code></td>
+            <td>NO</td>
+            <td><span class="pill-badge pill-amber">PRIMARY KEY</span></td>
+            <td>รหัสพนักงาน (Unique Identifier)</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><code>username</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>ชื่อบัญชีผู้ใช้งานระบบ</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><code>display_name</code></td>
+            <td><code>varchar(150)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>ชื่อ-นามสกุลพนักงาน</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><code>email</code></td>
+            <td><code>varchar(150)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>อีเมลประจำตัวพนักงาน</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><code>job_title</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>ตำแหน่งงานในองค์กร</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><code>department</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>แผนกงาน</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><code>company</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>บริษัทที่สังกัด</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><code>device_code</code></td>
+            <td><code>varchar(50)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>รหัสอุปกรณ์คอมพิวเตอร์ประจำตัว</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><code>authority_group</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>กลุ่มสิทธิ์การอนุมัติในระบบ</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td><code>creation_date</code></td>
+            <td><code>varchar(50)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>วันที่เริ่มสร้างบัญชี (YYYY-MM-DD)</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td><code>expiry_date</code></td>
+            <td><code>varchar(50)</code></td>
+            <td>YES</td>
+            <td>-</td>
+            <td>วันที่หมดอายุสัญญา (ถ้ามี)</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td><code>telephone_pass_code</code></td>
+            <td><code>varchar(50)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>รหัสผ่านโทรศัพท์ / พิมพ์งาน</td>
+          </tr>
+          <tr>
+            <td>13</td>
+            <td><code>o365_license</code></td>
+            <td><code>varchar(100)</code></td>
+            <td>NO</td>
+            <td>-</td>
+            <td>สิทธิ์ Microsoft 365 License</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION 2: GROUP CATEGORIES -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon-box">🏷️</div>
+        <div>
+          <div class="section-title">2. โครงสร้างหมวดหมู่สิทธิ์ (Group Category System)</div>
+          <div style="font-size: 13px; color: #64748b;">หมวดหมู่การจำแนกสิทธิ์ 5 ประเภทในตาราง
+            <code>groups.category</code>
+          </div>
+        </div>
+      </div>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>หมวดหมู่ (Category)</th>
+            <th>ความหมาย / หน้าที่</th>
+            <th>Group ID ตัวอย่าง</th>
+            <th>การประมวลผลบน UI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill-badge pill-sky">INTERNET_LEVEL</span></td>
+            <td>สิทธิ์การใช้งานอินเทอร์เน็ต</td>
+            <td>101 (Level A), 102 (Level B), 103 (Level C)</td>
+            <td>คำนวณแสดง Internet Level Card บน UserDetailModal</td>
+          </tr>
+          <tr>
+            <td><span class="pill-badge pill-purple">RESOURCE_ENTITLEMENT</span></td>
+            <td>สิทธิ์ทรัพยากรพิเศษ (มีเดีย/สื่อสาร/อีเมล)</td>
+            <td>104 (Video Access), 105 (Communications), 106 (Free Mail)</td>
+            <td>แสดงการ์ด Special Entitlement พร้อมไอคอนเฉพาะตัว</td>
+          </tr>
+          <tr>
+            <td><span class="pill-badge pill-emerald">NETWORK_VPN</span></td>
+            <td>สิทธิ์การเชื่อมต่อ VPN จากภายนอก</td>
+            <td>107 (VPN Remote Access)</td>
+            <td>คำนวณการ์ด Remote VPN Access (Enabled/Disabled)</td>
+          </tr>
+          <tr>
+            <td><span class="pill-badge pill-amber">PRINT_QUOTA</span></td>
+            <td>สิทธิ์พิมพ์งาน (โควตาปริ้นสี/ขาวดำ)</td>
+            <td>108 (Color Printer), 109 (Mono Printer)</td>
+            <td>คำนวณการ์ด Print Quota Policy (Color & Mono/Color Only)</td>
+          </tr>
+          <tr>
+            <td><span class="pill-badge pill-indigo">ORGANIZATIONAL</span></td>
+            <td>กลุ่มสิทธิ์ตามโครงสร้างองค์กร/แผนก</td>
+            <td>1 (IT Admin), 2 (HR Ops), 3 (Finance), ฯลฯ</td>
+            <td>แสดงการ์ดกลุ่มองค์กรในหน้าต่าง Assigned Groups</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION 3: FILTERING ARCHITECTURE -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon-box">⚡</div>
+        <div>
+          <div class="section-title">3. สถาปัตยกรรมระบบกรองข้อมูล Hybrid Dual-Mode Filtering</div>
+          <div style="font-size: 13px; color: #64748b;">การสลับโหมดการทำงานระหว่าง 1-Click Direct Switch กับ Multi-Token
+            Accumulator</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div
+          style="background: var(--slate-50); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+          <h4 style="color: var(--primary); font-size: 16px; margin-bottom: 10px;">1. Dropdown UI & KPI Cards
+            (Single-Select Direct Switch)</h4>
+          <p style="font-size: 13.5px; color: var(--slate-700);">
+            เมื่อผู้ใช้เลือกตัวกรองจาก Dropdown Menu หรือคลิกการ์ด KPI Summary บน Dashboard (เช่น Level A ➔ Level B)
+            ระบบจะสลับค่าตัวกรองให้ทันทีใน 1 คลิก โดยปลดตัวเดิมออกให้อัตโนมัติ ไม่เอามารวมกัน
+          </p>
+        </div>
+
+        <div
+          style="background: var(--slate-50); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+          <h4 style="color: var(--emerald); font-size: 16px; margin-bottom: 10px;">2. Omni Token Popup Overlay
+            (Multi-Token Accumulator)</h4>
+          <p style="font-size: 13.5px; color: var(--slate-700);">
+            เมื่อผู้ใช้เปิด Token Popup Overlay หรือพิมพ์ Token ในช่องค้นหา ระบบจะสะสม Token หลายรายการพร้อมกันได้ เช่น
+            เรียกดูพนักงาน 2 บริษัทพร้อมกัน หรือเรียกดูสิทธิ์ Level A และ Level B ควบคู่กัน
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: USEFUL SQL CHEAT SHEET -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="icon-box">💻</div>
+        <div>
+          <div class="section-title">4. ชุดคำสั่ง SQL สำคัญประจำระบบ (SQL Commands Cheat Sheet)</div>
+          <div style="font-size: 13px; color: #64748b;">คำสั่งสำหรับเรียกดู ซิงค์ และทดสอบข้อมูลใน MySQL Workbench</div>
+        </div>
+      </div>
+
+      <div class="sql-box">
+        <span class="sql-comment">-- 1. เลือกใช้งานฐานข้อมูล</span><br>
+        <span class="sql-keyword">USE</span> user_access_dashboard_data;<br><br>
+
+        <span class="sql-comment">-- 2. เรียกดูพนักงานทั้งหมด (Clean Schema)</span><br>
+        <span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> `users`;<br><br>
+
+        <span class="sql-comment">-- 3. เรียกดูข้อมูลกลุ่มสิทธิ์ทั้งหมด (ต้องใช้ Backtick ` ครอบคำว่า groups)</span><br>
+        <span class="sql-keyword">SELECT</span> group_id, group_name, category, description <span
+          class="sql-keyword">FROM</span> `groups`;<br><br>
+
+        <span class="sql-comment">-- 4. เรียกดูพนักงานพร้อมสิทธิ์กลุ่มที่สังกัด (JOIN Query)</span><br>
+        <span class="sql-keyword">SELECT</span> u.employee_id, u.display_name, u.company, g.group_name, g.category<br>
+        <span class="sql-keyword">FROM</span> users u<br>
+        <span class="sql-keyword">JOIN</span> user_groups ug <span class="sql-keyword">ON</span> u.employee_id =
+        ug.employee_id<br>
+        <span class="sql-keyword">JOIN</span> `groups` g <span class="sql-keyword">ON</span> ug.group_id =
+        g.group_id;<br><br>
+
+        <span class="sql-comment">-- 5. อัปเดตคอลัมน์ category ให้ตรงตามหมวดหมู่จริง</span><br>
+        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
+          class="sql-string">'INTERNET_LEVEL'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
+          class="sql-keyword">IN</span> (101, 102, 103);<br>
+        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
+          class="sql-string">'RESOURCE_ENTITLEMENT'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
+          class="sql-keyword">IN</span> (104, 105, 106);<br>
+        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
+          class="sql-string">'NETWORK_VPN'</span> <span class="sql-keyword">WHERE</span> `group_id` = 107;<br>
+        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
+          class="sql-string">'PRINT_QUOTA'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
+          class="sql-keyword">IN</span> (108, 109);<br>
+        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
+          class="sql-string">'ORGANIZATIONAL'</span> <span class="sql-keyword">WHERE</span> `group_id` &lt; 100 <span
+          class="sql-keyword">OR</span> `category` <span class="sql-keyword">IS NULL</span>;
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      User Access Management System V2 &bull; Enterprise System Summary Document &bull; Generated Automatically
+    </footer>
+
+  </div>
+
+</body>
+
+</html>

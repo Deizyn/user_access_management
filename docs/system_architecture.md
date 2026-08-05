@@ -2,23 +2,23 @@
 
 ## 1. Overview & System Design Philosophy
 
-The **User Access Management Dashboard (V3 Architecture)** is designed following **Clean Architecture** principles and **Single Source of Truth** data management. It provides enterprise-grade identity, access entitlement tracking, and CSV/Active Directory integration.
+The **User Access Management Dashboard (V3 Architecture)** is designed following **Clean Architecture** principles and **Single Source of Truth** data management. It provides enterprise-grade identity, access entitlement tracking, CSV/Active Directory integration, and WebAssembly SQLite offline compatibility.
 
 ### Core Technology Stack
-- **Frontend Layer:** React (TypeScript), Tailwind CSS, Lucide Icons, WASM SQLite In-Memory Database.
+- **Frontend Layer:** React (TypeScript), Tailwind CSS, Lucide Icons, WASM SQLite In-Memory Database (`sql.js`).
 - **Backend API Layer:** Express.js REST API (`server.ts`, `api.ts`), MySQL 8.0 Connection Pool (`mysql2/promise`).
 - **Data Persistence:** Relational MySQL Server Database (`user_access_dashboard_data`), WASM SQLite in-memory cache.
 
 ---
 
-## 2. Single-Table Database Architecture
+## 2. Relational Database Architecture (Clean Schema 2.0 Spec)
 
-All group definitions (both System Special Groups and Custom Organizational Groups) are consolidated into a single unified table: `` `groups` ``.
+All permission entitlement calculations (Internet Level A/B/C, VPN Access, Print Quota Policy, Special Entitlements) are derived dynamically via the junction mapping table `` `user_groups` `` $\rightarrow$ `` `groups` ``. Redundant permission columns are removed from `` `users` `` table to maintain a clean 3NF database schema.
 
 ### 2.1 Database Tables Schema (`user_access_dashboard_data`)
 
 #### Table 1: `` `groups` ``
-Stores all access group definitions, badge styling, and entitlement categories.
+Stores all access group definitions, entitlement categories, and badge styling.
 
 ```sql
 CREATE TABLE IF NOT EXISTS `groups` (
@@ -34,41 +34,26 @@ CREATE TABLE IF NOT EXISTS `groups` (
 
 - **`is_special` = 1:** Special Entitlement Group (System Master Catalog IDs 101–109 or special entitlement).
 - **`is_special` = 0:** Standard Organizational Security Group (IDs 200+ created via UI/CSV).
+- **`category` Options:** `INTERNET_LEVEL`, `RESOURCE_ENTITLEMENT`, `NETWORK_VPN`, `PRINT_QUOTA`, `ORGANIZATIONAL`.
 
-#### Table 1.5: `` `special_groups` ``
-Master catalog for system special groups, rules, categories, and badge styling.
-
-```sql
-CREATE TABLE IF NOT EXISTS `special_groups` (
-  `special_group_id` INT PRIMARY KEY,
-  `group_name` VARCHAR(100) NOT NULL UNIQUE,
-  `category` VARCHAR(50) NOT NULL,
-  `badge_color` VARCHAR(100) NULL,
-  `description` TEXT NULL,
-  `is_active` TINYINT(1) DEFAULT 1,
-  FOREIGN KEY (`special_group_id`) REFERENCES `groups` (`group_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-#### Table 2: `` `users` ``
-
-Stores employee profile records.
+#### Table 2: `` `users` `` (Clean 14-Column Schema)
+Stores employee profile records without redundant permission columns (internet_level is retained for fast filtering/caching; derived permissions computed from groups).
 
 ```sql
 CREATE TABLE IF NOT EXISTS `users` (
   `employee_id` VARCHAR(50) PRIMARY KEY,
-  `username` VARCHAR(100) NOT NULL,
+  `username` VARCHAR(100) NOT NULL UNIQUE,
   `display_name` VARCHAR(150) NOT NULL,
   `email` VARCHAR(150) NOT NULL,
-  `job_title` VARCHAR(100) NULL DEFAULT '-',
-  `department` VARCHAR(100) NULL DEFAULT '-',
-  `company` VARCHAR(100) NULL DEFAULT '-',
-  `device_code` VARCHAR(100) NULL DEFAULT '-',
-  `authority_group` VARCHAR(100) NULL DEFAULT '-',
-  `creation_date` VARCHAR(50) NULL DEFAULT '-',
+  `job_title` VARCHAR(100) NOT NULL,
+  `department` VARCHAR(100) NOT NULL,
+  `company` VARCHAR(100) NOT NULL,
+  `device_code` VARCHAR(50) NOT NULL,
+  `authority_group` VARCHAR(100) NOT NULL,
+  `creation_date` VARCHAR(50) NOT NULL,
   `expiry_date` VARCHAR(50) NULL,
-  `telephone_pass_code` VARCHAR(100) NULL DEFAULT '-',
-  `o365_license` VARCHAR(100) NULL DEFAULT '-',
+  `telephone_pass_code` VARCHAR(50) NOT NULL,
+  `o365_license` VARCHAR(100) NOT NULL DEFAULT 'Microsoft 365 E3',
   `internet_level` VARCHAR(10) NULL DEFAULT 'B'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
@@ -88,20 +73,38 @@ CREATE TABLE IF NOT EXISTS `user_groups` (
 
 ---
 
-## 3. Strict Fallback & Data Policy
+## 3. Key Architectural Systems
 
-### 3.1 Zero Mock Data Rule (No Fake Data Generation)
+### 3.1 Hybrid Dual-Mode Filtering Architecture
+The filtering system operates in two distinct, non-conflicting modes:
+1. **Dropdown UI & Dashboard KPI Cards (Single-Select Direct Switch Mode):**
+   - Clicking an Internet Level (Level A / B / C), Company, Department, or Group from Dropdown UI or KPI Summary Cards replaces the filter instantly in 1 click without accumulating.
+2. **Omni Token Popup & Token Bar (Multi-Token Accumulator Mode):**
+   - Selecting tokens from the Token Popup Overlay or typing in the search bar accumulates tokens into multi-value filter arrays (e.g. `Company: Alpha Group` + `Company: Beta Corp`).
+
+### 3.2 Dynamic Profile Derivation Engine
+Instead of storing static permission strings in the `users` table, employee entitlements are dynamically computed from mapped groups:
+- **Primary Internet Level:** Evaluated via `getUserPrimaryInternetLevel(user.groups)` (Level A > B > C).
+- **VPN Access:** Evaluated via `getUserVpnStatus(user.groups)` (Group ID 107 or category `NETWORK_VPN`).
+- **Print Quota Policy:** Evaluated via `getUserPrintQuotaGroup(user.groups)` (Group ID 108/109 or category `PRINT_QUOTA`).
+- **Special Entitlements:** Contextual grid card layout in `UserDetailModal` with custom Lucide icons (`<Video />`, `<MessageSquare />`, `<Mail />`, `<Sparkles />`).
+
+---
+
+## 4. Strict Fallback & Data Policy
+
+### 4.1 Zero Mock Data Rule (No Fake Data Generation)
 To ensure strict enterprise compliance:
 - **No auto-generated mock values:** `Math.random()`, fake codes (`DEV-xxxx`, `PIN-xxxx`), or domain fallbacks (`@company.co.th`) are strictly prohibited.
 - **Missing Field Fallback:** Any empty string or missing field in CSV/API payload strictly defaults to **`"-"`** (or `null` for date types).
 
-### 3.2 Clean Database Reset Behavior
-- Clicking **"Reset Data"** executes `DELETE FROM user_groups` and `DELETE FROM users`, returning the employee count to **0**.
-- Default Master Groups (IDs 101–109) are preserved in `` `groups` `` so the system remains ready for new imports.
+### 4.2 Clean Database Reset & Auto-Sync Behavior
+- Clicking **"Reset Data"** executes `DELETE FROM user_groups` and `DELETE FROM users`, returning employee count to **0**.
+- Default Master Groups (IDs 101–109) are preserved and re-seeded in `` `groups` `` with full `category` and `badge_color` attributes so the system remains immediately ready for new imports.
 
 ---
 
-## 4. Dedicated Group Management REST API Specification
+## 5. Dedicated Group Management REST API Specification
 
 The system exposes dedicated RESTful endpoints specifically designed for group CRUD operations, entitlement management, and employee assignment:
 
@@ -120,7 +123,7 @@ The system exposes dedicated RESTful endpoints specifically designed for group C
 
 ---
 
-## 5. Extensibility & Maintenance Guide
+## 6. Extensibility & Maintenance Guide
 
 ### How to Add a New Special Group via SQL
 To register a new Special Group (e.g. `AI & ChatGPT Access`), run:
