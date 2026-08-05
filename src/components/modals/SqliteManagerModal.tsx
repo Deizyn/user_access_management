@@ -291,7 +291,7 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh]">
 
         {/* Header */}
@@ -357,8 +357,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
           <button
             onClick={() => setActiveTab('import')}
             className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'import'
-                ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
+              ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
           >
             <Upload className="w-4 h-4 text-indigo-600" />
@@ -367,8 +367,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
           <button
             onClick={() => setActiveTab('export')}
             className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'export'
-                ? 'border-emerald-600 text-emerald-700 bg-emerald-50/50'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
+              ? 'border-emerald-600 text-emerald-700 bg-emerald-50/50'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
           >
             <Download className="w-4 h-4 text-emerald-600" />
@@ -377,8 +377,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
           <button
             onClick={() => setActiveTab('schema')}
             className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'schema'
-                ? 'border-slate-800 text-slate-900 bg-slate-100/70'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
+              ? 'border-slate-800 text-slate-900 bg-slate-100/70'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
           >
             <FileCode className="w-4 h-4 text-slate-600" />
@@ -387,8 +387,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
           <button
             onClick={() => setActiveTab('sql_console')}
             className={`py-3 px-4 text-xs font-bold border-b-2 flex items-center space-x-2 transition-colors shrink-0 cursor-pointer ${activeTab === 'sql_console'
-                ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
-                : 'border-transparent text-slate-600 hover:text-slate-900'
+              ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
+              : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
           >
             <Code2 className="w-4 h-4 text-indigo-600" />
@@ -408,8 +408,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
                 <button
                   onClick={() => setImportMode('csv')}
                   className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${importMode === 'csv'
-                      ? 'bg-white text-indigo-700 shadow-xs border border-slate-200/80'
-                      : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-indigo-700 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
                     }`}
                 >
                   <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
@@ -418,8 +418,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
                 <button
                   onClick={() => setImportMode('json')}
                   className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 cursor-pointer ${importMode === 'json'
-                      ? 'bg-white text-emerald-700 shadow-xs border border-slate-200/80'
-                      : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-emerald-700 shadow-xs border border-slate-200/80'
+                    : 'text-slate-600 hover:text-slate-900'
                     }`}
                 >
                   <FileJson className="w-4 h-4 text-emerald-600" />
@@ -457,8 +457,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
                       onDragLeave={() => setIsCsvDragOver(false)}
                       onClick={() => csvFileInputRef.current?.click()}
                       className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${isCsvDragOver
-                          ? 'border-indigo-500 bg-indigo-50/50 scale-[1.01]'
-                          : 'border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-100/50'
+                        ? 'border-indigo-500 bg-indigo-50/50 scale-[1.01]'
+                        : 'border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-100/50'
                         }`}
                     >
                       <input
@@ -612,8 +612,8 @@ export const SqliteManagerModal: React.FC<SqliteManagerModalProps> = ({
               {importStatus.type && (
                 <div
                   className={`p-3.5 rounded-xl text-xs font-medium flex items-center gap-2.5 ${importStatus.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                      : 'bg-rose-50 text-rose-800 border border-rose-200'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-800 border border-rose-200'
                     }`}
                 >
                   {importStatus.type === 'success' ? (

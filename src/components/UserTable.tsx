@@ -89,6 +89,18 @@ export const UserTable: React.FC<UserTableProps> = ({
     }
   }, [totalUsers, totalPages, currentPage]);
 
+  // Close popovers when clicking outside anywhere on the document
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenPopoverUserId(null);
+      setShowColumnDropdown(false);
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalUsers);
   const paginatedUsers = users.slice(startIndex, endIndex);
@@ -462,7 +474,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                                 {openPopoverUserId === user.employee_id && (
                                   <div 
                                     onClick={(e) => e.stopPropagation()}
-                                    className="absolute left-0 top-full mt-1 z-[80] bg-white rounded-xl shadow-xl border border-slate-200 p-2.5 min-w-[210px] flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-100"
+                                    className="absolute left-0 top-full mt-1 z-30 bg-white rounded-xl shadow-xl border border-slate-200 p-2.5 min-w-[210px] flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-100"
                                   >
                                     <div className="text-[10px] font-bold text-slate-600 pb-1 border-b border-slate-100 flex items-center justify-between">
                                       <span>Special Groups ที่เหลือ ({remainingSpecial.length})</span>
@@ -572,7 +584,10 @@ export const UserTable: React.FC<UserTableProps> = ({
                       <td className="p-3 whitespace-nowrap text-center">
                         <button
                           type="button"
-                          onClick={() => onViewUser(user)}
+                          onClick={() => {
+                            setOpenPopoverUserId(null);
+                            onViewUser(user);
+                          }}
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors cursor-pointer shadow-2xs"
                           title="ดูรายละเอียดเพิ่มเติมของ User Profile"
                         >

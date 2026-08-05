@@ -218,3 +218,8 @@
     1. ทำการสแกนและแปลงลิงก์อ้างอิงเส้นทางไฟล์ทั้งหมดทุกบรรทัด ให้ชี้ไปยัง `user_management_dashboard_V4/user_access_management`
     2. ปรับปรุงเวอร์ชันในหัวข้อเอกสารสถาปัตยกรรมและไดอะแกรมให้เป็น V4 Clean Architecture ทั้งหมด
     3. ตรวจสอบและตัดช่องว่างส่วนเกินเพื่อให้เอกสารสะอาดเรียบร้อย 100%
+- **[LOG-070] Fix Special Groups Popover Overlap & Global Z-Index Hierarchy Layering**:
+  - **ปัญหาที่พบ**: ปุ่ม `+เพิ่มเติม` แสดง Special Groups ที่เหลือใช้ `z-index` ที่ `z-[80]` และขาดการปิดแบบ Click Outside ทำให้ Popover ค้างอยู่บนหน้าจอซ้อนทับ Modal รายละเอียดพนักงาน (`UserDetailModal`)
+  - **การแก้ไข**:
+    1. อัปเดต [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) ปรับ `z-index` ของ Popover ลงมาเป็น `z-30` และเพิ่ม Global Click Listener ซ่อน Popover เมื่อคลิกนอกพื้นที่หรือกดดู Profile
+    2. อัปเดต Modal ทั้งหมดใน `src/components/modals/` ให้ใช้ `z-[100]` ยืนยันว่าหน้าต่าง Modal จะแสดงผลทับทุก Dropdown และ Popover ภายในตารางอย่างสะอาดเรียบร้อย 100%

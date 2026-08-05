@@ -164,7 +164,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto cursor-pointer"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto cursor-pointer"
     >
       <div 
         onClick={(e) => e.stopPropagation()}

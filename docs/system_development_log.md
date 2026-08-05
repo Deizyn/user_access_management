@@ -305,6 +305,14 @@
   4. ยืนยันสเปกตาราง `users` (13 คอลัมน์หลักมาตรฐาน) และสเปก CSV Import (14 คอลัมน์มาตรฐานรวม `Groups`) อย่างเป็นเอกภาพ 100%
 - **สถานะ**: อัปเดตศูนย์รวมเอกสารระบบทั้งหมดสมบูรณ์เรียบร้อย 100% ✅
 
+### 2.59 แก้ไขปัญหาการแสดงผล Popover สิทธิ์เพิ่มเติม (+เพิ่มเติม) ซ้อนทับกับ Modal รายละเอียดพนักงาน
+- **การปรับปรุง**:
+  1. เพิ่ม `useEffect` Event Listener สำหรับ Click Outside บน `document` ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) ให้ซ่อน Popover อัตโนมัติเมื่อคลิกพื้นที่อื่นบนหน้าจอ
+  2. ปรับลด `z-index` ของ Special Groups Popover ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) จาก `z-[80]` ลงมาเป็น `z-30`
+  3. ปรับเพิ่ม `z-index` ของ Modal ทั้งหมด ([UserDetailModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/UserDetailModal.tsx), [UserFormModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/UserFormModal.tsx), [LevelGroupExplorerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/LevelGroupExplorerModal.tsx), ฯลฯ) ขึ้นเป็น `z-[100]` เพื่อให้ Modal แสดงผลทับทุกส่วนประกอบในหน้าเว็บอย่างถูกต้อง 100%
+  4. เพิ่มคำสั่ง `setOpenPopoverUserId(null)` เมื่อผู้ใช้กดปุ่ม "ดู Profile"
+- **สถานะ**: แก้ไขปัญหาสกรีนซ้อนทับเรียบร้อย 100% ✅
+
 ---
 
 
