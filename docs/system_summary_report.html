@@ -4,11 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Access Management - Executive System Summary</title>
+  <title>User Access Management - Project System Summary (User & Developer Guide)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Fira+Code:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -23,8 +23,13 @@
       --slate-100: #f1f5f9;
       --slate-50: #f8fafc;
       --emerald: #10b981;
+      --emerald-light: #d1fae5;
       --sky: #0284c7;
+      --sky-light: #e0f2fe;
       --purple: #9333ea;
+      --purple-light: #f3e8ff;
+      --rose: #e11d48;
+      --rose-light: #ffe4e6;
       --border-color: #e2e8f0;
       --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
       --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -46,7 +51,7 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
     }
 
@@ -55,9 +60,9 @@
       background: linear-gradient(135deg, var(--slate-900) 0%, #1e1b4b 100%);
       color: white;
       padding: 40px;
-      border-radius: 20px;
+      border-radius: 24px;
       box-shadow: var(--shadow-lg);
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       position: relative;
       overflow: hidden;
     }
@@ -67,15 +72,17 @@
       position: absolute;
       top: -50%;
       right: -10%;
-      width: 400px;
-      height: 400px;
+      width: 450px;
+      height: 450px;
       background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
       border-radius: 50%;
     }
 
     .badge-status {
-      display: inline-block;
-      background-color: rgba(99, 102, 241, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(99, 102, 241, 0.25);
       border: 1px solid rgba(165, 180, 252, 0.4);
       color: #c7d2fe;
       padding: 6px 16px;
@@ -86,10 +93,18 @@
       margin-bottom: 15px;
     }
 
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #34d399;
+    }
+
     h1 {
       font-size: 2.2rem;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       background: linear-gradient(to right, #ffffff, #c7d2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -98,13 +113,57 @@
     .subtitle {
       color: #94a3b8;
       font-size: 1.05rem;
-      max-width: 800px;
+      max-width: 850px;
+      line-height: 1.6;
     }
 
-    /* GRID METRICS */
+    /* VIEW SWITCHER TABS */
+    .view-switcher {
+      display: flex;
+      gap: 12px;
+      background: white;
+      padding: 8px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 30px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--slate-600);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background-color: var(--slate-100);
+      color: var(--slate-900);
+    }
+
+    .tab-btn.active {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    /* METRICS GRID */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
@@ -112,7 +171,7 @@
     .metric-card {
       background: white;
       padding: 24px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
@@ -123,17 +182,28 @@
       box-shadow: var(--shadow-md);
     }
 
+    .metric-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
     .metric-title {
       font-size: 13px;
       font-weight: 700;
       color: var(--slate-600);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .metric-value {
-      font-size: 1.8rem;
+      font-size: 1.7rem;
       font-weight: 800;
       color: var(--slate-900);
     }
@@ -141,14 +211,14 @@
     .metric-desc {
       font-size: 13px;
       color: #64748b;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     /* SECTION CARD */
     .section-card {
       background: white;
       padding: 32px;
-      border-radius: 16px;
+      border-radius: 20px;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       margin-bottom: 30px;
@@ -157,29 +227,94 @@
     .section-header {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 24px;
       padding-bottom: 16px;
       border-bottom: 2px solid var(--slate-100);
     }
 
     .icon-box {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
       background: var(--primary-light);
       color: var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 18px;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .icon-box.green {
+      background: var(--emerald-light);
+      color: var(--emerald);
+    }
+
+    .icon-box.sky {
+      background: var(--sky-light);
+      color: var(--sky);
+    }
+
+    .icon-box.purple {
+      background: var(--purple-light);
+      color: var(--purple);
+    }
+
+    .icon-box.rose {
+      background: var(--rose-light);
+      color: var(--rose);
     }
 
     .section-title {
-      font-size: 1.35rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: var(--slate-900);
+    }
+
+    .section-sub {
+      font-size: 13.5px;
+      color: #64748b;
+    }
+
+    /* FEATURE CARDS GRID */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .feature-card {
+      background: var(--slate-50);
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      background: white;
+      border-color: var(--primary-light);
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 6px;
+    }
+
+    .feature-body {
+      font-size: 13.5px;
+      color: var(--slate-700);
+      line-height: 1.6;
     }
 
     /* TABLES */
@@ -199,16 +334,17 @@
     }
 
     .custom-table th:first-child {
-      border-top-left-radius: 8px;
+      border-top-left-radius: 10px;
     }
 
     .custom-table th:last-child {
-      border-top-right-radius: 8px;
+      border-top-right-radius: 10px;
     }
 
     .custom-table td {
       padding: 14px 16px;
       border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
     }
 
     .custom-table tr:hover td {
@@ -254,31 +390,140 @@
       border: 1px solid #fde68a;
     }
 
-    /* SQL BOX */
-    .sql-box {
-      background-color: #0f172a;
-      color: #38bdf8;
-      padding: 20px;
-      border-radius: 12px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 13.5px;
-      overflow-x: auto;
-      line-height: 1.5;
+    .pill-rose {
+      background: #ffe4e6;
+      color: #9f1239;
+      border: 1px solid #fecdd3;
+    }
+
+    /* WORKFLOW STEPS */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
       margin-top: 15px;
     }
 
-    .sql-keyword {
+    .step-item {
+      display: flex;
+      gap: 16px;
+      background: var(--slate-50);
+      padding: 18px 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 13.5px;
+      color: var(--slate-600);
+    }
+
+    /* CODE & SQL BOX */
+    .code-box {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 22px;
+      border-radius: 14px;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 13.5px;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin-top: 15px;
+      border: 1px solid #1e293b;
+    }
+
+    .kw {
       color: #f472b6;
       font-weight: bold;
     }
 
-    .sql-string {
+    .str {
       color: #a3e635;
     }
 
-    .sql-comment {
+    .cm {
       color: #64748b;
       font-style: italic;
+    }
+
+    .fn {
+      color: #38bdf8;
+    }
+
+    /* PIPELINE DIAGRAM (CSS/HTML Flow) */
+    .pipeline-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding: 20px;
+      background: var(--slate-900);
+      border-radius: 16px;
+      color: white;
+    }
+
+    .pipeline-node {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 14px 18px;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .pipeline-node-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 4px;
+    }
+
+    .pipeline-node-desc {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .pipeline-arrow {
+      color: #818cf8;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    /* HIDE/SHOW LOGIC */
+    .view-content {
+      display: block;
+    }
+
+    .view-content.hidden {
+      display: none !important;
     }
 
     /* FOOTER */
@@ -299,315 +544,601 @@
 
     <!-- HEADER -->
     <header>
-      <div class="badge-status">SYSTEM ARCHITECTURE SUMMARY</div>
-      <h1>User Access Management Dashboard V2</h1>
+      <div class="badge-status">
+        <span class="badge-dot"></span>
+        SYSTEM SUMMARY REPORT V4 CLEAN ARCHITECTURE
+      </div>
+      <h1>User Access Management (UAM) Dashboard</h1>
       <div class="subtitle">
-        สรุปภาพรวมสถาปัตยกรรมระบบ โครงสร้างตารางฐานข้อมูล MySQL 100% Clean Schema, ระบบ Hybrid Dual-Mode Filtering
-        และคู่มือคำสั่ง SQL สำคัญ
+        คู่มือสรุปภาพรวมการทำงานของระบบบริหารจัดการสิทธิ์พนักงานองค์กรแบบรวมศูนย์ สำหรับฝั่งผู้ใช้งานทั่วไป (User View)
+        และฝั่งนักพัฒนา (Developer View)
       </div>
     </header>
 
-    <!-- METRICS -->
+    <!-- VIEW SWITCHER TABS -->
+    <div class="view-switcher">
+      <button class="tab-btn active" onclick="switchView('all')">
+        🌐 สรุปภาพรวมทั้งหมด (All-in-One View)
+      </button>
+      <button class="tab-btn" onclick="switchView('user')">
+        📱 สำหรับฝั่งผู้ใช้งาน (User Guide)
+      </button>
+      <button class="tab-btn" onclick="switchView('dev')">
+        💻 สำหรับฝั่งนักพัฒนา (Developer Guide)
+      </button>
+    </div>
+
+    <!-- METRICS OVERVIEW -->
     <div class="metrics-grid">
       <div class="metric-card">
-        <div class="metric-title">MySQL Database Schema</div>
+        <div class="metric-icon" style="background: #e0e7ff; color: #4f46e5;">🛡️</div>
+        <div class="metric-title">Core Objective</div>
+        <div class="metric-value" style="font-size: 1.4rem;">Single Source</div>
+        <div class="metric-desc">บริหารจัดการสิทธิ์พนักงานแบบศูนย์กลางความจริงเดียว</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon" style="background: #d1fae5; color: #10b981;">🗄️</div>
+        <div class="metric-title">MySQL 3NF Schema</div>
         <div class="metric-value">13 Columns</div>
-        <div class="metric-desc">Clean Schema ไร้คอลัมน์สิทธิ์ซ้ำซ้อนใน <code>users</code></div>
+        <div class="metric-desc">ตาราง users แบบ Clean Schema ไร้คอลัมน์สิทธิ์ซ้ำซ้อน</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-title">Special Group Categories</div>
-        <div class="metric-value">5 Categories</div>
-        <div class="metric-desc">จำแนกหมวดหมู่สิทธิ์ใช้งานชัดเจน 100%</div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-title">Filtering Architecture</div>
+        <div class="metric-icon" style="background: #e0f2fe; color: #0284c7;">⚡</div>
+        <div class="metric-title">Filtering Engine</div>
         <div class="metric-value">Dual-Mode</div>
-        <div class="metric-desc">Dropdown Single-Switch + Token Accumulator</div>
+        <div class="metric-desc">Dropdown Single-Select + Multi-Token Accumulator</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-title">System Health & Verification</div>
-        <div class="metric-value">0 Errors</div>
-        <div class="metric-desc">TypeScript <code>npx tsc --noEmit</code> Passed Cleanly</div>
+        <div class="metric-icon" style="background: #f3e8ff; color: #9333ea;">🔌</div>
+        <div class="metric-title">Database Integration</div>
+        <div class="metric-value">MySQL + SQLite</div>
+        <div class="metric-desc">MySQL 8 Server + In-Memory WASM SQLite Fallback</div>
       </div>
     </div>
 
-    <!-- SECTION 1: DATABASE SCHEMA -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="icon-box">🗄️</div>
-        <div>
-          <div class="section-title">1. โครงสร้างตารางฐานข้อมูล MySQL (Clean Schema Spec 2.0)</div>
-          <div style="font-size: 13px; color: #64748b;">ตาราง <code>user_access_dashboard_data.users</code>
-            ตรงตามโครงสร้างจริงในฐานข้อมูล MySQL 100%</div>
+    <!-- =================================================================== -->
+    <!-- SECTION 1: USER PERSPECTIVE (ฝั่งผู้ใช้งาน) -->
+    <!-- =================================================================== -->
+    <div id="user-view" class="view-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box">📱</div>
+          <div>
+            <div class="section-title">1. ภาพรวมและฟังก์ชันหลักสำหรับผู้ใช้งาน (User Guide & Admin Features)</div>
+            <div class="section-sub">คู่มือความเข้าใจเบื้องต้นสำหรับผู้ใช้งานระบบ ผู้ดูแลระบบ (IT Admin) และฝ่าย HR</div>
+          </div>
         </div>
-      </div>
 
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>ชื่อคอลัมน์ (Field Name)</th>
-            <th>ชนิดข้อมูล (Type)</th>
-            <th>Null Allowed</th>
-            <th>Key Type</th>
-            <th>คำอธิบายหน้าที่</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td><code>employee_id</code></td>
-            <td><code>varchar(50)</code></td>
-            <td>NO</td>
-            <td><span class="pill-badge pill-amber">PRIMARY KEY</span></td>
-            <td>รหัสพนักงาน (Unique Identifier)</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td><code>username</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>ชื่อบัญชีผู้ใช้งานระบบ</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td><code>display_name</code></td>
-            <td><code>varchar(150)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>ชื่อ-นามสกุลพนักงาน</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td><code>email</code></td>
-            <td><code>varchar(150)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>อีเมลประจำตัวพนักงาน</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td><code>job_title</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>ตำแหน่งงานในองค์กร</td>
-          </tr>
-          <tr>
-            <td>6</td>
-            <td><code>department</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>แผนกงาน</td>
-          </tr>
-          <tr>
-            <td>7</td>
-            <td><code>company</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>บริษัทที่สังกัด</td>
-          </tr>
-          <tr>
-            <td>8</td>
-            <td><code>device_code</code></td>
-            <td><code>varchar(50)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>รหัสอุปกรณ์คอมพิวเตอร์ประจำตัว</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td><code>authority_group</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>กลุ่มสิทธิ์การอนุมัติในระบบ</td>
-          </tr>
-          <tr>
-            <td>10</td>
-            <td><code>creation_date</code></td>
-            <td><code>varchar(50)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>วันที่เริ่มสร้างบัญชี (YYYY-MM-DD)</td>
-          </tr>
-          <tr>
-            <td>11</td>
-            <td><code>expiry_date</code></td>
-            <td><code>varchar(50)</code></td>
-            <td>YES</td>
-            <td>-</td>
-            <td>วันที่หมดอายุสัญญา (ถ้ามี)</td>
-          </tr>
-          <tr>
-            <td>12</td>
-            <td><code>telephone_pass_code</code></td>
-            <td><code>varchar(50)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>รหัสผ่านโทรศัพท์ / พิมพ์งาน</td>
-          </tr>
-          <tr>
-            <td>13</td>
-            <td><code>o365_license</code></td>
-            <td><code>varchar(100)</code></td>
-            <td>NO</td>
-            <td>-</td>
-            <td>สิทธิ์ Microsoft 365 License</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <p style="font-size: 14.5px; color: var(--slate-700); margin-bottom: 20px;">
+          ระบบ <strong>User Access Management (UAM) Dashboard</strong>
+          ถูกออกแบบมาเพื่อให้ผู้ดูแลระบบและองค์กรสามารถตรวจสอบ ค้นหา และบริหารจัดการสิทธิ์การเข้าถึงระบบต่างๆ
+          ของพนักงานได้อย่างถูกต้อง รวดเร็ว และเป็นระบบ โดยรวมสิทธิ์ทั้งหมดไว้ในหน้าเดียว
+        </p>
 
-    <!-- SECTION 2: GROUP CATEGORIES -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="icon-box">🏷️</div>
-        <div>
-          <div class="section-title">2. โครงสร้างหมวดหมู่สิทธิ์ (Group Category System)</div>
-          <div style="font-size: 13px; color: #64748b;">หมวดหมู่การจำแนกสิทธิ์ 5 ประเภทในตาราง
-            <code>groups.category</code>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <div class="feature-title">1. Dashboard Analytics & KPI Summary</div>
+            <div class="feature-body">
+              แสดงการ์ดสรุปสถิติสำคัญเรียลไทม์ เช่น จำนวนพนักงานทั้งหมด, สัดส่วน Internet Level (Level A / B / C),
+              จำนวนพนักงานที่ได้รับสิทธิ์ VPN, สิทธิ์การพิมพ์งาน (Color / Mono) และสถิติแยกตามบริษัท/แผนก
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <div class="feature-title">2. Master User Table & Smart Filter</div>
+            <div class="feature-body">
+              ตารางผู้ใช้งานหลัก รองรับการค้นหาตามชื่อ/รหัสพนักงาน/ตำแหน่ง/แผนก/บริษัท, ระบบซ่อน/แสดงคอลัมน์ (Column
+              Toggles), การจัดเรียงลำดับ (Sorting) และการแบ่งหน้า (Pagination)
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">3. Hybrid Dual-Mode Filtering</div>
+            <div class="feature-body">
+              รองรับ 2 โหมดการกรอง:
+              <br>• <strong>Dropdown & KPI Card:</strong> สลับดูสิทธิ์ทีละกลุ่มใน 1 คลิก (Single-Select)
+              <br>• <strong>Token Popup Bar:</strong> เลือกสะสมหลายสิทธิ์พร้อมกัน เช่น ค้นหาบริษัท A + บริษัท B
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-title">4. User Detail Profile Modal</div>
+            <div class="feature-body">
+              กดดูสิทธิ์เชิงลึกรายบุคคล แสดงการ์ดสิทธิ์ Internet Level, สถานะ VPN, โควตาการพิมพ์งาน, รหัสอุปกรณ์,
+              รหัส PIN โทรศัพท์, ไลเซนส์ Microsoft 365 และการ์ดสิทธิ์พิเศษ (Video, Mail, VoIP ฯลฯ)
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📥</div>
+            <div class="feature-title">5. CSV Bulk Import & Export</div>
+            <div class="feature-body">
+              รองรับการนำเข้าข้อมูลพนักงานจำนวนมากผ่านไฟล์ CSV (รูปแบบ 14 คอลัมน์มาตรฐาน)
+              พร้อมระบบตรวจสอบความถูกต้องอัตโนมัติ และปุ่มส่งออกรายงานไฟล์ CSV
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <div class="feature-title">6. Group Explorer & Member Explorer</div>
+            <div class="feature-body">
+              หน้าต่างสำรวจกลุ่มสิทธิ์ สามารถเปิดดูรายชื่อสิทธิ์ในระบบ และคลิกเข้าไปดูรายชื่อพนักงานที่สังกัดในกลุ่มนั้นๆ
+              ได้ทันที
+            </div>
           </div>
         </div>
       </div>
 
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>หมวดหมู่ (Category)</th>
-            <th>ความหมาย / หน้าที่</th>
-            <th>Group ID ตัวอย่าง</th>
-            <th>การประมวลผลบน UI</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="pill-badge pill-sky">INTERNET_LEVEL</span></td>
-            <td>สิทธิ์การใช้งานอินเทอร์เน็ต</td>
-            <td>101 (Level A), 102 (Level B), 103 (Level C)</td>
-            <td>คำนวณแสดง Internet Level Card บน UserDetailModal</td>
-          </tr>
-          <tr>
-            <td><span class="pill-badge pill-purple">RESOURCE_ENTITLEMENT</span></td>
-            <td>สิทธิ์ทรัพยากรพิเศษ (มีเดีย/สื่อสาร/อีเมล)</td>
-            <td>104 (Video Access), 105 (Communications), 106 (Free Mail)</td>
-            <td>แสดงการ์ด Special Entitlement พร้อมไอคอนเฉพาะตัว</td>
-          </tr>
-          <tr>
-            <td><span class="pill-badge pill-emerald">NETWORK_VPN</span></td>
-            <td>สิทธิ์การเชื่อมต่อ VPN จากภายนอก</td>
-            <td>107 (VPN Remote Access)</td>
-            <td>คำนวณการ์ด Remote VPN Access (Enabled/Disabled)</td>
-          </tr>
-          <tr>
-            <td><span class="pill-badge pill-amber">PRINT_QUOTA</span></td>
-            <td>สิทธิ์พิมพ์งาน (โควตาปริ้นสี/ขาวดำ)</td>
-            <td>108 (Color Printer), 109 (Mono Printer)</td>
-            <td>คำนวณการ์ด Print Quota Policy (Color & Mono/Color Only)</td>
-          </tr>
-          <tr>
-            <td><span class="pill-badge pill-indigo">ORGANIZATIONAL</span></td>
-            <td>กลุ่มสิทธิ์ตามโครงสร้างองค์กร/แผนก</td>
-            <td>1 (IT Admin), 2 (HR Ops), 3 (Finance), ฯลฯ</td>
-            <td>แสดงการ์ดกลุ่มองค์กรในหน้าต่าง Assigned Groups</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SECTION 3: FILTERING ARCHITECTURE -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="icon-box">⚡</div>
-        <div>
-          <div class="section-title">3. สถาปัตยกรรมระบบกรองข้อมูล Hybrid Dual-Mode Filtering</div>
-          <div style="font-size: 13px; color: #64748b;">การสลับโหมดการทำงานระหว่าง 1-Click Direct Switch กับ Multi-Token
-            Accumulator</div>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div
-          style="background: var(--slate-50); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-          <h4 style="color: var(--primary); font-size: 16px; margin-bottom: 10px;">1. Dropdown UI & KPI Cards
-            (Single-Select Direct Switch)</h4>
-          <p style="font-size: 13.5px; color: var(--slate-700);">
-            เมื่อผู้ใช้เลือกตัวกรองจาก Dropdown Menu หรือคลิกการ์ด KPI Summary บน Dashboard (เช่น Level A ➔ Level B)
-            ระบบจะสลับค่าตัวกรองให้ทันทีใน 1 คลิก โดยปลดตัวเดิมออกให้อัตโนมัติ ไม่เอามารวมกัน
-          </p>
+      <!-- WORKFLOW FOR USERS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box green">🔄</div>
+          <div>
+            <div class="section-title">2. ขั้นตอนการใช้งานระบบเบื้องต้น (Step-by-Step User Workflow)</div>
+            <div class="section-sub">แนวทางการปฏิบัติงานสำหรับผู้ใช้งานและผู้ดูแลระบบ</div>
+          </div>
         </div>
 
-        <div
-          style="background: var(--slate-50); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-          <h4 style="color: var(--emerald); font-size: 16px; margin-bottom: 10px;">2. Omni Token Popup Overlay
-            (Multi-Token Accumulator)</h4>
-          <p style="font-size: 13.5px; color: var(--slate-700);">
-            เมื่อผู้ใช้เปิด Token Popup Overlay หรือพิมพ์ Token ในช่องค้นหา ระบบจะสะสม Token หลายรายการพร้อมกันได้ เช่น
-            เรียกดูพนักงาน 2 บริษัทพร้อมกัน หรือเรียกดูสิทธิ์ Level A และ Level B ควบคู่กัน
-          </p>
+        <div class="steps-container">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">ค้นหาและกรองสิทธิ์พนักงาน (Search & Filter)</div>
+              <div class="step-desc">
+                พิมพ์ชื่อ รหัสพนักงาน หรือเลือกกรองจาก Dropdown Menu (เช่น กรองเฉพาะพนักงานสิทธิ์ Internet Level A หรือสังกัด IT)
+                หรือคลิกการ์ด KPI Summary บน Dashboard เพื่อกรองข้อมูลทันที
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">เรียกดูรายละเอียดสิทธิ์รายบุคคล (View User Profile)</div>
+              <div class="step-desc">
+                กดปุ่ม <strong>"ดูรายละเอียด"</strong> บนแถบพนักงาน เพื่อเปิดหน้าต่าง User Detail Modal
+                เรียกดูสิทธิ์ระบบอินเทอร์เน็ต VPN การพิมพ์ รหัสผ่าน และการ์ดสิทธิ์พิเศษประจำตัว
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">การอัปเดตข้อมูลผ่านไฟล์ CSV (Import Bulk Data)</div>
+              <div class="step-desc">
+                กดปุ่ม <strong>"นำเข้า CSV"</strong> เพื่ออัปโหลดไฟล์รายชื่อพนักงาน ข้อมูลจะถูกซิงค์และแมปกลุ่มสิทธิ์โดยอัตโนมัติบันทึกลงดิสก์ MySQL ทันที
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- SECTION 4: USEFUL SQL CHEAT SHEET -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="icon-box">💻</div>
-        <div>
-          <div class="section-title">4. ชุดคำสั่ง SQL สำคัญประจำระบบ (SQL Commands Cheat Sheet)</div>
-          <div style="font-size: 13px; color: #64748b;">คำสั่งสำหรับเรียกดู ซิงค์ และทดสอบข้อมูลใน MySQL Workbench</div>
+    <!-- =================================================================== -->
+    <!-- SECTION 2: DEVELOPER PERSPECTIVE (ฝั่งนักพัฒนา) -->
+    <!-- =================================================================== -->
+    <div id="dev-view" class="view-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box purple">💻</div>
+          <div>
+            <div class="section-title">3. สถาปัตยกรรมและเทคโนโลยีระบบ (Developer Tech Stack & Architecture)</div>
+            <div class="section-sub">ข้อมูลเชิงเทคนิค โครงสร้างโค้ด Clean Architecture และ Data Triad Layer</div>
+          </div>
+        </div>
+
+        <p style="font-size: 14.5px; color: var(--slate-700); margin-bottom: 20px;">
+          ระบบพัฒนาขึ้นด้วยแนวคิด <strong>Clean Architecture</strong> และ <strong>Single Source of Truth</strong>
+          โดยแยกการประมวลผลสิทธิ์ออกจากตารางพนักงาน และคำนวณสิทธิ์สด (Dynamic Profile Derivation) ผ่านตารางความสัมพันธ์
+        </p>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ชั้นระบบ (Layer)</th>
+              <th>เทคโนโลยีที่ใช้ (Tech Stack)</th>
+              <th>หน้าที่และบทบาทหลัก (Role & Responsibility)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Frontend Framework</strong></td>
+              <td><span class="pill-badge pill-indigo">React 19 + TypeScript</span></td>
+              <td>SPA User Interface, Single-State Management, Custom Hooks (<code>useUserAccessData</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Build Tool & Bundler</strong></td>
+              <td><span class="pill-badge pill-sky">Vite 6 + esbuild</span></td>
+              <td>High-performance HMR Development & Optimized Production Build Bundle</td>
+            </tr>
+            <tr>
+              <td><strong>Styling & Icons</strong></td>
+              <td><span class="pill-badge pill-emerald">Tailwind CSS v4 + Lucide React</span></td>
+              <td>Modern Responsive Styling, Glassmorphism Effects, Micro-animations</td>
+            </tr>
+            <tr>
+              <td><strong>Backend REST API</strong></td>
+              <td><span class="pill-badge pill-amber">Node.js + Express Server</span></td>
+              <td>RESTful API Layer (<code>server.ts</code>, <code>src/backend/routes/api.ts</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Database Engine</strong></td>
+              <td><span class="pill-badge pill-purple">MySQL 8.0 Server</span></td>
+              <td>Database Persistence (<code>user_access_dashboard_data</code>) connection via <code>mysql2/promise</code></td>
+            </tr>
+            <tr>
+              <td><strong>Offline Cache Engine</strong></td>
+              <td><span class="pill-badge pill-rose">SQLite 3 WebAssembly</span></td>
+              <td>In-memory Client Engine (<code>sql.js</code>) สำหรับรองรับการทำงานในโหมด Offline / WASM</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ACTIVE DIRECTORY & DATA PIPELINE -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box sky">🔄</div>
+          <div>
+            <div class="section-title">4. Active Directory (AD) & Data Pipeline Workflow</div>
+            <div class="section-sub">เส้นทางไหลของข้อมูลตั้งแต่ LDAP Server จนถึงการเรนเดอร์บนหน้าจอ UI</div>
+          </div>
+        </div>
+
+        <div class="pipeline-flow">
+          <div class="pipeline-node">
+            <div class="pipeline-node-title">1. Active Directory</div>
+            <div class="pipeline-node-desc">LDAP / Graph API Fetching Payload</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node">
+            <div class="pipeline-node-title">2. Transformation Engine</div>
+            <div class="pipeline-node-desc">Clean 13 Cols + Map Groups Catalog</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node">
+            <div class="pipeline-node-title">3. MySQL Persistence</div>
+            <div class="pipeline-node-desc">Atomic Upsert (`ON DUPLICATE KEY`)</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node">
+            <div class="pipeline-node-title">4. Express REST API</div>
+            <div class="pipeline-node-desc">Serve `/api/users` & `/api/groups`</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node">
+            <div class="pipeline-node-title">5. Dynamic Profile UI</div>
+            <div class="pipeline-node-desc">Live Profile Derivation (`groupHelpers`)</div>
+          </div>
         </div>
       </div>
 
-      <div class="sql-box">
-        <span class="sql-comment">-- 1. เลือกใช้งานฐานข้อมูล</span><br>
-        <span class="sql-keyword">USE</span> user_access_dashboard_data;<br><br>
+      <!-- RELATIONAL DATABASE SCHEMA 3NF -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box purple">🗄️</div>
+          <div>
+            <div class="section-title">5. โครงสร้างตารางฐานข้อมูล 3NF (MySQL Clean Schema 2.0)</div>
+            <div class="section-sub">ตารางสัมพันธ์ 3 ตารางหลัก ในฐานข้อมูล <code>user_access_dashboard_data</code></div>
+          </div>
+        </div>
 
-        <span class="sql-comment">-- 2. เรียกดูพนักงานทั้งหมด (Clean Schema)</span><br>
-        <span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> `users`;<br><br>
+        <h4 style="margin-top: 15px; color: var(--slate-900);">1) ตาราง <code>users</code> (Clean 13 Columns Schema)</h4>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">เก็บเฉพาะข้อมูลโปรไฟล์พนักงาน ปราศจากคอลัมน์สิทธิ์ซ้ำซ้อน</p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Field Name</th>
+              <th>Data Type</th>
+              <th>Null</th>
+              <th>Key</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>employee_id</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>NO</td>
+              <td><span class="pill-badge pill-amber">PRIMARY</span></td>
+              <td>รหัสพนักงานประจำตัว (Unique Key)</td>
+            </tr>
+            <tr>
+              <td><code>username</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td><span class="pill-badge pill-sky">UNIQUE</span></td>
+              <td>ชื่อบัญชี Active Directory</td>
+            </tr>
+            <tr>
+              <td><code>display_name</code></td>
+              <td><code>varchar(150)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>ชื่อ-นามสกุลพนักงาน</td>
+            </tr>
+            <tr>
+              <td><code>email</code></td>
+              <td><code>varchar(150)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>อีเมลประจำตัวพนักงาน</td>
+            </tr>
+            <tr>
+              <td><code>job_title</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>ตำแหน่งงานในองค์กร</td>
+            </tr>
+            <tr>
+              <td><code>department</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>แผนก/สังกัดงาน</td>
+            </tr>
+            <tr>
+              <td><code>company</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>บริษัทในเครือ</td>
+            </tr>
+            <tr>
+              <td><code>device_code</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>รหัสเครื่องคอมพิวเตอร์ประจำตัว</td>
+            </tr>
+            <tr>
+              <td><code>authority_group</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>กลุ่มสิทธิ์การอนุมัติในระบบ</td>
+            </tr>
+            <tr>
+              <td><code>creation_date</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>วันที่เริ่มสร้างบัญชี (YYYY-MM-DD)</td>
+            </tr>
+            <tr>
+              <td><code>expiry_date</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>YES</td>
+              <td>-</td>
+              <td>วันที่หมดอายุสัญญา (ถ้ามี)</td>
+            </tr>
+            <tr>
+              <td><code>telephone_pass_code</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>รหัส PIN โทรศัพท์ / พิมพ์งาน</td>
+            </tr>
+            <tr>
+              <td><code>o365_license</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>NO</td>
+              <td>-</td>
+              <td>สิทธิ์ Microsoft 365 License</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <span class="sql-comment">-- 3. เรียกดูข้อมูลกลุ่มสิทธิ์ทั้งหมด (ต้องใช้ Backtick ` ครอบคำว่า groups)</span><br>
-        <span class="sql-keyword">SELECT</span> group_id, group_name, category, description <span
-          class="sql-keyword">FROM</span> `groups`;<br><br>
+        <h4 style="margin-top: 25px; color: var(--slate-900);">2) ตาราง <code>groups</code> (Access Groups Catalog)</h4>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">เก็บรายละเอียดกลุ่มสิทธิ์และหมวดหมู่ (Category)</p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Field Name</th>
+              <th>Data Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>group_id</code></td>
+              <td><code>int (PK)</code></td>
+              <td>รหัสกลุ่มสิทธิ์ (Master ID 101-109 สิทธิ์พิเศษ, 200+ กลุ่มองค์กร)</td>
+            </tr>
+            <tr>
+              <td><code>group_name</code></td>
+              <td><code>varchar(100) UNIQUE</code></td>
+              <td>ชื่อกลุ่มสิทธิ์ (เช่น Internet Level A, VPN Access, IT Department)</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td><code>text</code></td>
+              <td>คำอธิบายรายละเอียดสิทธิ์</td>
+            </tr>
+            <tr>
+              <td><code>is_special</code></td>
+              <td><code>tinyint(1)</code></td>
+              <td>1 = สิทธิ์พิเศษ/Master Group, 0 = กลุ่มองค์กรทั่วไป</td>
+            </tr>
+            <tr>
+              <td><code>category</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>หมวดหมู่สิทธิ์: <code>INTERNET_LEVEL</code>, <code>RESOURCE_ENTITLEMENT</code>, <code>NETWORK_VPN</code>, <code>PRINT_QUOTA</code>, <code>ORGANIZATIONAL</code></td>
+            </tr>
+            <tr>
+              <td><code>badge_color</code></td>
+              <td><code>varchar(100)</code></td>
+              <td>คลาส Tailwind สีป้าย Badge บน UI</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <span class="sql-comment">-- 4. เรียกดูพนักงานพร้อมสิทธิ์กลุ่มที่สังกัด (JOIN Query)</span><br>
-        <span class="sql-keyword">SELECT</span> u.employee_id, u.display_name, u.company, g.group_name, g.category<br>
-        <span class="sql-keyword">FROM</span> users u<br>
-        <span class="sql-keyword">JOIN</span> user_groups ug <span class="sql-keyword">ON</span> u.employee_id =
-        ug.employee_id<br>
-        <span class="sql-keyword">JOIN</span> `groups` g <span class="sql-keyword">ON</span> ug.group_id =
-        g.group_id;<br><br>
+        <h4 style="margin-top: 25px; color: var(--slate-900);">3) ตาราง <code>user_groups</code> (Junction Junction Map Table)</h4>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">เชื่อมโยงความสัมพันธ์ M:N ระหว่างพนักงานและกลุ่มสิทธิ์</p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Field Name</th>
+              <th>Data Type</th>
+              <th>Constraint</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>employee_id</code></td>
+              <td><code>varchar(50)</code></td>
+              <td>FOREIGN KEY -> <code>users(employee_id) ON DELETE CASCADE</code></td>
+            </tr>
+            <tr>
+              <td><code>group_id</code></td>
+              <td><code>int</code></td>
+              <td>FOREIGN KEY -> <code>groups(group_id) ON DELETE CASCADE</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        <span class="sql-comment">-- 5. อัปเดตคอลัมน์ category ให้ตรงตามหมวดหมู่จริง</span><br>
-        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
-          class="sql-string">'INTERNET_LEVEL'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
-          class="sql-keyword">IN</span> (101, 102, 103);<br>
-        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
-          class="sql-string">'RESOURCE_ENTITLEMENT'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
-          class="sql-keyword">IN</span> (104, 105, 106);<br>
-        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
-          class="sql-string">'NETWORK_VPN'</span> <span class="sql-keyword">WHERE</span> `group_id` = 107;<br>
-        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
-          class="sql-string">'PRINT_QUOTA'</span> <span class="sql-keyword">WHERE</span> `group_id` <span
-          class="sql-keyword">IN</span> (108, 109);<br>
-        <span class="sql-keyword">UPDATE</span> `groups` <span class="sql-keyword">SET</span> `category` = <span
-          class="sql-string">'ORGANIZATIONAL'</span> <span class="sql-keyword">WHERE</span> `group_id` &lt; 100 <span
-          class="sql-keyword">OR</span> `category` <span class="sql-keyword">IS NULL</span>;
+      <!-- REST API SPECIFICATION -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box green">🌐</div>
+          <div>
+            <div class="section-title">6. REST API Endpoints Specification</div>
+            <div class="section-sub">อินเทอร์เฟซการสื่อสารระหว่าง Frontend และ Backend Express (<code>server.ts</code>)</div>
+          </div>
+        </div>
+
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint</th>
+              <th>Query / Payload</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill-badge pill-emerald">GET</span></td>
+              <td><code>/api/users</code></td>
+              <td>-</td>
+              <td>ดึงข้อมูลพนักงานทั้งหมด พร้อม JOIN ข้อมูล <code>user_groups</code></td>
+            </tr>
+            <tr>
+              <td><span class="pill-badge pill-emerald">GET</span></td>
+              <td><code>/api/groups</code></td>
+              <td><code>?is_special=true</code></td>
+              <td>ดึงข้อมูลกลุ่มสิทธิ์ทั้งหมด พร้อมป้ายกำกับ Category</td>
+            </tr>
+            <tr>
+              <td><span class="pill-badge pill-emerald">GET</span></td>
+              <td><code>/api/user-groups</code></td>
+              <td>-</td>
+              <td>ดึงข้อมูลจับคู่ความสัมพันธ์ <code>employee_id</code> ➔ <code>group_id</code></td>
+            </tr>
+            <tr>
+              <td><span class="pill-badge pill-sky">POST</span></td>
+              <td><code>/api/db/sync</code></td>
+              <td><code>{ users, groups, userGroups }</code></td>
+              <td>บันทึก/อัปเดตข้อมูลแบบ Atomic Upsert ลงดิสก์ MySQL Server</td>
+            </tr>
+            <tr>
+              <td><span class="pill-badge pill-rose">POST</span></td>
+              <td><code>/api/db/reset</code></td>
+              <td>-</td>
+              <td>ล้างข้อมูลพนักงานทั้งหมดใน MySQL (คงไว้เฉพาะ Master Groups 101-109)</td>
+            </tr>
+            <tr>
+              <td><span class="pill-badge pill-sky">POST</span></td>
+              <td><code>/api/groups</code></td>
+              <td><code>{ group_name, category, ... }</code></td>
+              <td>สร้างกลุ่มสิทธิ์ใหม่ลงในตาราง <code>groups</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DEV CHEAT SHEET & COMMANDS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="icon-box rose">💻</div>
+          <div>
+            <div class="section-title">7. คำสั่งสำหรับนักพัฒนา & SQL Cheat Sheet</div>
+            <div class="section-sub">คำสั่ง CLI สำหรับการพัฒนา และคำสั่ง SQL สำหรับตรวจสอบข้อมูล</div>
+          </div>
+        </div>
+
+        <h4 style="color: var(--slate-900); margin-bottom: 10px;">คำสั่ง Development CLI Commands</h4>
+        <div class="code-box">
+<span class="cm"># 1. รันเซิร์ฟเวอร์พัฒนา (Vite HMR + Express Backend Port 3000)</span>
+npm run dev
+
+<span class="cm"># 2. ตรวจสอบชนิดข้อมูล TypeScript ทั้งโปรเจกต์ (Strict Type Check)</span>
+npx tsc --noEmit
+
+<span class="cm"># 3. บิลด์โปรเจกต์สำหรับ Production</span>
+npm run build
+        </div>
+
+        <h4 style="color: var(--slate-900); margin-top: 20px; margin-bottom: 10px;">คำสั่ง SQL Cheat Sheet สำหรับ MySQL Workbench</h4>
+        <div class="code-box">
+<span class="cm">-- 1. เรียกดูพนักงานพร้อมสิทธิ์ที่สังกัดทั้งหมด (JOIN 3 Tables)</span>
+<span class="kw">USE</span> user_access_dashboard_data;
+
+<span class="kw">SELECT</span> u.employee_id, u.display_name, u.company, u.department, g.group_name, g.category
+<span class="kw">FROM</span> users u
+<span class="kw">JOIN</span> user_groups ug <span class="kw">ON</span> u.employee_id = ug.employee_id
+<span class="kw">JOIN</span> `groups` g <span class="kw">ON</span> ug.group_id = g.group_id
+<span class="kw">ORDER BY</span> u.employee_id;
+
+<span class="cm">-- 2. ตรวจสอบจำนวนพนักงานและกลุ่มสิทธิ์</span>
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_users <span class="kw">FROM</span> users;
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_groups <span class="kw">FROM</span> `groups`;
+<span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_mappings <span class="kw">FROM</span> user_groups;
+        </div>
       </div>
     </div>
 
     <!-- FOOTER -->
     <footer>
-      User Access Management System V2 &bull; Enterprise System Summary Document &bull; Generated Automatically
+      User Access Management Dashboard V4 Clean Architecture &bull; Executive System Summary Report &bull; Documented for Users & Developers
     </footer>
 
   </div>
+
+  <!-- VIEW SWITCHER JAVASCRIPT -->
+  <script>
+    function switchView(viewName) {
+      const userView = document.getElementById('user-view');
+      const devView = document.getElementById('dev-view');
+      const btns = document.querySelectorAll('.tab-btn');
+
+      btns.forEach(btn => btn.classList.remove('active'));
+
+      if (viewName === 'user') {
+        btns[1].classList.add('active');
+        userView.classList.remove('hidden');
+        devView.classList.add('hidden');
+      } else if (viewName === 'dev') {
+        btns[2].classList.add('active');
+        userView.classList.add('hidden');
+        devView.classList.remove('hidden');
+      } else {
+        btns[0].classList.add('active');
+        userView.classList.remove('hidden');
+        devView.classList.remove('hidden');
+      }
+    }
+  </script>
 
 </body>
 

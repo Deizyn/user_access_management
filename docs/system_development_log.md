@@ -317,12 +317,23 @@
 - **การปรับปรุง**: แก้ไขใน [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/SqliteManagerModal.tsx) บรรทัด 191 โดยเปลี่ยนจากการส่ง `binary.buffer` (ซึ่งมี Type เป็น `ArrayBufferLike`) ไปเป็นการส่ง `binary` (`Uint8Array`) เข้า `new Blob([binary], { type: 'application/x-sqlite3' })` โดยตรง เพื่อขจัดข้อผิดพลาด Type Warning ใน VS Code และรองรับ Web Blob Standards 100%
 - **สถานะ**: ขจัดข้อผิดพลาดเส้นใต้แดงใน VS Code เรียบร้อย 100% ✅
 
----
-
-
----
+### 2.61 จัดทำรายงานสรุปการทำงานของระบบ (Project System Summary Report HTML)
+- **การปรับปรุง**:
+  1. สร้างและอัปเดตไฟล์รายงานสรุปภาพรวม [docs/system_summary_report.html](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/system_summary_report.html) ให้มีข้อมูลสรุปการทำงานของโปรเจกต์อย่างครบถ้วน
+  2. จัดแบ่งเนื้อหาอย่างชัดเจนออกเป็น 2 มุมมองหลัก:
+     - **ฝั่งผู้ใช้งาน (User Guide & Admin Features)**: อธิบายฟังก์ชัน Dashboard Analytics, Master User Table, Hybrid Dual-Mode Filtering, User Detail Modal, CSV Bulk Import/Export, และ Group Explorer พร้อมขั้นตอนการใช้งาน (User Workflows)
+     - **ฝั่งนักพัฒนา (Developer & Technical Guide)**: อธิบายสถาปัตยกรรมระบบ Clean Architecture, Active Directory LDAP Data Pipeline, โครงสร้างตารางฐานข้อมูล 3NF (13 Columns `users`), REST API Endpoints Specification, และชุดคำสั่ง Development & SQL Cheat Sheet
+### 2.62 แก้ไขปัญหาปุ่มกดตัวเลือกแสดงคอลัมน์ (Columns Toggle Dropdown) กดเลือกไม่ได้
+- **การปรับปรุง**:
+  1. แก้ไขปัญหาใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) เกิดจาก `handleClickOutside` บน `document` ดักจับทุก Click Event ส่งผลให้การคลิกปุ่ม Columns หรือ Checkbox ภายใน Dropdown สั่งปิด Dropdown ทันที (`setShowColumnDropdown(false)`)
+  2. ผูก `useRef` กับองค์ประกอบ `columnDropdownRef` และปรับปรุง `handleClickOutside` ให้ตรวจเช็ก `columnDropdownRef.current.contains(event.target)` ก่อนสั่งปิด
+  3. เพิ่ม `e.stopPropagation()` บนปุ่มเปิดปิด ปุ่มปิด `X` และรายการ `<label>` / `<input type="checkbox">` ภายใน Dropdown
+  4. ปรับปรุงการอัปเดตสเตต `setVisibleColumns` ให้เป็น Atomic Functional State Update (`prev => ({ ...prev, [key]: !prev[key] })`)
+- **สถานะ**: แก้ไขให้สามารถกดเปิด/ปิด และติ๊กเลือกซ่อน/แสดงคอลัมน์ได้ราบรื่น 100% ✅
 
 ---
 
 ## ⚡ 3. เครื่องมือสำหรับการพัฒนา (Developer Tooling)
 - ติดตั้งและตั้งค่า **Superpowers Antigravity Workflow** ในโฟลเดอร์ `.agents/skills` รองรับการพัฒนาแบบ TDD, Brainstorming, Systematic Debugging และ Subagent Execution
+
+

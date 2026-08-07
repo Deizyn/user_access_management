@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Eye,
   ArrowUpDown,
@@ -89,11 +89,17 @@ export const UserTable: React.FC<UserTableProps> = ({
     }
   }, [totalUsers, totalPages, currentPage]);
 
+  const columnDropdownRef = useRef<HTMLDivElement>(null);
+
   // Close popovers when clicking outside anywhere on the document
   useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenPopoverUserId(null);
-      setShowColumnDropdown(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        columnDropdownRef.current &&
+        !columnDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowColumnDropdown(false);
+      }
     };
     document.addEventListener('click', handleClickOutside);
     return () => {
@@ -148,19 +154,33 @@ export const UserTable: React.FC<UserTableProps> = ({
         {/* Right Toolbar Controls: Columns Toggle */}
         <div className="flex items-center space-x-2">
 
-          <div className="relative">
+          <div className="relative" ref={columnDropdownRef}>
             <button
-              onClick={() => setShowColumnDropdown(!showColumnDropdown)}
-              className="inline-flex items-center px-3 py-1.5 border border-slate-200 text-xs font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowColumnDropdown((prev) => !prev);
+              }}
+              className="inline-flex items-center px-3 py-1.5 border border-slate-200 text-xs font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer select-none"
             >
               <Columns className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
               Columns
             </button>
 
             {showColumnDropdown && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-30 p-2 text-xs space-y-1">
-                <div className="font-bold text-slate-400 px-2 py-1 uppercase tracking-wider text-[10px]">
-                  Toggle Columns (ตั้งค่าคอลัมน์)
+              <div 
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-30 p-2 text-xs space-y-1 select-none animate-in fade-in zoom-in-95 duration-100"
+              >
+                <div className="font-bold text-slate-400 px-2 py-1 uppercase tracking-wider text-[10px] flex items-center justify-between border-b border-slate-100 pb-1 mb-1">
+                  <span>Toggle Columns (ตั้งค่าคอลัมน์)</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowColumnDropdown(false)}
+                    className="text-slate-400 hover:text-slate-600 p-0.5 rounded hover:bg-slate-100 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 {Object.entries({
                   name: 'Name (ชื่อพนักงาน)',
@@ -180,19 +200,21 @@ export const UserTable: React.FC<UserTableProps> = ({
                 }).map(([key, label]) => (
                   <label
                     key={key}
-                    className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer text-slate-800"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-slate-100/80 cursor-pointer text-slate-800 transition-colors"
                   >
                     <span className="font-medium">{label}</span>
                     <input
                       type="checkbox"
-                      checked={visibleColumns[key as keyof typeof visibleColumns]}
-                      onChange={() =>
-                        setVisibleColumns({
-                          ...visibleColumns,
-                          [key]: !visibleColumns[key as keyof typeof visibleColumns],
-                        })
-                      }
-                      className="rounded text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5 cursor-pointer"
+                      checked={!!visibleColumns[key as keyof typeof visibleColumns]}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setVisibleColumns((prev) => ({
+                          ...prev,
+                          [key]: !prev[key as keyof typeof visibleColumns],
+                        }));
+                      }}
+                      className="rounded text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5 cursor-pointer accent-indigo-600"
                     />
                   </label>
                 ))}

@@ -225,3 +225,9 @@
     2. อัปเดต Modal ทั้งหมดใน `src/components/modals/` ให้ใช้ `z-[100]` ยืนยันว่าหน้าต่าง Modal จะแสดงผลทับทุก Dropdown และ Popover ภายในตารางอย่างสะอาดเรียบร้อย 100%
 - **[LOG-071] Fix Blob Constructor Parameter Type in SqliteManagerModal.tsx**:
   - **การปรับปรุง**: แก้ไขการส่งพารามิเตอร์ `new Blob([binary], ...)` จากเดิม `binary.buffer` ใน [SqliteManagerModal.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/modals/SqliteManagerModal.tsx) ให้ส่ง `Uint8Array` โดยตรง ป้องกันการแจ้งเตือน Type Warning เรื่อง `ArrayBufferLike` / `SharedArrayBuffer` ใน VS Code
+- **[LOG-072] Create Comprehensive Interactive System Summary Report HTML**:
+  - **การปรับปรุง**: จัดทำไฟล์เอกสารสรุปการทำงานของโปรเจกต์ [docs/system_summary_report.html](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/docs/system_summary_report.html) รองรับการใช้งานและศึกษาโครงสร้างระบบทั้งฝั่งผู้ใช้งาน (User View) และฝั่งนักพัฒนา (Developer View) พร้อมปุ่ม Interactive Tab Switcher
+- **[LOG-073] Fix Column Toggle Dropdown Clickability & Event Propagation in UserTable.tsx**:
+  - **การปรับปรุง**: แก้ไขปัญหาปุ่มตัวเลือกแสดงคอลัมน์กดไม่ได้ใน [UserTable.tsx](file:///c:/Users/aapico.intern07/Documents/user_management_dashboard/user_management_dashboard_V4/user_access_management/src/components/UserTable.tsx) โดยผูก `useRef` กับ `columnDropdownRef` ป้องกัน `handleClickOutside` สั่งปิดป๊อปอัปเมื่อคลิกภายใน Dropdown พร้อมใส่ `e.stopPropagation()` และ Atomic Functional State Updates ให้ผู้ใช้สามารถเปิด/ปิดและติ๊กเลือกคอลัมน์ได้อย่างถูกต้องเรียบร้อย 100%
+
+
